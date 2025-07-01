@@ -34,8 +34,12 @@ export function AccountsProvider({ children }) {
     ]);
   };
 
+  const updateAccount = (updatedAccount) => {
+    setAccounts(prev => prev.map(account => account.id === updatedAccount.id ? updatedAccount : account));
+  };
+
   return (
-    <AccountsContext.Provider value={{ accounts, addAccount }}>
+    <AccountsContext.Provider value={{ accounts, addAccount, updateAccount }}>
       {children}
     </AccountsContext.Provider>
   );

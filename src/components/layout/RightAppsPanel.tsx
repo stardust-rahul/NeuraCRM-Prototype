@@ -29,9 +29,11 @@ import {
   Palette,
   Megaphone,
   Filter,
+  X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { toast } from "sonner";
 
 function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(" ");
@@ -42,7 +44,6 @@ const modules = [
   {
     name: "Leads",
     icon: TrendingUp,
-    description: "Manage potential customers and prospects",
     count: 7,
     status: "active",
     color: "bg-blue-600",
@@ -52,7 +53,6 @@ const modules = [
   {
     name: "Contacts",
     icon: Users,
-    description: "All your customer and prospect contacts",
     count: 12,
     status: "active",
     color: "bg-indigo-600",
@@ -62,7 +62,6 @@ const modules = [
   {
     name: "Accounts",
     icon: Building2,
-    description: "Manage organizations and companies",
     count: 5,
     status: "active",
     color: "bg-cyan-600",
@@ -72,7 +71,6 @@ const modules = [
   {
     name: "Deals",
     icon: BarChart2,
-    description: "Track sales opportunities and pipelines",
     count: 4,
     status: "active",
     color: "bg-green-600",
@@ -82,7 +80,6 @@ const modules = [
   {
     name: "Opportunities",
     icon: Target,
-    description: "Manage your sales pipeline stages",
     count: 2,
     status: "active",
     color: "bg-teal-600",
@@ -92,7 +89,6 @@ const modules = [
   {
     name: "Tasks",
     icon: ListChecks,
-    description: "Organize and track your to-dos",
     count: 10,
     status: "active",
     color: "bg-yellow-600",
@@ -102,7 +98,6 @@ const modules = [
   {
     name: "Reports",
     icon: PieChart,
-    description: "View analytics, insights and performance",
     count: 2,
     status: "active",
     color: "bg-purple-600",
@@ -112,77 +107,6 @@ const modules = [
   {
     name: "Pipelines",
     icon: Filter,
-    description: "Visualize and manage sales stages",
-    count: 3,
-    status: "active",
-    color: "bg-pink-600",
-    category: "Sales",
-    href: "/pipelines",
-  },
-  {
-    name: "Pipelines",
-    icon: Filter,
-    description: "Visualize and manage sales stages",
-    count: 3,
-    status: "active",
-    color: "bg-pink-600",
-    category: "Sales",
-    href: "/pipelines",
-  },
-  {
-    name: "Pipelines",
-    icon: Filter,
-    description: "Visualize and manage sales stages",
-    count: 3,
-    status: "active",
-    color: "bg-pink-600",
-    category: "Sales",
-    href: "/pipelines",
-  },
-  {
-    name: "Pipelines",
-    icon: Filter,
-    description: "Visualize and manage sales stages",
-    count: 3,
-    status: "active",
-    color: "bg-pink-600",
-    category: "Sales",
-    href: "/pipelines",
-  },
-  {
-    name: "Pipelines",
-    icon: Filter,
-    description: "Visualize and manage sales stages",
-    count: 3,
-    status: "active",
-    color: "bg-pink-600",
-    category: "Sales",
-    href: "/pipelines",
-  },
-  {
-    name: "Pipelines",
-    icon: Filter,
-    description: "Visualize and manage sales stages",
-    count: 3,
-    status: "active",
-    color: "bg-pink-600",
-    category: "Sales",
-    href: "/pipelines",
-  },
-  {
-    name: "Pipelines",
-    icon: Filter,
-    description: "Visualize and manage sales stages",
-    count: 3,
-    status: "active",
-    color: "bg-pink-600",
-    category: "Sales",
-    href: "/pipelines",
-  },
-  {
-    name: "Pipelines",
-    icon: Filter,
-    description: "Visualize and manage sales stages",
     count: 3,
     status: "active",
     color: "bg-pink-600",
@@ -196,7 +120,6 @@ const apps = [
   {
     name: "Marketing",
     icon: Megaphone,
-    description: "Campaign management and automation",
     count: 8,
     status: "active",
     color: "bg-purple-500",
@@ -206,7 +129,6 @@ const apps = [
   {
     name: "Sales",
     icon: DollarSign,
-    description: "Sales process and forecasting tools",
     count: 6,
     status: "active",
     color: "bg-green-500",
@@ -216,7 +138,6 @@ const apps = [
   {
     name: "Email",
     icon: Mail,
-    description: "Unified inbox and email management",
     count: 12,
     status: "active",
     color: "bg-blue-500",
@@ -226,7 +147,6 @@ const apps = [
   {
     name: "Chat",
     icon: MessageSquare,
-    description: "Team messaging and collaboration",
     count: 3,
     status: "active",
     color: "bg-emerald-500",
@@ -236,7 +156,6 @@ const apps = [
   {
     name: "VoIP",
     icon: Phone,
-    description: "Business calls and telephony",
     count: 2,
     status: "busy",
     color: "bg-orange-500",
@@ -246,7 +165,6 @@ const apps = [
   {
     name: "Calendar",
     icon: Calendar,
-    description: "Schedule events and meetings",
     count: 5,
     status: "active",
     color: "bg-violet-500",
@@ -256,7 +174,6 @@ const apps = [
   {
     name: "Automation",
     icon: Zap,
-    description: "Workflow automation engine",
     count: 8,
     status: "active",
     color: "bg-amber-500",
@@ -266,7 +183,6 @@ const apps = [
   {
     name: "E-commerce",
     icon: ShoppingCart,
-    description: "Online store management",
     count: 4,
     status: "active",
     color: "bg-rose-500",
@@ -276,7 +192,6 @@ const apps = [
   {
     name: "Support",
     icon: Headphones,
-    description: "Customer support and helpdesk",
     count: 3,
     status: "active",
     color: "bg-sky-500",
@@ -286,7 +201,6 @@ const apps = [
   {
     name: "Design",
     icon: Palette,
-    description: "Creative tools and design assets",
     count: 2,
     status: "active",
     color: "bg-fuchsia-500",
@@ -324,29 +238,33 @@ const recentActivities = [
     icon: Zap,
     category: "Sales",
   },
-  ];
+];
 
 interface RightAppsPanelProps {
   apps?: Array<any>;
   onAddApp?: (app: any) => void;
+  addedItems?: Set<string>;
 }
 
-export default function RightAppsPanel({ apps: propApps, onAddApp }: RightAppsPanelProps) {
+export default function RightAppsPanel({ apps: propApps, onAddApp, addedItems = new Set() }: RightAppsPanelProps) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState<'modules' | 'apps'>("modules");
 
-  let filteredModules: typeof modules = [];
-  let filteredApps: typeof apps = [];
-  if (activeTab === "modules") {
-    filteredModules = modules.filter(module =>
-      module.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  } else if (activeTab === "apps") {
-    filteredApps = apps.filter(app =>
-      app.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }
+  const toggleItem = (item: { name: string }) => {
+    onAddApp?.(item);
+  };
+
+  const availableModules = modules.filter(module => !addedItems.has(module.name));
+  const availableApps = propApps.filter(app => !addedItems.has(app.name));
+
+  const filteredModules = availableModules.filter(module =>
+    module.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  const filteredApps = availableApps.filter(app =>
+    app.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="w-80 bg-card border-l border-border flex flex-col -ml-1 h-screen">
@@ -359,6 +277,7 @@ export default function RightAppsPanel({ apps: propApps, onAddApp }: RightAppsPa
           </Button>
         </div>
       </div>
+      
       {/* Tabs */}
       <div className="flex-shrink-0 px-4 pt-2">
         <Tabs value={activeTab} onValueChange={(v: 'modules' | 'apps') => setActiveTab(v)} className="w-full">
@@ -372,7 +291,8 @@ export default function RightAppsPanel({ apps: propApps, onAddApp }: RightAppsPa
           </TabsList>
         </Tabs>
       </div>
-      {/* Search Bar - now below tabs */}
+      
+      {/* Search Bar */}
       <div className="flex-shrink-0 px-4 pt-2">
         <OutlinedInput
           size="small"
@@ -387,140 +307,66 @@ export default function RightAppsPanel({ apps: propApps, onAddApp }: RightAppsPa
           sx={{ width: '100%', mb: 2 }}
         />
       </div>
-      {/* Main content: tab panel + recent activity */}
+      
+      {/* Main content */}
       <div className="flex-1 flex flex-col min-h-0">
-        <Tabs value={activeTab} className="w-full h-full">
-          {/* Only render the active tab's content */}
-          {activeTab === "modules" && (
-            <div className="mt-0 h-full flex flex-col min-h-0">
-              <div className="p-4 flex flex-col min-h-0 h-full">
-                {/* <div className="mb-4">
-                  <h3 className="text-sm font-semibold text-foreground mb-2">
-                    Business Modules ({filteredModules.length})
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    Core business entities and data management
-                  </p>
-                </div> */}
-                <div className="space-y-2 flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-blue-200 scrollbar-track-transparent">
-                  {filteredModules.map((module) => (
-                    <div
-                      key={module.name}
-                      className="bg-white rounded-lg shadow-sm border border-border/40 p-2 flex flex-col gap-1 transition hover:shadow-md"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className={cn("w-7 h-7 rounded-md flex items-center justify-center", module.color)}>
-                            <module.icon className="w-4 h-4 text-white" />
-                          </div>
-                          <span className="font-semibold text-sm text-foreground">{module.name}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0.5 font-medium rounded-full border border-border/60 bg-muted/60 text-foreground/80">
-                            {module.category}
-                          </Badge>
-                          <button
-                            className="ml-1 p-0.5 rounded-full hover:bg-muted transition-colors border border-border/60"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onAddApp?.(module);
-                            }}
-                            title="Add to Navigation"
-                          >
-                            <Plus className="w-3 h-3 text-primary" />
-                          </button>
-                        </div>
+        <div className="p-4 flex flex-col min-h-0 h-full">
+          <div className="space-y-2 flex-1 min-h-0 overflow-y-auto pr-1">
+            {activeTab === "modules" ? (
+              filteredModules.length > 0 ? (
+                filteredModules.map((module) => (
+                  <div
+                    key={module.name}
+                    className="bg-white rounded-lg shadow-sm border border-border/40 p-3 flex items-center justify-between hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={cn("w-8 h-8 rounded-md flex items-center justify-center", module.color)}>
+                        <module.icon className="w-4 h-4 text-white" />
                       </div>
+                      <span className="font-medium text-sm">{module.name}</span>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-          {activeTab === "apps" && (
-            <div className="mt-0 h-full flex flex-col min-h-0">
-              <div className="p-4 flex flex-col min-h-0 h-full">
-                {/* <div className="mb-4">
-                  <h3 className="text-sm font-semibold text-foreground mb-2">
-                    Business Applications ({filteredApps.length})
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    Tools and integrations for business operations
-                  </p>
-                </div> */}
-                <div className="space-y-2 flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-blue-200 scrollbar-track-transparent">
-                  {filteredApps.map((app) => (
-                    <div
-                      key={app.name}
-                      className="bg-white rounded-lg shadow-sm border border-border/40 p-2 flex flex-col gap-1 transition hover:shadow-md"
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs px-2"
+                      onClick={() => toggleItem(module)}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className={cn("w-7 h-7 rounded-md flex items-center justify-center", app.color)}>
-                            <app.icon className="w-4 h-4 text-white" />
-                          </div>
-                          <span className="font-semibold text-sm text-foreground">{app.name}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0.5 font-medium rounded-full border border-border/60 bg-muted/60 text-foreground/80">
-                            {app.category}
-                          </Badge>
-                          <button
-                            className="ml-1 p-0.5 rounded-full hover:bg-muted transition-colors border border-border/60"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onAddApp?.(app);
-                            }}
-                            title="Add to Navigation"
-                          >
-                            <Plus className="w-3 h-3 text-primary" />
-                          </button>
-                        </div>
-                      </div>
+                      {addedItems.has(module.name) ? 'Added' : 'Add'}
+                    </Button>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-4 text-muted-foreground text-sm">
+                  {searchTerm ? 'No matching modules found' : 'All modules have been added'}
+                </div>
+              )
+            ) : filteredApps.length > 0 ? (
+              filteredApps.map((app) => (
+                <div
+                  key={app.name}
+                  className="bg-white rounded-lg shadow-sm border border-border/40 p-3 flex items-center justify-between hover:shadow-md transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={cn("w-8 h-8 rounded-md flex items-center justify-center", app.color)}>
+                      <app.icon className="w-4 h-4 text-white" />
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </Tabs>
-        {/* Recent Activity Section - always at the bottom */}
-        <div className="p-4 border-t border-border flex-shrink-0">
-          <div className="mb-3">
-            <h3 className="text-sm font-semibold text-foreground">
-              Recent Activity
-            </h3>
-            <p className="text-xs text-muted-foreground">
-              Latest updates across your workspace
-            </p>
-          </div>
-          <div className="space-y-3">
-            {recentActivities.map((activity, index) => (
-              <div key={index} className="flex items-start space-x-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                  <activity.icon className="w-4 h-4 text-muted-foreground" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-sm font-medium text-foreground">
-                      {activity.action}
-                    </p>
-                    <Badge variant="outline" className="text-xs">
-                      {activity.category}
-                    </Badge>
+                    <span className="font-medium text-sm">{app.name}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground mb-1">
-                    {activity.target}
-                  </p>
-                  <div className="flex items-center">
-                    <Clock className="w-3 h-3 text-muted-foreground mr-1" />
-                    <span className="text-xs text-muted-foreground">
-                      {activity.time}
-                    </span>
-                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs px-2"
+                    onClick={() => toggleItem(app)}
+                  >
+                    {addedItems.has(app.name) ? 'Added' : 'Add'}
+                  </Button>
                 </div>
+              ))
+            ) : (
+              <div className="text-center py-4 text-muted-foreground text-sm">
+                {searchTerm ? 'No matching apps found' : 'All apps have been added'}
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

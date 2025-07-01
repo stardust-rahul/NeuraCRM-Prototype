@@ -202,7 +202,7 @@ export default function Accounts() {
             </TableHeader>
             <TableBody>
               {filteredAccounts.map((account, idx) => (
-                <TableRow key={account.id} className="border-b hover:bg-muted/30 text-sm">
+                <TableRow key={account.id || account.name + idx} className="border-b hover:bg-muted/30 text-sm">
                   <TableCell className="px-2 py-1"><input type="checkbox" /></TableCell>
                   <TableCell className="px-2 py-1 text-muted-foreground">{idx + 1}</TableCell>
                   <TableCell className="px-2 py-1 font-medium">
@@ -210,18 +210,22 @@ export default function Accounts() {
                   </TableCell>
                   <TableCell className="px-2 py-1">{account.industry}</TableCell>
                   <TableCell className="px-2 py-1">
-                    <a
-                      href={
-                        account.website.startsWith("http://") || account.website.startsWith("https://")
-                          ? account.website
-                          : `http://${account.website}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      {account.website}
-                    </a>
+                    {account.website ? (
+                      <a
+                        href={
+                          account.website.startsWith("http://") || account.website.startsWith("https://")
+                            ? account.website
+                            : `http://${account.website}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        {account.website}
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground">No website</span>
+                    )}
                   </TableCell>
                   <TableCell className="px-2 py-1">{account.owner}</TableCell>
                   <TableCell className="px-2 py-1">{account.created}</TableCell>

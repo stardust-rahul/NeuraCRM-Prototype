@@ -21,12 +21,15 @@ import {
 import { useParams } from "react-router-dom";
 import { useAccounts } from "@/context/AccountsContext";
 import { useContacts } from "@/context/ContactsContext";
-import { initialOpportunities } from "./Opportunities";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { useOpportunities } from "@/context/OpportunitiesContext";
+import { useState } from "react";
 
 export default function AccountDetail() {
   const { accountId } = useParams();
-  const { accounts } = useAccounts();
-  const { contacts } = useContacts();
+  const { accounts, updateAccount } = useAccounts();
+  const { contacts, addContact } = useContacts();
+  const { addOpportunity, opportunities } = useOpportunities();
 
   // For now, we'll find the account from the context.
   // In a real app, you'd likely fetch this from an API.
@@ -50,9 +53,38 @@ export default function AccountDetail() {
   const accountContacts = contacts.filter(contact => contact.account === accountToShow?.name);
 
   // Find related opportunities for this account
-  const relatedOpportunities = (initialOpportunities || []).filter(
+  const relatedOpportunities = (opportunities || []).filter(
     (opp) => opp.account === accountToShow?.name
   );
+
+  // Modal state
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [showOpportunityModal, setShowOpportunityModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  // Form state
+  const [contactForm, setContactForm] = useState({ name: '', email: '', phone: '', title: '', account: accountToShow?.name || '', owner: accountToShow?.owner || '' });
+  const [opportunityForm, setOpportunityForm] = useState({ title: '', stage: '', closeDate: '', account: accountToShow?.name || '' });
+  const [editForm, setEditForm] = useState(accountToShow ? { ...accountToShow } : { name: '', owner: '', industry: '', website: '', id: '' });
+
+  // Handlers
+  const handleAddContact = (e) => {
+    e.preventDefault();
+    addContact(contactForm);
+    setShowContactModal(false);
+    setContactForm({ name: '', email: '', phone: '', title: '', account: accountToShow?.name || '', owner: accountToShow?.owner || '' });
+  };
+  const handleAddOpportunity = (e) => {
+    e.preventDefault();
+    addOpportunity(opportunityForm);
+    setShowOpportunityModal(false);
+    setOpportunityForm({ title: '', stage: '', closeDate: '', account: accountToShow?.name || '' });
+  };
+  const handleEditAccount = (e) => {
+    e.preventDefault();
+    updateAccount(editForm);
+    setShowEditModal(false);
+  };
 
   if (!accountToShow) {
     return <div>Account not found</div>;
@@ -70,9 +102,9 @@ export default function AccountDetail() {
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <Button variant="outline">New Contact</Button>
-          <Button variant="outline">New Opportunity</Button>
-          <Button variant="default">
+          <Button variant="outline" onClick={() => setShowContactModal(true)}>New Contact</Button>
+          <Button variant="outline" onClick={() => setShowOpportunityModal(true)}>New Opportunity</Button>
+          <Button variant="default" onClick={() => setShowEditModal(true)}>
             Edit
             <ChevronDown className="w-4 h-4 ml-2" />
           </Button>
@@ -240,6 +272,58 @@ export default function AccountDetail() {
           </Card>
         </div>
       </div>
+
+      {/* Modals */}
+      <Dialog open={showContactModal} onOpenChange={setShowContactModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>New Contact</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleAddContact} className="space-y-4">
+            <input className="w-full border p-2 rounded" placeholder="Name" value={contactForm.name} onChange={e => setContactForm(f => ({ ...f, name: e.target.value }))} required />
+            <input className="w-full border p-2 rounded" placeholder="Email" value={contactForm.email} onChange={e => setContactForm(f => ({ ...f, email: e.target.value }))} required />
+            <input className="w-full border p-2 rounded" placeholder="Phone" value={contactForm.phone} onChange={e => setContactForm(f => ({ ...f, phone: e.target.value }))} required />
+            <input className="w-full border p-2 rounded" placeholder="Title" value={contactForm.title} onChange={e => setContactForm(f => ({ ...f, title: e.target.value }))} />
+            <DialogFooter>
+              <Button type="submit">Add Contact</Button>
+              <DialogClose asChild><Button variant="outline" type="button">Cancel</Button></DialogClose>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showOpportunityModal} onOpenChange={setShowOpportunityModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>New Opportunity</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleAddOpportunity} className="space-y-4">
+            <input className="w-full border p-2 rounded" placeholder="Title" value={opportunityForm.title} onChange={e => setOpportunityForm(f => ({ ...f, title: e.target.value }))} required />
+            <input className="w-full border p-2 rounded" placeholder="Stage" value={opportunityForm.stage} onChange={e => setOpportunityForm(f => ({ ...f, stage: e.target.value }))} required />
+            <input className="w-full border p-2 rounded" placeholder="Close Date" value={opportunityForm.closeDate} onChange={e => setOpportunityForm(f => ({ ...f, closeDate: e.target.value }))} required />
+            <DialogFooter>
+              <Button type="submit">Add Opportunity</Button>
+              <DialogClose asChild><Button variant="outline" type="button">Cancel</Button></DialogClose>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Account</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditAccount} className="space-y-4">
+            <input className="w-full border p-2 rounded" placeholder="Name" value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} required />
+            <input className="w-full border p-2 rounded" placeholder="Owner" value={editForm.owner} onChange={e => setEditForm(f => ({ ...f, owner: e.target.value }))} required />
+            <input className="w-full border p-2 rounded" placeholder="Industry" value={editForm.industry} onChange={e => setEditForm(f => ({ ...f, industry: e.target.value }))} />
+            <input className="w-full border p-2 rounded" placeholder="Website" value={editForm.website} onChange={e => setEditForm(f => ({ ...f, website: e.target.value }))} />
+            <DialogFooter>
+              <Button type="submit">Save Changes</Button>
+              <DialogClose asChild><Button variant="outline" type="button">Cancel</Button></DialogClose>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 } 

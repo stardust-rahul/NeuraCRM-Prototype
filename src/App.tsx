@@ -40,6 +40,7 @@ import { ContactsProvider } from "./context/ContactsContext";
 import Pricing from "./pages/Pricing";
 import Opportunities from "./pages/Opportunities";
 import OpportunityDetail from "./pages/OpportunityDetail";
+import { OpportunitiesProvider } from "./context/OpportunitiesContext";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
       <AccountsProvider>
         <ContactsProvider>
       <LeadsProvider>
+      <OpportunitiesProvider>
         <BrowserRouter>
           <Routes>
                 {/* Routes */}
@@ -98,6 +100,7 @@ const App = () => (
                 } />
           </Routes>
         </BrowserRouter>
+      </OpportunitiesProvider>
       </LeadsProvider>
         </ContactsProvider>
       </AccountsProvider>
