@@ -64,6 +64,8 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import LeadsList from "@/components/LeadsList";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Contacts from "@/pages/Contacts";
+import { OpportunitiesList, initialOpportunities as sharedInitialOpportunities } from "./Opportunities";
+import { useOpportunities } from "@/context/OpportunitiesContext";
 
 const salesMetrics = [
   {
@@ -122,29 +124,6 @@ const initialLeads = [
     owner: "Mike Chen",
     tags: ["SMB", "Follow-up"],
     lastContact: "1 week ago",
-  },
-];
-
-const initialOpportunities = [
-  {
-    id: "O-001",
-    title: "Enterprise Software License",
-    company: "Global Corp",
-    value: "$125,000",
-    stage: "negotiation",
-    probability: 85,
-    closeDate: "2025-02-15",
-    owner: "Sarah Johnson",
-  },
-  {
-    id: "O-002",
-    title: "CRM Implementation",
-    company: "StartupX",
-    value: "$45,000",
-    stage: "proposal",
-    probability: 60,
-    closeDate: "2025-03-01",
-    owner: "Mike Chen",
   },
 ];
 
@@ -321,10 +300,11 @@ export default function Sales({ defaultTab = "analytics" }) {
     created: "",
     shipment: "pending",
   });
-  const [opportunities, setOpportunities] = useState(initialOpportunities);
+  const { opportunities, addOpportunity, removeOpportunity, updateOpportunity } = useOpportunities();
   const [showOpportunityForm, setShowOpportunityForm] = useState(false);
   const [editingOpportunity, setEditingOpportunity] = useState(null);
   const [newOpportunity, setNewOpportunity] = useState({
+    id: "",
     title: "",
     company: "",
     value: "",
@@ -332,6 +312,8 @@ export default function Sales({ defaultTab = "analytics" }) {
     probability: 0,
     closeDate: "",
     owner: "",
+    notes: "",
+    created: "",
   });
   const [products, setProducts] = useState(initialProducts);
   const [showProductForm, setShowProductForm] = useState(false);
@@ -574,28 +556,16 @@ export default function Sales({ defaultTab = "analytics" }) {
   const handleAddOpportunity = (e) => {
     e.preventDefault();
     if (editingOpportunity) {
-      setOpportunities((prev) =>
-        prev.map((opp) =>
-          opp.id === editingOpportunity.id
-            ? { ...opp, ...newOpportunity, probability: Number(newOpportunity.probability) }
-            : opp
-        )
-      );
+      updateOpportunity({ ...editingOpportunity, ...newOpportunity, probability: Number(newOpportunity.probability) });
       toast({ title: "Opportunity updated", description: `Opportunity '${newOpportunity.title}' updated successfully!` });
     } else {
-      setOpportunities((prev) => [
-        {
-          ...newOpportunity,
-          id: `O-${(prev.length + 1).toString().padStart(3, "0")}`,
-          probability: Number(newOpportunity.probability),
-        },
-        ...prev,
-      ]);
+      addOpportunity(newOpportunity);
       toast({ title: "Opportunity added", description: `Opportunity '${newOpportunity.title}' added successfully!` });
     }
     setShowOpportunityForm(false);
     setEditingOpportunity(null);
     setNewOpportunity({
+      id: "",
       title: "",
       company: "",
       value: "",
@@ -603,26 +573,35 @@ export default function Sales({ defaultTab = "analytics" }) {
       probability: 0,
       closeDate: "",
       owner: "",
+      notes: "",
+      created: "",
     });
   };
 
   const handleEditOpportunity = (opp) => {
     setEditingOpportunity(opp);
-    setNewOpportunity({ ...opp });
+    setNewOpportunity({
+      id: opp.id || "",
+      title: opp.title || "",
+      company: opp.company || "",
+      value: opp.value || "",
+      stage: opp.stage || "prospect",
+      probability: opp.probability || 0,
+      closeDate: opp.closeDate || "",
+      owner: opp.owner || "",
+      notes: opp.notes || "",
+      created: opp.created || "",
+    });
     setShowOpportunityForm(true);
   };
 
   const handleDeleteOpportunity = (id) => {
-    setOpportunities((prev) => prev.filter((opp) => opp.id !== id));
+    removeOpportunity(id);
     toast({ title: "Opportunity deleted", description: `Opportunity deleted successfully!` });
   };
 
   const handleStageChange = (id, newStage) => {
-    setOpportunities((prev) =>
-      prev.map((opp) =>
-        opp.id === id ? { ...opp, stage: newStage } : opp
-      )
-    );
+    updateOpportunity({ ...opportunities.find(opp => opp.id === id), stage: newStage });
     toast({ title: "Stage changed", description: `Opportunity moved to '${newStage.charAt(0).toUpperCase() + newStage.slice(1)}' stage.` });
   };
 
@@ -1246,118 +1225,13 @@ export default function Sales({ defaultTab = "analytics" }) {
 
         {/* Opportunities Pipeline */}
         <TabsContent value="opportunities" className="space-y-6">
-          {/* Add/Edit Opportunity Modal */}
-          <Dialog open={showOpportunityForm} onOpenChange={setShowOpportunityForm}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{editingOpportunity ? "Edit Opportunity" : "Add Opportunity"}</DialogTitle>
-                <DialogDescription>
-                  Enter details for a new opportunity.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleAddOpportunity} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="opp-title">Title</Label>
-                    <Input id="opp-title" name="title" value={newOpportunity.title} onChange={handleOpportunityInput} required />
-                  </div>
-                  <div>
-                    <Label htmlFor="opp-company">Company</Label>
-                    <Input id="opp-company" name="company" value={newOpportunity.company} onChange={handleOpportunityInput} required />
-                  </div>
-                  <div>
-                    <Label htmlFor="opp-value">Value</Label>
-                    <Input id="opp-value" name="value" value={newOpportunity.value} onChange={handleOpportunityInput} required />
-                  </div>
-                  <div>
-                    <Label htmlFor="opp-stage">Stage</Label>
-                    <select id="opp-stage" name="stage" value={newOpportunity.stage} onChange={handleOpportunityInput} className="w-full border rounded px-2 py-1">
-                      <option value="prospect">Prospect</option>
-                      <option value="qualified">Qualified</option>
-                      <option value="proposal">Proposal</option>
-                      <option value="negotiation">Negotiation</option>
-                    </select>
-                  </div>
-                  <div>
-                    <Label htmlFor="opp-probability">Probability (%)</Label>
-                    <Input id="opp-probability" name="probability" value={newOpportunity.probability} onChange={handleOpportunityInput} type="number" min="0" max="100" required />
-                  </div>
-                  <div>
-                    <Label htmlFor="opp-closeDate">Close Date</Label>
-                    <Input id="opp-closeDate" name="closeDate" value={newOpportunity.closeDate} onChange={handleOpportunityInput} type="date" />
-                  </div>
-                  <div>
-                    <Label htmlFor="opp-owner">Owner</Label>
-                    <Input id="opp-owner" name="owner" value={newOpportunity.owner} onChange={handleOpportunityInput} required />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit">{editingOpportunity ? "Update Opportunity" : "Add Opportunity"}</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-          {/* Opportunities Table */}
-          <div className="flex items-center justify-between px-2 py-2">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold">Opportunities</h1>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button onClick={() => { setShowOpportunityForm(true); setEditingOpportunity(null); }}> <Plus className="w-4 h-4 mr-2" /> New Opportunity </Button>
-            </div>
-          </div>
-          <div className="overflow-x-auto rounded border border-border/50 bg-white">
-            <table className="min-w-full divide-y divide-border">
-              <thead>
-                <tr>
-                  <th className="p-2 text-left">#</th>
-                  <th className="p-2 text-left">Title</th>
-                  <th className="p-2 text-left">Company</th>
-                  <th className="p-2 text-left">Value</th>
-                  <th className="p-2 text-left">Stage</th>
-                  <th className="p-2 text-left">Probability</th>
-                  <th className="p-2 text-left">Close Date</th>
-                  <th className="p-2 text-left">Owner</th>
-                  <th className="p-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(opportunities || []).map((opp, idx) => (
-                  <tr key={opp.id || idx} className="border-b hover:bg-muted/30">
-                    <td className="p-2">{idx + 1}</td>
-                    <td className="p-2 font-medium">{opp.title}</td>
-                    <td className="p-2">{opp.company}</td>
-                    <td className="p-2">{opp.value}</td>
-                    <td className="p-2 capitalize">{opp.stage}</td>
-                    <td className="p-2">{opp.probability}%</td>
-                    <td className="p-2">{opp.closeDate}</td>
-                    <td className="p-2">{opp.owner}</td>
-                    <td className="p-2">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => { /* Optionally implement view details modal */ }}>
-                            <Eye className="w-4 h-4 mr-2" /> View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => { setEditingOpportunity({ ...opp }); setNewOpportunity({ ...opp }); setShowOpportunityForm(true); }}>
-                            <Edit className="w-4 h-4 mr-2" /> Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDeleteOpportunity(opp.id)}>
-                            <Trash className="w-4 h-4 mr-2" /> Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <OpportunitiesList
+            opportunities={opportunities}
+            onSelect={() => {}}
+            onAddOpportunity={addOpportunity}
+            accounts={[]}
+            contacts={[]}
+          />
         </TabsContent>
 
         {/* Quotes */}

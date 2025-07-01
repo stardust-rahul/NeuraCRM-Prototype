@@ -30,6 +30,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { useOpportunities } from "@/context/OpportunitiesContext";
 
 const InfoRow = ({ icon: Icon, label, value, isLink = false }) => (
   <div>
@@ -438,6 +439,8 @@ function OpportunitiesList({ opportunities, onSelect, onAddOpportunity, accounts
   );
 }
 
+export { OpportunitiesList };
+
 function OpportunityDetailView({ opportunity, onBack, contacts }) {
   // Stages for the progress bar
   const stages = [
@@ -590,37 +593,17 @@ function OpportunityDetailView({ opportunity, onBack, contacts }) {
 }
 
 export default function OpportunitiesPage() {
-  const [opportunities, setOpportunities] = useState(initialOpportunities);
+  const { opportunities, addOpportunity } = useOpportunities();
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
-  const [accounts, setAccounts] = useState([
-    ...Array.from(new Set(initialOpportunities.map(o => o.account)))
-  ]);
-  const [contacts, setContacts] = useState(["Ankit Chandan"]);
-  const [contactsByAccount, setContactsByAccount] = useState({
-    "Amazon India": ["Ankit Chandan"],
-    // ...other accounts if needed
-  });
-
-  const handleAddOpportunity = (opp, newAccount, newContact) => {
-    setOpportunities(prev => [opp, ...prev]);
-    if (newAccount && !accounts.includes(newAccount)) setAccounts(prev => [newAccount, ...prev]);
-    if (newContact && newAccount) {
-      setContactsByAccount(prev => ({
-        ...prev,
-        [newAccount]: prev[newAccount] ? [...prev[newAccount], newContact] : [newContact]
-      }));
-    }
-  };
 
   if (selectedOpportunity) {
-    const accountContacts = contactsByAccount[selectedOpportunity.account] || [];
     return (
       <OpportunityDetailView
         opportunity={selectedOpportunity}
         onBack={() => setSelectedOpportunity(null)}
-        contacts={accountContacts}
+        contacts={[]}
       />
     );
   }
-  return <OpportunitiesList opportunities={opportunities} onSelect={setSelectedOpportunity} onAddOpportunity={handleAddOpportunity} accounts={accounts} contacts={contactsByAccount[opportunities[0].account] || []} />;
+  return <OpportunitiesList opportunities={opportunities} onSelect={setSelectedOpportunity} onAddOpportunity={addOpportunity} accounts={[]} contacts={[]} />;
 } 
