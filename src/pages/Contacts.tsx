@@ -93,44 +93,42 @@ export default function Contacts() {
         </div>
       </div>
 
-      <div className="px-4 py-4">
-        <div className="overflow-x-auto rounded border border-border/50 bg-white">
-          <Table>
+      <div className="px-8 py-8">
+        <div className="overflow-x-auto rounded border border-border/50 bg-white shadow-sm">
+          <Table className="min-w-full border-separate border-spacing-0">
             <TableHeader>
-              <TableRow className="bg-gray-50 hover:bg-gray-50">
-                <TableHead className="w-[40px] px-2">
-                  <input type="checkbox" />
-                </TableHead>
-                <TableHead className="w-[50px] px-2">#</TableHead>
-                <TableHead className="px-2 py-2">Name</TableHead>
-                <TableHead className="px-2 py-2">Email</TableHead>
-                <TableHead className="px-2 py-2">Phone</TableHead>
-                <TableHead className="px-2 py-2">Account</TableHead>
-                <TableHead className="px-2 py-2">Last Contact</TableHead>
-                <TableHead className="px-2 py-2">Status</TableHead>
-                <TableHead className="text-right px-2 py-2">Actions</TableHead>
+              <TableRow className="bg-gray-100 hover:bg-gray-100 border-b border-gray-300">
+                <TableHead className="w-[40px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100"> <input type="checkbox" /> </TableHead>
+                <TableHead className="w-[50px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">#</TableHead>
+                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Name</TableHead>
+                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Email</TableHead>
+                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Phone</TableHead>
+                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Account</TableHead>
+                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Last Contact</TableHead>
+                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Status</TableHead>
+                <TableHead className="text-right px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredContacts.map((contact, idx) => (
-                <TableRow key={contact.id || idx} className="border-b hover:bg-muted/30 text-sm">
-                  <TableCell className="px-2 py-1">
+                <TableRow key={contact.id || idx} className="border-b border-gray-300 text-sm group hover:bg-blue-50 transition-colors">
+                  <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
                     <input type="checkbox" />
                   </TableCell>
-                  <TableCell className="px-2 py-1 text-muted-foreground">{idx + 1}</TableCell>
-                  <TableCell className="px-2 py-1 font-medium">
+                  <TableCell className="px-2 py-1 text-muted-foreground border-r border-gray-200 bg-white group-hover:bg-blue-50">{idx + 1}</TableCell>
+                  <TableCell className="px-2 py-1 font-medium border-r border-gray-200 bg-white group-hover:bg-blue-50">
                     <Link to={`/contacts/${contact.id}`} className="text-blue-600 hover:underline">
                       {contact.name}
                     </Link>
                   </TableCell>
-                  <TableCell className="px-2 py-1">{contact.email}</TableCell>
-                  <TableCell className="px-2 py-1">{contact.phone}</TableCell>
-                  <TableCell className="px-2 py-1 font-bold">{contact.account}</TableCell>
-                  <TableCell className="px-2 py-1">{contact.lastContact || 'N/A'}</TableCell>
-                  <TableCell className="px-2 py-1">
+                  <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{contact.email}</TableCell>
+                  <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{contact.phone}</TableCell>
+                  <TableCell className="px-2 py-1 font-bold border-r border-gray-200 bg-white group-hover:bg-blue-50">{contact.account}</TableCell>
+                  <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{contact.lastContact || 'N/A'}</TableCell>
+                  <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
                     <Badge variant={contact.status === 'active' ? 'default' : 'secondary'}>{contact.status || 'unknown'}</Badge>
                   </TableCell>
-                  <TableCell className="px-2 py-1 text-right">
+                  <TableCell className="px-2 py-1 text-right bg-white group-hover:bg-blue-50">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">
