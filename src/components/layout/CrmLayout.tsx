@@ -21,128 +21,49 @@ import { LeadsProvider } from "@/context/LeadsContext";
 interface CrmLayoutProps {
   children: ReactNode;
 }
-
+const MODULE_NAMES = [
+  "Leads",
+  "Contacts",
+  "Accounts",
+  "Deals",
+  "Opportunities",
+  "Tasks",
+  "Reports",
+  "Pipelines"
+];
+const APP_NAMES = [
+  "Dashboard",
+  "Sales",
+  "Marketing",
+  "Email",
+  "Chat",
+  "VoIP"
+];
 const initialApps = [
-  {
-    name: "Leads",
-    icon: TrendingUp,
-    description: "Manage potential customers",
-    href: "/leads",
-    count: 7,
-    status: "active",
-    color: "bg-blue-600",
-  },
-  {
-    name: "Deals",
-    icon: BarChart2,
-    description: "Track sales opportunities",
-    href: "/deals",
-    count: 4,
-    status: "active",
-    color: "bg-green-600",
-  },
-  {
-    name: "Tasks",
-    icon: ListChecks,
-    description: "Organize your to-dos",
-    href: "/tasks",
-    count: 10,
-    status: "active",
-    color: "bg-yellow-600",
-  },
-  {
-    name: "Reports",
-    icon: BarChart2,
-    description: "View analytics & insights",
-    href: "/reports",
-    count: 2,
-    status: "active",
-    color: "bg-purple-600",
-  },
-  {
-    name: "Pipelines",
-    icon: ListChecks,
-    description: "Visualize sales stages",
-    href: "/pipelines",
-    count: 3,
-    status: "active",
-    color: "bg-pink-600",
-  },
-  {
-    name: "Contacts",
-    icon: Users,
-    description: "All your contacts",
-    href: "/contacts",
-    count: 12,
-    status: "active",
-    color: "bg-indigo-600",
-  },
-  {
-    name: "Email",
-    icon: Mail,
-    description: "Unified inbox",
-    href: "/email",
-    count: 12,
-    status: "active",
-    color: "bg-blue-500",
-  },
-  {
-    name: "Chat",
-    icon: MessageSquare,
-    description: "Team messaging",
-    href: "/chat",
-    count: 3,
-    status: "active",
-    color: "bg-green-500",
-  },
-  {
-    name: "VoIP",
-    icon: Phone,
-    description: "Business calls",
-    href: "/voip",
-    count: 2,
-    status: "busy",
-    color: "bg-orange-500",
-  },
-  {
-    name: "Calendar",
-    icon: Calendar,
-    description: "Schedule events",
-    href: "/calendar",
-    count: 5,
-    status: "active",
-    color: "bg-purple-500",
-  },
-  {
-    name: "Automation",
-    icon: Zap,
-    description: "Workflow engine",
-    href: "/automation",
-    count: 8,
-    status: "active",
-    color: "bg-yellow-500",
-  },
-  {
-    name: "Opportunities",
-    icon: Target,
-    description: "Manage your sales pipeline",
-    href: "/opportunities",
-    count: 2,
-    status: "active",
-    color: "bg-teal-600",
-  },
+  { name: "Leads", icon: TrendingUp, description: "Manage potential customers", href: "/leads", count: 7, status: "active", color: "bg-blue-600", type: "module" },
+  { name: "Deals", icon: BarChart2, description: "Track sales opportunities", href: "/deals", count: 4, status: "active", color: "bg-green-600", type: "module" },
+  { name: "Tasks", icon: ListChecks, description: "Organize your to-dos", href: "/tasks", count: 10, status: "active", color: "bg-yellow-600", type: "module" },
+  { name: "Reports", icon: BarChart2, description: "View analytics & insights", href: "/reports", count: 2, status: "active", color: "bg-purple-600", type: "module" },
+  { name: "Pipelines", icon: ListChecks, description: "Visualize sales stages", href: "/pipelines", count: 3, status: "active", color: "bg-pink-600", type: "module" },
+  { name: "Contacts", icon: Users, description: "All your contacts", href: "/contacts", count: 12, status: "active", color: "bg-indigo-600", type: "module" },
+  { name: "Accounts", icon: Building2, description: "Manage accounts", href: "/companies", count: 5, status: "active", color: "bg-cyan-600", type: "module" },
+  { name: "Opportunities", icon: Target, description: "Manage your sales pipeline", href: "/opportunities", count: 2, status: "active", color: "bg-teal-600", type: "module" },
+  { name: "Email", icon: Mail, description: "Unified inbox", href: "/email", count: 12, status: "active", color: "bg-blue-500", type: "app" },
+  { name: "Chat", icon: MessageSquare, description: "Team messaging", href: "/chat", count: 3, status: "active", color: "bg-green-500", type: "app" },
+  { name: "VoIP", icon: Phone, description: "Business calls", href: "/voip", count: 2, status: "busy", color: "bg-orange-500", type: "app" },
 ];
 
 // Define all possible apps in one place
+const baseApps = [
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, description: "Main dashboard", color: "bg-gray-600", count: 0, status: "active", type: "app" },
+  { name: "Sales", href: "/sales", icon: TrendingUp, description: "Sales pipeline", color: "bg-blue-700", count: 0, status: "active", type: "app" },
+  { name: "Marketing", href: "/marketing", icon: BarChart2, description: "Marketing campaigns", color: "bg-pink-700", count: 0, status: "active", type: "app" },
+  { name: "Settings", href: "/settings", icon: Zap, description: "App settings", color: "bg-gray-400", count: 0, status: "active", type: "module" },
+];
+
 const allApps = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, description: "Main dashboard", color: "bg-gray-600", count: 0, status: "active" },
-  { name: "Sales", href: "/sales", icon: TrendingUp, description: "Sales pipeline", color: "bg-blue-700", count: 0, status: "active" },
-  { name: "Marketing", href: "/marketing", icon: BarChart2, description: "Marketing campaigns", color: "bg-pink-700", count: 0, status: "active" },
-  { name: "Accounts", href: "/accounts", icon: Building2, description: "Manage accounts", color: "bg-cyan-600", count: 0, status: "active" },
-  { name: "Settings", href: "/settings", icon: Zap, description: "App settings", color: "bg-gray-400", count: 0, status: "active" },
-  { name: "Opportunities", href: "/opportunities", icon: Target, description: "Manage your sales pipeline", color: "bg-teal-600", count: 2, status: "active" },
-  // All initialApps (excluding duplicates)
-  ...initialApps.filter(app => !["Dashboard", "Sales", "Marketing", "Accounts", "Settings", "Opportunities"].includes(app.name)),
+    ...baseApps,
+    ...initialApps.filter(initialApp => !baseApps.some(app => app.name === initialApp.name))
 ];
 
 export default function CrmLayout({ children }: CrmLayoutProps) {
@@ -150,13 +71,38 @@ export default function CrmLayout({ children }: CrmLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAppsOpen, setIsAppsOpen] = useState(true);
   // Start with the default visible apps
-  const [visibleApps, setVisibleApps] = useState([
-    "Dashboard",
-    "Sales",
-    "Marketing",
-    "Accounts",
-    "Settings",
-  ]);
+  const [visibleApps, setVisibleApps] = useState(() => {
+    // Try to load from localStorage and clean up any legacy/incorrect entries
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('visibleApps');
+      let arr = saved ? JSON.parse(saved) : [
+        "Dashboard",
+        "Sales",
+        "Marketing",
+        "Accounts",
+        "Settings",
+      ];
+      // Remove any modules not in MODULE_NAMES, and only allow correct apps
+      arr = arr.filter(
+        name => MODULE_NAMES.includes(name) || APP_NAMES.includes(name) || name === "Settings"
+      );
+      // Add any missing required base apps/modules (for first run)
+      APP_NAMES.concat(["Settings"]).forEach(name => {
+        if (!arr.includes(name)) arr.unshift(name);
+      });
+      // Remove duplicates
+      arr = Array.from(new Set(arr));
+      localStorage.setItem('visibleApps', JSON.stringify(arr));
+      return arr;
+    }
+    return [
+      "Dashboard",
+      "Sales",
+      "Marketing",
+      "Accounts",
+      "Settings",
+    ];
+  });
 
   // Track added items for RightAppsPanel
   const [addedItems, setAddedItems] = useState<Set<string>>(() => {
@@ -194,6 +140,10 @@ export default function CrmLayout({ children }: CrmLayoutProps) {
   const availableApps = allApps.filter(
     (app) => !visibleApps.includes(app.name) && app.name !== "Settings"
   );
+
+  // For RightAppsPanel, filter allApps into apps and modules
+  const rightPanelApps = allApps.filter(app => app.type === "app");
+  const rightPanelModules = allApps.filter(app => app.type === "module" && app.name !== "Settings");
 
   // For LeftNavbar, pass the app objects for visibleApps
   const visibleAppObjects = visibleApps
@@ -298,8 +248,9 @@ export default function CrmLayout({ children }: CrmLayoutProps) {
       {isAppsOpen && (
         <div className="hidden xl:block">
           <RightAppsPanel 
-            apps={availableApps} 
-            onAddApp={addAppToNavbar} 
+            apps={rightPanelApps}
+            modules={rightPanelModules}
+            onAddApp={addAppToNavbar}
             addedItems={addedItems}
           />
         </div>

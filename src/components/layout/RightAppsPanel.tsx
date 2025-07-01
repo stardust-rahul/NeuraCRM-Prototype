@@ -39,176 +39,6 @@ function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(" ");
 }
 
-// Modules - Core business entities
-const modules = [
-  {
-    name: "Leads",
-    icon: TrendingUp,
-    count: 7,
-    status: "active",
-    color: "bg-blue-600",
-    category: "Sales",
-    href: "/leads",
-  },
-  {
-    name: "Contacts",
-    icon: Users,
-    count: 12,
-    status: "active",
-    color: "bg-indigo-600",
-    category: "CRM",
-    href: "/contacts",
-  },
-  {
-    name: "Accounts",
-    icon: Building2,
-    count: 5,
-    status: "active",
-    color: "bg-cyan-600",
-    category: "CRM",
-    href: "/companies",
-  },
-  {
-    name: "Deals",
-    icon: BarChart2,
-    count: 4,
-    status: "active",
-    color: "bg-green-600",
-    category: "Sales",
-    href: "/deals",
-  },
-  {
-    name: "Opportunities",
-    icon: Target,
-    count: 2,
-    status: "active",
-    color: "bg-teal-600",
-    category: "Sales",
-    href: "/opportunities",
-  },
-  {
-    name: "Tasks",
-    icon: ListChecks,
-    count: 10,
-    status: "active",
-    color: "bg-yellow-600",
-    category: "Productivity",
-    href: "/tasks",
-  },
-  {
-    name: "Reports",
-    icon: PieChart,
-    count: 2,
-    status: "active",
-    color: "bg-purple-600",
-    category: "Analytics",
-    href: "/reports",
-  },
-  {
-    name: "Pipelines",
-    icon: Filter,
-    count: 3,
-    status: "active",
-    color: "bg-pink-600",
-    category: "Sales",
-    href: "/pipelines",
-  },
-];
-
-// Apps - Business tools and integrations
-const apps = [
-  {
-    name: "Marketing",
-    icon: Megaphone,
-    count: 8,
-    status: "active",
-    color: "bg-purple-500",
-    category: "Marketing",
-    href: "/marketing",
-  },
-  {
-    name: "Sales",
-    icon: DollarSign,
-    count: 6,
-    status: "active",
-    color: "bg-green-500",
-    category: "Sales",
-    href: "/sales",
-  },
-  {
-    name: "Email",
-    icon: Mail,
-    count: 12,
-    status: "active",
-    color: "bg-blue-500",
-    category: "Communication",
-    href: "/email",
-  },
-  {
-    name: "Chat",
-    icon: MessageSquare,
-    count: 3,
-    status: "active",
-    color: "bg-emerald-500",
-    category: "Communication",
-    href: "/chat",
-  },
-  {
-    name: "VoIP",
-    icon: Phone,
-    count: 2,
-    status: "busy",
-    color: "bg-orange-500",
-    category: "Communication",
-    href: "/voip",
-  },
-  {
-    name: "Calendar",
-    icon: Calendar,
-    count: 5,
-    status: "active",
-    color: "bg-violet-500",
-    category: "Productivity",
-    href: "/calendar",
-  },
-  {
-    name: "Automation",
-    icon: Zap,
-    count: 8,
-    status: "active",
-    color: "bg-amber-500",
-    category: "Productivity",
-    href: "/automation",
-  },
-  {
-    name: "E-commerce",
-    icon: ShoppingCart,
-    count: 4,
-    status: "active",
-    color: "bg-rose-500",
-    category: "Sales",
-    href: "/ecommerce",
-  },
-  {
-    name: "Support",
-    icon: Headphones,
-    count: 3,
-    status: "active",
-    color: "bg-sky-500",
-    category: "Service",
-    href: "/support",
-  },
-  {
-    name: "Design",
-    icon: Palette,
-    count: 2,
-    status: "active",
-    color: "bg-fuchsia-500",
-    category: "Creative",
-    href: "/design",
-  },
-];
-
 const recentActivities = [
   {
     action: "Meeting scheduled",
@@ -246,7 +76,14 @@ interface RightAppsPanelProps {
   addedItems?: Set<string>;
 }
 
-export default function RightAppsPanel({ apps: propApps, onAddApp, addedItems = new Set() }: RightAppsPanelProps) {
+interface RightAppsPanelProps {
+  apps: Array<any>;
+  modules: Array<any>;
+  onAddApp?: (app: any) => void;
+  addedItems?: Set<string>;
+}
+
+export default function RightAppsPanel({ apps, modules, onAddApp, addedItems = new Set() }: RightAppsPanelProps) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState<'modules' | 'apps'>("modules");
@@ -256,7 +93,7 @@ export default function RightAppsPanel({ apps: propApps, onAddApp, addedItems = 
   };
 
   const availableModules = modules.filter(module => !addedItems.has(module.name));
-  const availableApps = propApps.filter(app => !addedItems.has(app.name));
+  const availableApps = apps.filter(app => !addedItems.has(app.name));
 
   const filteredModules = availableModules.filter(module =>
     module.name.toLowerCase().includes(searchTerm.toLowerCase())
