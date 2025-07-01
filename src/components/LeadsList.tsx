@@ -19,26 +19,24 @@ import { Eye, Edit, Trash, ArrowUpRight, MoreHorizontal } from "lucide-react";
 
 export default function LeadsList({ leads, onLeadClick }) {
   return (
-    <div className="overflow-x-auto rounded border border-border/50 bg-white">
-      <Table>
+    <div className="overflow-x-auto rounded border border-border/50 bg-white shadow-sm">
+      <Table className="min-w-full border-separate border-spacing-0">
         <TableHeader>
-          <TableRow className="bg-gray-50 hover:bg-gray-50">
-            <TableHead className="w-[40px] px-2">
-              <input type="checkbox" />
-            </TableHead>
-            <TableHead className="w-[50px] px-2">#</TableHead>
-            <TableHead className="px-2 py-2">Name</TableHead>
-            <TableHead className="px-2 py-2">Email</TableHead>
-            <TableHead className="px-2 py-2">Phone</TableHead>
-            <TableHead className="px-2 py-2">Company</TableHead>
-            <TableHead className="px-2 py-2">Title</TableHead>
-            <TableHead className="px-2 py-2">Source</TableHead>
-            <TableHead className="px-2 py-2">Score</TableHead>
-            <TableHead className="px-2 py-2">Status</TableHead>
-            <TableHead className="px-2 py-2">Created</TableHead>
-            <TableHead className="px-2 py-2">Updated</TableHead>
-            <TableHead className="px-2 py-2">Notes</TableHead>
-            <TableHead className="text-right px-2 py-2">Actions</TableHead>
+          <TableRow className="bg-gray-100 hover:bg-gray-100 border-b border-gray-300">
+            <TableHead className="w-[40px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100"> <input type="checkbox" /> </TableHead>
+            <TableHead className="w-[50px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">#</TableHead>
+            <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Name</TableHead>
+            <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Email</TableHead>
+            <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Phone</TableHead>
+            <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Company</TableHead>
+            <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Title</TableHead>
+            <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Source</TableHead>
+            <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Score</TableHead>
+            <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Status</TableHead>
+            <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Created</TableHead>
+            <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Updated</TableHead>
+            <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Notes</TableHead>
+            <TableHead className="text-right px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -121,15 +119,15 @@ export default function LeadsList({ leads, onLeadClick }) {
             return (
               <TableRow
                 key={lead.id || idx}
-                className="border-b hover:bg-muted/30 text-sm"
+                className="border-b border-gray-300 text-sm group hover:bg-blue-50 transition-colors"
               >
-                <TableCell className="px-2 py-1">
+                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
                   <input type="checkbox" />
                 </TableCell>
-                <TableCell className="px-2 py-1 text-muted-foreground">
+                <TableCell className="px-2 py-1 text-muted-foreground border-r border-gray-200 bg-white group-hover:bg-blue-50">
                   {idx + 1}
                 </TableCell>
-                <TableCell className="px-2 py-1 font-medium">
+                <TableCell className="px-2 py-1 font-medium border-r border-gray-200 bg-white group-hover:bg-blue-50">
                   <button
                     onClick={() => onLeadClick(lead, idx)}
                     className="text-blue-600 hover:underline text-left"
@@ -137,23 +135,23 @@ export default function LeadsList({ leads, onLeadClick }) {
                     {lead.contact || lead.name}
                   </button>
                 </TableCell>
-                <TableCell className="px-2 py-1">{lead.email}</TableCell>
-                <TableCell className="px-2 py-1">{lead.phone}</TableCell>
-                <TableCell className="px-2 py-1 font-bold">{company}</TableCell>
-                <TableCell className="px-2 py-1">{title}</TableCell>
-                <TableCell className="px-2 py-1">{source}</TableCell>
-                <TableCell className="px-2 py-1">
+                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{lead.email}</TableCell>
+                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{lead.phone}</TableCell>
+                <TableCell className="px-2 py-1 font-bold border-r border-gray-200 bg-white group-hover:bg-blue-50">{company}</TableCell>
+                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{title}</TableCell>
+                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{source}</TableCell>
+                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
                   <Badge variant={scoreColor}>{score}</Badge>
                 </TableCell>
-                <TableCell className="px-2 py-1">
+                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
                   <Badge variant={statusVariant}>{status}</Badge>
                 </TableCell>
-                <TableCell className="px-2 py-1">{created}</TableCell>
-                <TableCell className="px-2 py-1">{updated}</TableCell>
-                <TableCell className="px-2 py-1 max-w-xs truncate" title={notes}>
+                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{created}</TableCell>
+                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{updated}</TableCell>
+                <TableCell className="px-2 py-1 max-w-xs truncate border-r border-gray-200 bg-white group-hover:bg-blue-50" title={notes}>
                   {notes}
                 </TableCell>
-                <TableCell className="px-2 py-1 text-right">
+                <TableCell className="px-2 py-1 text-right bg-white group-hover:bg-blue-50">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon">
