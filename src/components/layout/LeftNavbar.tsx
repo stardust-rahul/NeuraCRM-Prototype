@@ -101,7 +101,10 @@ export default function LeftNavbar({ navigation, onDelete }: LeftNavbarProps) {
       )}
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 space-y-1 py-4 overflow-y-auto overflow-x-hidden">
+      <nav className={cn(
+        "flex-1 space-y-1 py-4 overflow-x-hidden transition-all duration-300",
+        isHovered ? "px-4 overflow-y-auto" : "px-1 overflow-y-hidden"
+      )}>
         {/* Apps Section */}
         {apps.length > 0 && (
           <>
