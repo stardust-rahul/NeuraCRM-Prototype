@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import LeftNavbar from "./LeftNavbar";
 import RightAppsPanel from "./RightAppsPanel";
@@ -158,6 +158,38 @@ export default function CrmLayout({ children }: CrmLayoutProps) {
     "Settings",
   ]);
 
+  // Track added items for RightAppsPanel
+  const [addedItems, setAddedItems] = useState<Set<string>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('addedItems');
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    }
+    return new Set();
+  });
+
+  // Sync addedItems with visibleApps (except Settings)
+  useEffect(() => {
+    const newAddedItems = new Set(addedItems);
+    const currentApps = new Set(visibleApps.filter(app => app !== 'Settings'));
+    
+    // Remove items that are no longer in visibleApps
+    Array.from(addedItems).forEach(item => {
+      if (!currentApps.has(item) && item !== 'Settings') {
+        newAddedItems.delete(item);
+      }
+    });
+    
+    // Add new items from visibleApps
+    currentApps.forEach(app => {
+      newAddedItems.add(app);
+    });
+
+    if (JSON.stringify(Array.from(newAddedItems)) !== JSON.stringify(Array.from(addedItems))) {
+      setAddedItems(newAddedItems);
+      localStorage.setItem('addedItems', JSON.stringify(Array.from(newAddedItems)));
+    }
+  }, [visibleApps]);
+
   // Compute available apps as those not in visibleApps (except Settings)
   const availableApps = allApps.filter(
     (app) => !visibleApps.includes(app.name) && app.name !== "Settings"
@@ -171,6 +203,12 @@ export default function CrmLayout({ children }: CrmLayoutProps) {
   const addAppToNavbar = (app) => {
     if (!visibleApps.includes(app.name)) {
       setVisibleApps([...visibleApps, app.name]);
+      setAddedItems(prev => {
+        const newSet = new Set(prev);
+        newSet.add(app.name);
+        localStorage.setItem('addedItems', JSON.stringify(Array.from(newSet)));
+        return newSet;
+      });
     }
   };
 
@@ -178,6 +216,12 @@ export default function CrmLayout({ children }: CrmLayoutProps) {
     if (name === "Settings") return;
     if (visibleApps.includes(name)) {
       setVisibleApps(visibleApps.filter((n) => n !== name));
+      setAddedItems(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(name);
+        localStorage.setItem('addedItems', JSON.stringify(Array.from(newSet)));
+        return newSet;
+      });
     }
   };
 
@@ -253,7 +297,11 @@ export default function CrmLayout({ children }: CrmLayoutProps) {
       {/* Right Apps Panel - Hidden on tablets and mobile */}
       {isAppsOpen && (
         <div className="hidden xl:block">
-          <RightAppsPanel apps={availableApps} onAddApp={addAppToNavbar} />
+          <RightAppsPanel 
+            apps={availableApps} 
+            onAddApp={addAppToNavbar} 
+            addedItems={addedItems}
+          />
         </div>
       )}
 
