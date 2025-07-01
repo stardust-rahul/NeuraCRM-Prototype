@@ -6,6 +6,16 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+  DialogClose
+} from "@/components/ui/dialog";
+import {
   Building2,
   Edit,
   Globe,
@@ -21,13 +31,20 @@ import {
 import { useParams } from "react-router-dom";
 import { useAccounts } from "@/context/AccountsContext";
 import { useContacts } from "@/context/ContactsContext";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { useOpportunities } from "@/context/OpportunitiesContext";
 import { useState } from "react";
+import { OpportunityModal, OpportunitiesList } from "@/components/opportunities";
 
 export default function AccountDetail() {
+  // EARLY DEBUG LOGGING
   const { accountId } = useParams();
   const { accounts, updateAccount } = useAccounts();
+  console.log('AccountDetail debug:', { accountId, accounts });
+  if (!Array.isArray(accounts)) {
+    return <div>Accounts context missing or corrupted. accounts={String(accounts)}</div>;
+  }
+
+  // (rest of hooks)
   const { contacts, addContact } = useContacts();
   const { addOpportunity, opportunities } = useOpportunities();
 
@@ -59,12 +76,11 @@ export default function AccountDetail() {
 
   // Modal state
   const [showContactModal, setShowContactModal] = useState(false);
-  const [showOpportunityModal, setShowOpportunityModal] = useState(false);
+  const [showOppModal, setShowOppModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
   // Form state
   const [contactForm, setContactForm] = useState({ name: '', email: '', phone: '', title: '', account: accountToShow?.name || '', owner: accountToShow?.owner || '' });
-  const [opportunityForm, setOpportunityForm] = useState({ title: '', stage: '', closeDate: '', account: accountToShow?.name || '' });
   const [editForm, setEditForm] = useState(accountToShow ? { ...accountToShow } : { name: '', owner: '', industry: '', website: '', id: '' });
 
   // Handlers
@@ -74,12 +90,6 @@ export default function AccountDetail() {
     setShowContactModal(false);
     setContactForm({ name: '', email: '', phone: '', title: '', account: accountToShow?.name || '', owner: accountToShow?.owner || '' });
   };
-  const handleAddOpportunity = (e) => {
-    e.preventDefault();
-    addOpportunity(opportunityForm);
-    setShowOpportunityModal(false);
-    setOpportunityForm({ title: '', stage: '', closeDate: '', account: accountToShow?.name || '' });
-  };
   const handleEditAccount = (e) => {
     e.preventDefault();
     updateAccount(editForm);
@@ -87,7 +97,14 @@ export default function AccountDetail() {
   };
 
   if (!accountToShow) {
-    return <div>Account not found</div>;
+    console.log('AccountDetail: accountToShow not found', { accountId, accounts });
+    return (
+      <div>
+        <div>Account not found</div>
+        <pre>accountId: {JSON.stringify(accountId, null, 2)}</pre>
+        <pre>accounts: {JSON.stringify(accounts, null, 2)}</pre>
+      </div>
+    );
   }
 
   return (
@@ -103,7 +120,7 @@ export default function AccountDetail() {
         </div>
         <div className="flex items-center space-x-2">
           <Button variant="outline" onClick={() => setShowContactModal(true)}>New Contact</Button>
-          <Button variant="outline" onClick={() => setShowOpportunityModal(true)}>New Opportunity</Button>
+          <Button variant="outline" onClick={() => setShowOppModal(true)}>New Opportunity</Button>
           <Button variant="default" onClick={() => setShowEditModal(true)}>
             Edit
             <ChevronDown className="w-4 h-4 ml-2" />
@@ -231,25 +248,10 @@ export default function AccountDetail() {
               ))}
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg">Opportunities ({relatedOpportunities.length})</CardTitle>
-              <ChevronDown/>
-            </CardHeader>
-            <CardContent>
-              {relatedOpportunities.length === 0 ? (
-                <p className="text-gray-500">No opportunities found.</p>
-              ) : (
-                relatedOpportunities.map(opp => (
-                  <div key={opp.id} className="mb-2">
-                    <div className="font-semibold text-blue-600">{opp.title}</div>
-                    <div className="text-sm text-gray-500">Stage: {opp.stage}</div>
-                    <div className="text-sm text-gray-500">Close Date: {opp.closeDate}</div>
-                  </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
+          <OpportunitiesList
+            opportunities={relatedOpportunities}
+            onAddOpportunity={() => setShowOppModal(true)}
+          />
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-lg">Cases (0)</CardTitle>
@@ -291,22 +293,7 @@ export default function AccountDetail() {
           </form>
         </DialogContent>
       </Dialog>
-      <Dialog open={showOpportunityModal} onOpenChange={setShowOpportunityModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>New Opportunity</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleAddOpportunity} className="space-y-4">
-            <input className="w-full border p-2 rounded" placeholder="Title" value={opportunityForm.title} onChange={e => setOpportunityForm(f => ({ ...f, title: e.target.value }))} required />
-            <input className="w-full border p-2 rounded" placeholder="Stage" value={opportunityForm.stage} onChange={e => setOpportunityForm(f => ({ ...f, stage: e.target.value }))} required />
-            <input className="w-full border p-2 rounded" placeholder="Close Date" value={opportunityForm.closeDate} onChange={e => setOpportunityForm(f => ({ ...f, closeDate: e.target.value }))} required />
-            <DialogFooter>
-              <Button type="submit">Add Opportunity</Button>
-              <DialogClose asChild><Button variant="outline" type="button">Cancel</Button></DialogClose>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <OpportunityModal open={showOppModal} onClose={() => setShowOppModal(false)} initialData={{ account: accountToShow?.name || '' }} />
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
         <DialogContent>
           <DialogHeader>

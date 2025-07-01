@@ -46,7 +46,7 @@ const initialApps = [
   { name: "Reports", icon: BarChart2, description: "View analytics & insights", href: "/reports", count: 2, status: "active", color: "bg-purple-600", type: "module" },
   { name: "Pipelines", icon: ListChecks, description: "Visualize sales stages", href: "/pipelines", count: 3, status: "active", color: "bg-pink-600", type: "module" },
   { name: "Contacts", icon: Users, description: "All your contacts", href: "/contacts", count: 12, status: "active", color: "bg-indigo-600", type: "module" },
-  { name: "Accounts", icon: Building2, description: "Manage accounts", href: "/companies", count: 5, status: "active", color: "bg-cyan-600", type: "module" },
+  { name: "Accounts", icon: Building2, description: "Manage accounts", href: "/accounts", count: 5, status: "active", color: "bg-cyan-600", type: "module" },
   { name: "Opportunities", icon: Target, description: "Manage your sales pipeline", href: "/opportunities", count: 2, status: "active", color: "bg-teal-600", type: "module" },
   { name: "Email", icon: Mail, description: "Unified inbox", href: "/email", count: 12, status: "active", color: "bg-blue-500", type: "app" },
   { name: "Chat", icon: MessageSquare, description: "Team messaging", href: "/chat", count: 3, status: "active", color: "bg-green-500", type: "app" },

@@ -5,24 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Mail, Phone, Building, User, Calendar, Edit, Plus, CaseSensitive, Briefcase, File, ChevronDown, MessageSquare, Video, PhoneCall, Clock } from 'lucide-react';
 import { useContacts } from '@/context/ContactsContext';
+import { useOpportunities } from '@/context/OpportunitiesContext';
+import { OpportunityModal, OpportunitiesList } from '@/components/opportunities';
 
 export default function ContactDetail() {
   const { contactId } = useParams();
   const { contacts } = useContacts();
-  
-  const contact = contacts.find(c => c.id === contactId);
+  const { opportunities } = useOpportunities();
+  const [showOppModal, setShowOppModal] = useState(false);
 
-  // A mock opportunity for demonstration purposes as it is not in the data model.
-  const opportunity = {
-    name: "Eire-",
-    stage: "Qualify",
-    amount: "₹6,00,000",
-    closeDate: "30/06/2025"
-  };
+  const contact = contacts.find(c => c.id === contactId);
 
   if (!contact) {
     return <div>Contact not found</div>;
   }
+
+  // Filter opportunities related to this contact
+  const relatedOpportunities = opportunities.filter(o => o.contact === contact.name);
 
   return (
     <div className="bg-gray-50/50 min-h-screen">
@@ -39,13 +38,15 @@ export default function ContactDetail() {
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <Button variant="outline">New Opportunity</Button>
+          <Button variant="outline" onClick={() => setShowOppModal(true)}>New Opportunity</Button>
           <Button variant="outline">Edit</Button>
           <Button variant="outline" size="icon">
             <ChevronDown className="h-4 w-4" />
           </Button>
         </div>
       </div>
+      {/* New Opportunity Modal */}
+      <OpportunityModal open={showOppModal} onClose={() => setShowOppModal(false)} initialData={{ contact: contact.name, account: contact.account }} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
         {/* Left Column */}
@@ -113,24 +114,10 @@ export default function ContactDetail() {
 
         {/* Right Column */}
         <div className="lg:col-span-1 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex justify-between items-center">
-                <span>Opportunities (1)</span>
-                <Button variant="ghost" size="icon"><ChevronDown className="h-4 w-4" /></Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Link to={`/opportunities/${opportunity.name}`}>
-                <div className="text-sm space-y-2">
-                  <p className="font-semibold text-blue-600">{opportunity.name}</p>
-                  <div className="flex justify-between"><span>Stage:</span><span>{opportunity.stage}</span></div>
-                  <div className="flex justify-between"><span>Amount:</span><span>{opportunity.amount}</span></div>
-                  <div className="flex justify-between"><span>Close Date:</span><span>{opportunity.closeDate}</span></div>
-                </div>
-              </Link>
-            </CardContent>
-          </Card>
+          <OpportunitiesList
+            opportunities={relatedOpportunities}
+            onAddOpportunity={() => setShowOppModal(true)}
+          />
           <Card>
             <CardHeader>
               <CardTitle className="flex justify-between items-center">
