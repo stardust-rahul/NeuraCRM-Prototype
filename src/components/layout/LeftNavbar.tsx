@@ -93,8 +93,8 @@ export default function LeftNavbar({ navigation, onDelete }: LeftNavbarProps) {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-sidebar-foreground/40" />
             <Input
-              placeholder="Search..."
-              className="w-full pl-10 bg-sidebar-accent border-sidebar-border text-sidebar-foreground placeholder:text-sidebar-foreground/40"
+              placeholder="     Search..."
+              className="w-full h-10 pl-10 pr-3 rounded-md shadow-sm bg-sidebar-accent border-sidebar-border text-sidebar-foreground placeholder:text-sidebar-foreground/40 focus:outline-none focus:ring-2 focus:ring-sidebar-ring"
             />
           </div>
         </div>
