@@ -1,0 +1,70 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+.kanban-celebrate {
+  animation: confetti-burst 1.2s ease-out;
+  position: relative;
+  overflow: visible;
+}
+.kanban-sad {
+  animation: sad-shake-fade 1.2s ease-out;
+}
+@keyframes confetti-burst {
+  0% { box-shadow: 0 0 0 0 #22c55e99; }
+  10% { box-shadow: 0 0 16px 8px #22c55e99; }
+  20% { box-shadow: 0 0 32px 16px #22c55e99; }
+  40% { box-shadow: 0 0 16px 8px #22c55e99; }
+  100% { box-shadow: 0 0 0 0 #22c55e00; }
+}
+@keyframes sad-shake-fade {
+  0% { box-shadow: 0 0 0 0 #ef444499; opacity: 1; transform: translateX(0); }
+  10% { transform: translateX(-8px); }
+  20% { transform: translateX(8px); }
+  30% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  50% { transform: translateX(-4px); }
+  60% { transform: translateX(4px); }
+  70% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+  90% { opacity: 0.7; }
+  100% { box-shadow: 0 0 0 0 #ef444400; opacity: 0.5; transform: translateX(0); }
+}

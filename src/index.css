@@ -1,0 +1,481 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 26% 98%;
+    --foreground: 220 87% 4%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 87% 4%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 87% 4%;
+
+    --primary: #3b82f6;
+    --primary-foreground: 220 26% 98%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 87% 4%;
+
+    --muted: 220 14% 95%;
+    --muted-foreground: 220 8% 46%;
+
+    --accent: 217 91% 95%;
+    --accent-foreground: 217 91% 35%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 221 39% 11%;
+    --sidebar-foreground: 220 26% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 220 26% 98%;
+    --sidebar-accent: 221 39% 15%;
+    --sidebar-accent-foreground: 220 26% 98%;
+    --sidebar-border: 221 39% 15%;
+    --sidebar-ring: 217 91% 60%;
+
+    --font-size-base: 16px;
+    --sidebar-bg: #1e293b;
+    --sidebar-icon-color: #94a3b8;
+    --screen-zoom: 100%;
+    
+    /* Element size scaling variables */
+    --element-scale: 1;
+    --font-scale: 1;
+    --spacing-scale: 1;
+    --icon-scale: 1;
+    --compact-scale: 1;
+  }
+
+  .dark {
+    --background: 221 39% 11%;
+    --foreground: 220 26% 98%;
+
+    --card: 221 39% 13%;
+    --card-foreground: 220 26% 98%;
+
+    --popover: 221 39% 13%;
+    --popover-foreground: 220 26% 98%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 221 39% 11%;
+
+    --secondary: 221 39% 15%;
+    --secondary-foreground: 220 26% 98%;
+
+    --muted: 221 39% 15%;
+    --muted-foreground: 220 26% 70%;
+
+    --accent: 221 39% 15%;
+    --accent-foreground: 217 91% 60%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 221 39% 15%;
+    --input: 221 39% 15%;
+    --ring: 217 91% 60%;
+
+    --sidebar-background: 221 39% 8%;
+    --sidebar-foreground: 220 26% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 221 39% 8%;
+    --sidebar-accent: 221 39% 12%;
+    --sidebar-accent-foreground: 220 26% 98%;
+    --sidebar-border: 221 39% 12%;
+    --sidebar-ring: 217 91% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Apply proportional scaling to elements */
+  .text-xs { font-size: calc(0.75rem * var(--font-scale)) !important; }
+  .text-sm { font-size: calc(0.875rem * var(--font-scale)) !important; }
+  .text-base { font-size: calc(1rem * var(--font-scale)) !important; }
+  .text-lg { font-size: calc(1.125rem * var(--font-scale)) !important; }
+  .text-xl { font-size: calc(1.25rem * var(--font-scale)) !important; }
+  .text-2xl { font-size: calc(1.5rem * var(--font-scale)) !important; }
+  .text-3xl { font-size: calc(1.875rem * var(--font-scale)) !important; }
+  .text-4xl { font-size: calc(2.25rem * var(--font-scale)) !important; }
+
+  /* Scale padding and margins */
+  .p-1 { padding: calc(0.25rem * var(--spacing-scale)) !important; }
+  .p-2 { padding: calc(0.5rem * var(--spacing-scale)) !important; }
+  .p-3 { padding: calc(0.75rem * var(--spacing-scale)) !important; }
+  .p-4 { padding: calc(1rem * var(--spacing-scale)) !important; }
+  .p-6 { padding: calc(1.5rem * var(--spacing-scale)) !important; }
+  .p-8 { padding: calc(2rem * var(--spacing-scale)) !important; }
+  
+  .px-1 { padding-left: calc(0.25rem * var(--spacing-scale)) !important; padding-right: calc(0.25rem * var(--spacing-scale)) !important; }
+  .px-2 { padding-left: calc(0.5rem * var(--spacing-scale)) !important; padding-right: calc(0.5rem * var(--spacing-scale)) !important; }
+  .px-3 { padding-left: calc(0.75rem * var(--spacing-scale)) !important; padding-right: calc(0.75rem * var(--spacing-scale)) !important; }
+  .px-4 { padding-left: calc(1rem * var(--spacing-scale)) !important; padding-right: calc(1rem * var(--spacing-scale)) !important; }
+  .px-6 { padding-left: calc(1.5rem * var(--spacing-scale)) !important; padding-right: calc(1.5rem * var(--spacing-scale)) !important; }
+  .px-8 { padding-left: calc(2rem * var(--spacing-scale)) !important; padding-right: calc(2rem * var(--spacing-scale)) !important; }
+  
+  .py-1 { padding-top: calc(0.25rem * var(--spacing-scale)) !important; padding-bottom: calc(0.25rem * var(--spacing-scale)) !important; }
+  .py-2 { padding-top: calc(0.5rem * var(--spacing-scale)) !important; padding-bottom: calc(0.5rem * var(--spacing-scale)) !important; }
+  .py-3 { padding-top: calc(0.75rem * var(--spacing-scale)) !important; padding-bottom: calc(0.75rem * var(--spacing-scale)) !important; }
+  .py-4 { padding-top: calc(1rem * var(--spacing-scale)) !important; padding-bottom: calc(1rem * var(--spacing-scale)) !important; }
+  .py-6 { padding-top: calc(1.5rem * var(--spacing-scale)) !important; padding-bottom: calc(1.5rem * var(--spacing-scale)) !important; }
+  .py-8 { padding-top: calc(2rem * var(--spacing-scale)) !important; padding-bottom: calc(2rem * var(--spacing-scale)) !important; }
+
+  .m-1 { margin: calc(0.25rem * var(--spacing-scale)) !important; }
+  .m-2 { margin: calc(0.5rem * var(--spacing-scale)) !important; }
+  .m-3 { margin: calc(0.75rem * var(--spacing-scale)) !important; }
+  .m-4 { margin: calc(1rem * var(--spacing-scale)) !important; }
+  .m-6 { margin: calc(1.5rem * var(--spacing-scale)) !important; }
+  .m-8 { margin: calc(2rem * var(--spacing-scale)) !important; }
+
+  .mx-1 { margin-left: calc(0.25rem * var(--spacing-scale)) !important; margin-right: calc(0.25rem * var(--spacing-scale)) !important; }
+  .mx-2 { margin-left: calc(0.5rem * var(--spacing-scale)) !important; margin-right: calc(0.5rem * var(--spacing-scale)) !important; }
+  .mx-3 { margin-left: calc(0.75rem * var(--spacing-scale)) !important; margin-right: calc(0.75rem * var(--spacing-scale)) !important; }
+  .mx-4 { margin-left: calc(1rem * var(--spacing-scale)) !important; margin-right: calc(1rem * var(--spacing-scale)) !important; }
+  .mx-6 { margin-left: calc(1.5rem * var(--spacing-scale)) !important; margin-right: calc(1.5rem * var(--spacing-scale)) !important; }
+  .mx-8 { margin-left: calc(2rem * var(--spacing-scale)) !important; margin-right: calc(2rem * var(--spacing-scale)) !important; }
+
+  .my-1 { margin-top: calc(0.25rem * var(--spacing-scale)) !important; margin-bottom: calc(0.25rem * var(--spacing-scale)) !important; }
+  .my-2 { margin-top: calc(0.5rem * var(--spacing-scale)) !important; margin-bottom: calc(0.5rem * var(--spacing-scale)) !important; }
+  .my-3 { margin-top: calc(0.75rem * var(--spacing-scale)) !important; margin-bottom: calc(0.75rem * var(--spacing-scale)) !important; }
+  .my-4 { margin-top: calc(1rem * var(--spacing-scale)) !important; margin-bottom: calc(1rem * var(--spacing-scale)) !important; }
+  .my-6 { margin-top: calc(1.5rem * var(--spacing-scale)) !important; margin-bottom: calc(1.5rem * var(--spacing-scale)) !important; }
+  .my-8 { margin-top: calc(2rem * var(--spacing-scale)) !important; margin-bottom: calc(2rem * var(--spacing-scale)) !important; }
+
+  /* Scale gaps */
+  .gap-1 { gap: calc(0.25rem * var(--spacing-scale)) !important; }
+  .gap-2 { gap: calc(0.5rem * var(--spacing-scale)) !important; }
+  .gap-3 { gap: calc(0.75rem * var(--spacing-scale)) !important; }
+  .gap-4 { gap: calc(1rem * var(--spacing-scale)) !important; }
+  .gap-6 { gap: calc(1.5rem * var(--spacing-scale)) !important; }
+  .gap-8 { gap: calc(2rem * var(--spacing-scale)) !important; }
+
+  /* Scale spacing utilities */
+  .space-x-1 > * + * { margin-left: calc(0.25rem * var(--spacing-scale)) !important; }
+  .space-x-2 > * + * { margin-left: calc(0.5rem * var(--spacing-scale)) !important; }
+  .space-x-3 > * + * { margin-left: calc(0.75rem * var(--spacing-scale)) !important; }
+  .space-x-4 > * + * { margin-left: calc(1rem * var(--spacing-scale)) !important; }
+  .space-x-6 > * + * { margin-left: calc(1.5rem * var(--spacing-scale)) !important; }
+  .space-x-8 > * + * { margin-left: calc(2rem * var(--spacing-scale)) !important; }
+
+  .space-y-1 > * + * { margin-top: calc(0.25rem * var(--spacing-scale)) !important; }
+  .space-y-2 > * + * { margin-top: calc(0.5rem * var(--spacing-scale)) !important; }
+  .space-y-3 > * + * { margin-top: calc(0.75rem * var(--spacing-scale)) !important; }
+  .space-y-4 > * + * { margin-top: calc(1rem * var(--spacing-scale)) !important; }
+  .space-y-6 > * + * { margin-top: calc(1.5rem * var(--spacing-scale)) !important; }
+  .space-y-8 > * + * { margin-top: calc(2rem * var(--spacing-scale)) !important; }
+
+  /* Scale icon sizes */
+  .w-4 { width: calc(1rem * var(--icon-scale) * var(--compact-scale)) !important; }
+  .w-5 { width: calc(1.25rem * var(--icon-scale) * var(--compact-scale)) !important; }
+  .w-6 { width: calc(1.5rem * var(--icon-scale) * var(--compact-scale)) !important; }
+  .w-8 { width: calc(2rem * var(--icon-scale) * var(--compact-scale)) !important; }
+  .w-10 { width: calc(2.5rem * var(--icon-scale) * var(--compact-scale)) !important; }
+  .w-12 { width: calc(3rem * var(--icon-scale) * var(--compact-scale)) !important; }
+  .w-16 { width: calc(4rem * var(--icon-scale) * var(--compact-scale)) !important; }
+
+  .h-4 { height: calc(1rem * var(--icon-scale) * var(--compact-scale)) !important; }
+  .h-5 { height: calc(1.25rem * var(--icon-scale) * var(--compact-scale)) !important; }
+  .h-6 { height: calc(1.5rem * var(--icon-scale) * var(--compact-scale)) !important; }
+  .h-8 { height: calc(2rem * var(--icon-scale) * var(--compact-scale)) !important; }
+  .h-10 { height: calc(2.5rem * var(--icon-scale) * var(--compact-scale)) !important; }
+  .h-12 { height: calc(3rem * var(--icon-scale) * var(--compact-scale)) !important; }
+  .h-16 { height: calc(4rem * var(--icon-scale) * var(--compact-scale)) !important; }
+
+  .bg-primary {
+    background-color: var(--primary) !important;
+  }
+  .text-primary {
+    color: var(--primary) !important;
+  }
+  .border-primary {
+    border-color: var(--primary) !important;
+  }
+
+  html {
+    font-size: var(--font-size-base);
+  }
+
+  .text-base {
+    font-size: var(--font-size-base) !important;
+  }
+
+  .sidebar-bg {
+    background-color: var(--sidebar-bg) !important;
+  }
+  .sidebar-icon-color {
+    color: var(--sidebar-icon-color) !important;
+  }
+}
+.kanban-celebrate {
+  animation: confetti-burst 1.2s ease-out;
+  position: relative;
+  overflow: visible;
+}
+.kanban-sad {
+  animation: sad-shake-fade 1.2s ease-out;
+  background: linear-gradient(90deg, #fff1f2 0%, #fecaca 100%);
+  border-color: #ef4444 !important;
+}
+@keyframes confetti-burst {
+  0% { box-shadow: 0 0 0 0 #22c55e99; }
+  10% { box-shadow: 0 0 16px 8px #22c55e99; }
+  20% { box-shadow: 0 0 32px 16px #22c55e99; }
+  40% { box-shadow: 0 0 16px 8px #22c55e99; }
+  100% { box-shadow: 0 0 0 0 #22c55e00; }
+}
+@keyframes sad-shake-fade {
+  0% { box-shadow: 0 0 0 0 #ef4444cc; opacity: 1; transform: translateX(0); }
+  10% { transform: translateX(-8px); }
+  20% { transform: translateX(8px); }
+  30% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  50% { transform: translateX(-4px); }
+  60% { transform: translateX(4px); }
+  70% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+  90% { opacity: 0.7; }
+  100% { box-shadow: 0 0 0 0 #ef444400; opacity: 0.5; transform: translateX(0); }
+}
+
+/* Compact view specific styles */
+.compact-view {
+  --card-padding: calc(1rem * var(--compact-scale));
+  --section-spacing: calc(1.5rem * var(--compact-scale));
+  --button-padding: calc(0.5rem * var(--compact-scale)) calc(1rem * var(--compact-scale));
+  --input-padding: calc(0.5rem * var(--compact-scale));
+  --table-row-height: calc(2.5rem * var(--compact-scale));
+  --sidebar-width: calc(16rem * var(--compact-scale));
+}
+
+/* Apply compact view to common components */
+.compact-view .card {
+  padding: var(--card-padding) !important;
+}
+
+.compact-view .p-4 {
+  padding: var(--card-padding) !important;
+}
+
+.compact-view .p-6 {
+  padding: calc(1.5rem * var(--compact-scale)) !important;
+}
+
+.compact-view .p-8 {
+  padding: calc(2rem * var(--compact-scale)) !important;
+}
+
+.compact-view .space-y-6 > * + * {
+  margin-top: var(--section-spacing) !important;
+}
+
+.compact-view .space-y-8 > * + * {
+  margin-top: calc(2rem * var(--compact-scale)) !important;
+}
+
+.compact-view .gap-6 {
+  gap: var(--section-spacing) !important;
+}
+
+.compact-view .gap-8 {
+  gap: calc(2rem * var(--compact-scale)) !important;
+}
+
+/* Compact view for buttons */
+.compact-view button {
+  padding: var(--button-padding) !important;
+}
+
+.compact-view .btn-sm {
+  padding: calc(0.25rem * var(--compact-scale)) calc(0.5rem * var(--compact-scale)) !important;
+}
+
+/* Compact view for inputs */
+.compact-view input,
+.compact-view select,
+.compact-view textarea {
+  padding: var(--input-padding) !important;
+}
+
+/* Compact view for tables */
+.compact-view table tr {
+  height: var(--table-row-height) !important;
+}
+
+.compact-view .table-cell {
+  padding: calc(0.5rem * var(--compact-scale)) !important;
+}
+
+/* Compact view for sidebar */
+.compact-view .sidebar {
+  width: var(--sidebar-width) !important;
+}
+
+/* Compact view for navigation items */
+.compact-view .nav-item {
+  padding: calc(0.5rem * var(--compact-scale)) calc(0.75rem * var(--compact-scale)) !important;
+}
+
+/* Compact view for cards and panels */
+.compact-view .card-header {
+  padding: calc(1rem * var(--compact-scale)) !important;
+}
+
+.compact-view .card-content {
+  padding: calc(1rem * var(--compact-scale)) !important;
+}
+
+/* Compact view for form elements */
+.compact-view .form-group {
+  margin-bottom: calc(0.75rem * var(--compact-scale)) !important;
+}
+
+.compact-view .form-label {
+  margin-bottom: calc(0.25rem * var(--compact-scale)) !important;
+}
+
+/* Compact view for lists */
+.compact-view .list-item {
+  padding: calc(0.5rem * var(--compact-scale)) !important;
+}
+
+/* Compact view for modals and dialogs */
+.compact-view .modal-content {
+  padding: calc(1.5rem * var(--compact-scale)) !important;
+}
+
+.compact-view .dialog-content {
+  padding: calc(1.5rem * var(--compact-scale)) !important;
+}
+
+/* Compact view for tooltips and popovers */
+.compact-view .tooltip {
+  padding: calc(0.25rem * var(--compact-scale)) calc(0.5rem * var(--compact-scale)) !important;
+}
+
+.compact-view .popover-content {
+  padding: calc(0.75rem * var(--compact-scale)) !important;
+}
+
+/* Responsive appearance settings card */
+.appearance-settings-card {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: fit-content !important;
+  height: auto !important;
+  transition: all 0.3s ease;
+}
+
+.appearance-settings-card .card-content {
+  padding: calc(1.5rem * var(--spacing-scale) * var(--compact-scale)) !important;
+}
+
+.appearance-settings-card .card-header {
+  padding: calc(1.5rem * var(--spacing-scale) * var(--compact-scale)) calc(1.5rem * var(--spacing-scale) * var(--compact-scale)) calc(1rem * var(--spacing-scale) * var(--compact-scale)) !important;
+}
+
+/* Responsive form elements in appearance settings */
+.appearance-settings-card .form-group {
+  margin-bottom: calc(1rem * var(--spacing-scale) * var(--compact-scale)) !important;
+}
+
+.appearance-settings-card .form-label {
+  font-size: calc(0.875rem * var(--font-scale) * var(--compact-scale)) !important;
+  margin-bottom: calc(0.5rem * var(--spacing-scale) * var(--compact-scale)) !important;
+}
+
+.appearance-settings-card input,
+.appearance-settings-card select {
+  font-size: calc(0.875rem * var(--font-scale) * var(--compact-scale)) !important;
+  padding: calc(0.5rem * var(--spacing-scale) * var(--compact-scale)) calc(0.75rem * var(--spacing-scale) * var(--compact-scale)) !important;
+  height: calc(2.5rem * var(--spacing-scale) * var(--compact-scale)) !important;
+}
+
+.appearance-settings-card button {
+  font-size: calc(0.875rem * var(--font-scale) * var(--compact-scale)) !important;
+  padding: calc(0.5rem * var(--spacing-scale) * var(--compact-scale)) calc(1rem * var(--spacing-scale) * var(--compact-scale)) !important;
+  height: calc(2.5rem * var(--spacing-scale) * var(--compact-scale)) !important;
+}
+
+.appearance-settings-card .switch {
+  transform: scale(calc(1 * var(--compact-scale))) !important;
+}
+
+/* Responsive color pickers */
+.appearance-settings-card input[type="color"] {
+  width: calc(2rem * var(--spacing-scale) * var(--compact-scale)) !important;
+  height: calc(2rem * var(--spacing-scale) * var(--compact-scale)) !important;
+  border-radius: calc(0.25rem * var(--spacing-scale) * var(--compact-scale)) !important;
+}
+
+/* Responsive spacing in appearance settings */
+.appearance-settings-card .space-y-4 > * + * {
+  margin-top: calc(1rem * var(--spacing-scale) * var(--compact-scale)) !important;
+}
+
+.appearance-settings-card .space-y-6 > * + * {
+  margin-top: calc(1.5rem * var(--spacing-scale) * var(--compact-scale)) !important;
+}
+
+/* Responsive text sizes in appearance settings */
+.appearance-settings-card h4 {
+  font-size: calc(1rem * var(--font-scale) * var(--compact-scale)) !important;
+  margin-bottom: calc(0.75rem * var(--spacing-scale) * var(--compact-scale)) !important;
+}
+
+.appearance-settings-card p {
+  font-size: calc(0.875rem * var(--font-scale) * var(--compact-scale)) !important;
+}
+
+.appearance-settings-card .text-xs {
+  font-size: calc(0.75rem * var(--font-scale) * var(--compact-scale)) !important;
+}
+
+/* Responsive flex layouts in appearance settings */
+.appearance-settings-card .flex {
+  gap: calc(0.5rem * var(--spacing-scale) * var(--compact-scale)) !important;
+}
+
+.appearance-settings-card .space-x-2 > * + * {
+  margin-left: calc(0.5rem * var(--spacing-scale) * var(--compact-scale)) !important;
+}
+
+.appearance-settings-card .space-x-4 > * + * {
+  margin-left: calc(1rem * var(--spacing-scale) * var(--compact-scale)) !important;
+}
+
+/* Responsive card title and description */
+.appearance-settings-card .card-title {
+  font-size: calc(1.25rem * var(--font-scale) * var(--compact-scale)) !important;
+}
+
+.appearance-settings-card .card-description {
+  font-size: calc(0.875rem * var(--font-scale) * var(--compact-scale)) !important;
+}
+
+/* Responsive icon sizes in appearance settings */
+.appearance-settings-card .w-5 {
+  width: calc(1.25rem * var(--icon-scale) * var(--compact-scale)) !important;
+  height: calc(1.25rem * var(--icon-scale) * var(--compact-scale)) !important;
+}
+
+/* Responsive select trigger width */
+.appearance-settings-card .w-48 {
+  width: calc(12rem * var(--spacing-scale) * var(--compact-scale)) !important;
+}
