@@ -27,8 +27,9 @@ import {
   ChevronDown,
   Paperclip,
   Upload,
+  ChevronLeft,
 } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAccounts } from "@/context/AccountsContext";
 import { useContacts } from "@/context/ContactsContext";
 import { useOpportunities } from "@/context/OpportunitiesContext";
@@ -39,6 +40,7 @@ import PropTypes from "prop-types";
 export default function AccountDetail({ accountId: propAccountId }) {
   // EARLY DEBUG LOGGING
   const params = useParams();
+  const navigate = useNavigate();
   const accountId = propAccountId || params.accountId;
   const { accounts, updateAccount } = useAccounts();
   console.log('AccountDetail debug:', { accountId, accounts });
@@ -114,6 +116,10 @@ export default function AccountDetail({ accountId: propAccountId }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mr-2 flex items-center gap-1">
+            <ChevronLeft className="w-4 h-4" />
+            Back
+          </Button>
           <Building2 className="w-8 h-8 text-gray-600" />
           <div>
             <p className="text-sm text-gray-500">Account</p>

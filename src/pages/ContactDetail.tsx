@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Mail, Phone, Building, User, Calendar, Edit, Plus, CaseSensitive, Briefcase, File, ChevronDown, MessageSquare, Video, PhoneCall, Clock } from 'lucide-react';
+import { Mail, Phone, Building, User, Calendar, Edit, Plus, CaseSensitive, Briefcase, File, ChevronDown, MessageSquare, Video, PhoneCall, Clock, ChevronLeft } from 'lucide-react';
 import { useContacts } from '@/context/ContactsContext';
 import { useOpportunities } from '@/context/OpportunitiesContext';
 import { OpportunityModal, OpportunitiesList } from '@/components/opportunities';
 
 export default function ContactDetail() {
   const { contactId } = useParams();
+  const navigate = useNavigate();
   const { contacts } = useContacts();
   const { opportunities } = useOpportunities();
   const [showOppModal, setShowOppModal] = useState(false);
@@ -28,6 +29,10 @@ export default function ContactDetail() {
       {/* Header */}
       <div className="bg-white border-b p-4 flex justify-between items-center">
         <div className="flex items-center space-x-4">
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mr-2 flex items-center gap-1">
+            <ChevronLeft className="w-4 h-4" />
+            Back
+          </Button>
           <Avatar className="h-12 w-12">
             <AvatarImage src={`https://ui-avatars.com/api/?name=${contact.name}&background=random`} />
             <AvatarFallback>{contact.name?.charAt(0) || 'A'}</AvatarFallback>
