@@ -1124,7 +1124,7 @@ export default function Sales({ defaultTab = "analytics" }) {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search leads..."
+                  placeholder="     Search leads..."
                   className="w-56 pl-10"
                   value={leadSearch}
                   onChange={(e) => setLeadSearch(e.target.value)}
@@ -1252,7 +1252,7 @@ export default function Sales({ defaultTab = "analytics" }) {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search quotes..."
+                  placeholder="     Search quotes..."
                   className="w-56 pl-10"
                   value={quoteSearch || ''}
                   onChange={e => setQuoteSearch(e.target.value)}
@@ -1320,45 +1320,47 @@ export default function Sales({ defaultTab = "analytics" }) {
               </form>
             </DialogContent>
           </Dialog>
-          {/* Quotes Table */}
-          <div className="overflow-x-auto rounded border border-border/50 bg-white">
-            <table className="min-w-full divide-y divide-border">
-              <thead>
-                <tr>
-                  <th className="p-2 text-left"><input type="checkbox" checked={selectedQuotes.length === filteredQuotes.slice((quotesPage-1)*quotesView, quotesPage*quotesView).length && filteredQuotes.length > 0} onChange={e => {
+          {/* Quotes Table (Grid View) */}
+          <div className="overflow-x-auto rounded border border-border/50 bg-white shadow-sm">
+            <Table className="min-w-full border-separate border-spacing-0">
+              <TableHeader>
+                <TableRow className="bg-gray-100 hover:bg-gray-100 border-b border-gray-300">
+                  <TableHead className="w-[40px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100"><input type="checkbox" checked={selectedQuotes.length === filteredQuotes.slice((quotesPage-1)*quotesView, quotesPage*quotesView).length && filteredQuotes.length > 0} onChange={e => {
                     if (e.target.checked) {
                       setSelectedQuotes(filteredQuotes.slice((quotesPage-1)*quotesView, quotesPage*quotesView).map(q => q.id));
                     } else {
                       setSelectedQuotes([]);
                     }
-                  }} /></th>
-                  <th className="p-2 text-left">#</th>
-                  <th className="p-2 text-left">Customer</th>
-                  <th className="p-2 text-left">Amount</th>
-                  <th className="p-2 text-left">Status</th>
-                  <th className="p-2 text-left">Created</th>
-                  <th className="p-2 text-left">Owner</th>
-                  <th className="p-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(quotes || []).filter(q => !quoteSearch || q.customer.toLowerCase().includes(quoteSearch.toLowerCase())).slice((quotesPage-1)*quotesView, quotesPage*quotesView).map((quote, idx) => (
-                  <tr key={quote.id || idx} className="border-b hover:bg-muted/30">
-                    <td className="p-2"><input type="checkbox" checked={selectedQuotes.includes(quote.id)} onChange={e => {
-                      if (e.target.checked) setSelectedQuotes([...selectedQuotes, quote.id]);
-                      else setSelectedQuotes(selectedQuotes.filter(id => id !== quote.id));
-                    }} /></td>
-                    <td className="p-2">{idx + 1}</td>
-                    <td className="p-2 font-medium">
+                  }} /></TableHead>
+                  <TableHead className="w-[50px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">#</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Customer</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Amount</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Status</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Created</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Owner</TableHead>
+                  <TableHead className="text-right px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredQuotes.slice((quotesPage-1)*quotesView, quotesPage*quotesView).map((quote, idx) => (
+                  <TableRow key={quote.id || idx} className="border-b border-gray-300 text-sm group hover:bg-blue-50 transition-colors">
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
+                      <input type="checkbox" checked={selectedQuotes.includes(quote.id)} onChange={e => {
+                        if (e.target.checked) setSelectedQuotes([...selectedQuotes, quote.id]);
+                        else setSelectedQuotes(selectedQuotes.filter(id => id !== quote.id));
+                      }} />
+                    </TableCell>
+                    <TableCell className="px-2 py-1 text-muted-foreground border-r border-gray-200 bg-white group-hover:bg-blue-50">{idx + 1}</TableCell>
+                    <TableCell className="px-2 py-1 font-medium border-r border-gray-200 bg-white group-hover:bg-blue-50">
                       <a href="#" className="text-blue-600 hover:underline">{quote.customer}</a>
-                    </td>
-                    <td className="p-2">{quote.amount}</td>
-                    <td className="p-2">
+                    </TableCell>
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{quote.amount}</TableCell>
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
                       <Badge variant={quote.status === "approved" ? "default" : quote.status === "rejected" ? "destructive" : "secondary"}>{quote.status}</Badge>
-                    </td>
-                    <td className="p-2">{quote.created}</td>
-                    <td className="p-2">{quote.owner}</td>
-                    <td className="p-2">
+                    </TableCell>
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{quote.created}</TableCell>
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{quote.owner}</TableCell>
+                    <TableCell className="px-2 py-1 text-right bg-white group-hover:bg-blue-50">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
@@ -1378,11 +1380,11 @@ export default function Sales({ defaultTab = "analytics" }) {
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </TabsContent>
 
@@ -1404,7 +1406,7 @@ export default function Sales({ defaultTab = "analytics" }) {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search orders..."
+                  placeholder="     Search orders..."
                   className="w-56 pl-10"
                   value={orderSearch || ''}
                   onChange={e => setOrderSearch(e.target.value)}
@@ -1480,49 +1482,51 @@ export default function Sales({ defaultTab = "analytics" }) {
               </form>
             </DialogContent>
           </Dialog>
-          {/* Orders Table */}
-          <div className="overflow-x-auto rounded border border-border/50 bg-white">
-            <table className="min-w-full divide-y divide-border">
-              <thead>
-                <tr>
-                  <th className="p-2 text-left"><input type="checkbox" checked={selectedOrders.length === filteredOrders.slice((ordersPage-1)*ordersView, ordersPage*ordersView).length && filteredOrders.length > 0} onChange={e => {
+          {/* Orders Table (Grid View) */}
+          <div className="overflow-x-auto rounded border border-border/50 bg-white shadow-sm">
+            <Table className="min-w-full border-separate border-spacing-0">
+              <TableHeader>
+                <TableRow className="bg-gray-100 hover:bg-gray-100 border-b border-gray-300">
+                  <TableHead className="w-[40px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100"><input type="checkbox" checked={selectedOrders.length === filteredOrders.slice((ordersPage-1)*ordersView, ordersPage*ordersView).length && filteredOrders.length > 0} onChange={e => {
                     if (e.target.checked) {
                       setSelectedOrders(filteredOrders.slice((ordersPage-1)*ordersView, ordersPage*ordersView).map(o => o.id));
                     } else {
                       setSelectedOrders([]);
                     }
-                  }} /></th>
-                  <th className="p-2 text-left">#</th>
-                  <th className="p-2 text-left">Customer</th>
-                  <th className="p-2 text-left">Total</th>
-                  <th className="p-2 text-left">Status</th>
-                  <th className="p-2 text-left">Payment</th>
-                  <th className="p-2 text-left">Shipment</th>
-                  <th className="p-2 text-left">Created</th>
-                  <th className="p-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(orders || []).filter(o => !orderSearch || o.customer.toLowerCase().includes(orderSearch.toLowerCase())).slice((ordersPage-1)*ordersView, ordersPage*ordersView).map((order, idx) => (
-                  <tr key={order.id || idx} className="border-b hover:bg-muted/30">
-                    <td className="p-2"><input type="checkbox" checked={selectedOrders.includes(order.id)} onChange={e => {
-                      if (e.target.checked) setSelectedOrders([...selectedOrders, order.id]);
-                      else setSelectedOrders(selectedOrders.filter(id => id !== order.id));
-                    }} /></td>
-                    <td className="p-2">{idx + 1}</td>
-                    <td className="p-2 font-medium">
+                  }} /></TableHead>
+                  <TableHead className="w-[50px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">#</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Customer</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Total</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Status</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Payment</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Shipment</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Created</TableHead>
+                  <TableHead className="text-right px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredOrders.slice((ordersPage-1)*ordersView, ordersPage*ordersView).map((order, idx) => (
+                  <TableRow key={order.id || idx} className="border-b border-gray-300 text-sm group hover:bg-blue-50 transition-colors">
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
+                      <input type="checkbox" checked={selectedOrders.includes(order.id)} onChange={e => {
+                        if (e.target.checked) setSelectedOrders([...selectedOrders, order.id]);
+                        else setSelectedOrders(selectedOrders.filter(id => id !== order.id));
+                      }} />
+                    </TableCell>
+                    <TableCell className="px-2 py-1 text-muted-foreground border-r border-gray-200 bg-white group-hover:bg-blue-50">{idx + 1}</TableCell>
+                    <TableCell className="px-2 py-1 font-medium border-r border-gray-200 bg-white group-hover:bg-blue-50">
                       <a href="#" className="text-blue-600 hover:underline">{order.customer}</a>
-                    </td>
-                    <td className="p-2">{order.total}</td>
-                    <td className="p-2">
+                    </TableCell>
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{order.total}</TableCell>
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
                       <Badge variant={order.status === "completed" ? "default" : order.status === "cancelled" ? "destructive" : "secondary"}>{order.status}</Badge>
-                    </td>
-                    <td className="p-2">
+                    </TableCell>
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
                       <Badge variant={order.payment === "paid" ? "default" : order.payment === "refunded" ? "destructive" : "secondary"}>{order.payment}</Badge>
-                    </td>
-                    <td className="p-2">{order.shipment}</td>
-                    <td className="p-2">{order.created}</td>
-                    <td className="p-2">
+                    </TableCell>
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{order.shipment}</TableCell>
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{order.created}</TableCell>
+                    <TableCell className="px-2 py-1 text-right bg-white group-hover:bg-blue-50">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
@@ -1542,11 +1546,11 @@ export default function Sales({ defaultTab = "analytics" }) {
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </TabsContent>
 
@@ -1568,7 +1572,7 @@ export default function Sales({ defaultTab = "analytics" }) {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search products..."
+                  placeholder="     Search products..."
                   className="w-56 pl-10"
                   value={productSearch || ''}
                   onChange={e => setProductSearch(e.target.value)}
@@ -1632,43 +1636,45 @@ export default function Sales({ defaultTab = "analytics" }) {
               </form>
             </DialogContent>
           </Dialog>
-          {/* Products Table */}
-          <div className="overflow-x-auto rounded border border-border/50 bg-white">
-            <table className="min-w-full divide-y divide-border">
-              <thead>
-                <tr>
-                  <th className="p-2 text-left"><input type="checkbox" checked={selectedProducts.length === filteredProducts.slice((productsPage-1)*productsView, productsPage*productsView).length && filteredProducts.length > 0} onChange={e => {
+          {/* Products Table (Grid View) */}
+          <div className="overflow-x-auto rounded border border-border/50 bg-white shadow-sm">
+            <Table className="min-w-full border-separate border-spacing-0">
+              <TableHeader>
+                <TableRow className="bg-gray-100 hover:bg-gray-100 border-b border-gray-300">
+                  <TableHead className="w-[40px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100"><input type="checkbox" checked={selectedProducts.length === filteredProducts.slice((productsPage-1)*productsView, productsPage*productsView).length && filteredProducts.length > 0} onChange={e => {
                     if (e.target.checked) {
                       setSelectedProducts(filteredProducts.slice((productsPage-1)*productsView, productsPage*productsView).map(p => p.id));
                     } else {
                       setSelectedProducts([]);
                     }
-                  }} /></th>
-                  <th className="p-2 text-left">#</th>
-                  <th className="p-2 text-left">Image</th>
-                  <th className="p-2 text-left">Name</th>
-                  <th className="p-2 text-left">Price</th>
-                  <th className="p-2 text-left">Stock</th>
-                  <th className="p-2 text-left">Category</th>
-                  <th className="p-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(products || []).filter(p => !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase())).slice((productsPage-1)*productsView, productsPage*productsView).map((product, idx) => (
-                  <tr key={product.id || idx} className="border-b hover:bg-muted/30">
-                    <td className="p-2"><input type="checkbox" checked={selectedProducts.includes(product.id)} onChange={e => {
-                      if (e.target.checked) setSelectedProducts([...selectedProducts, product.id]);
-                      else setSelectedProducts(selectedProducts.filter(id => id !== product.id));
-                    }} /></td>
-                    <td className="p-2">{idx + 1}</td>
-                    <td className="p-2"><img src={product.image} alt={product.name} className="h-8 w-8 object-contain" /></td>
-                    <td className="p-2 font-medium">
+                  }} /></TableHead>
+                  <TableHead className="w-[50px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">#</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Image</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Name</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Price</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Stock</TableHead>
+                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Category</TableHead>
+                  <TableHead className="text-right px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredProducts.slice((productsPage-1)*productsView, productsPage*productsView).map((product, idx) => (
+                  <TableRow key={product.id || idx} className="border-b border-gray-300 text-sm group hover:bg-blue-50 transition-colors">
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
+                      <input type="checkbox" checked={selectedProducts.includes(product.id)} onChange={e => {
+                        if (e.target.checked) setSelectedProducts([...selectedProducts, product.id]);
+                        else setSelectedProducts(selectedProducts.filter(id => id !== product.id));
+                      }} />
+                    </TableCell>
+                    <TableCell className="px-2 py-1 text-muted-foreground border-r border-gray-200 bg-white group-hover:bg-blue-50">{idx + 1}</TableCell>
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50"><img src={product.image} alt={product.name} className="h-8 w-8 object-contain" /></TableCell>
+                    <TableCell className="px-2 py-1 font-medium border-r border-gray-200 bg-white group-hover:bg-blue-50">
                       <a href="#" className="text-blue-600 hover:underline">{product.name}</a>
-                    </td>
-                    <td className="p-2">{product.price}</td>
-                    <td className="p-2">{product.stock}</td>
-                    <td className="p-2">{product.category}</td>
-                    <td className="p-2">
+                    </TableCell>
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{product.price}</TableCell>
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{product.stock}</TableCell>
+                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{product.category}</TableCell>
+                    <TableCell className="px-2 py-1 text-right bg-white group-hover:bg-blue-50">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
@@ -1688,11 +1694,11 @@ export default function Sales({ defaultTab = "analytics" }) {
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </TabsContent>
       </Tabs>

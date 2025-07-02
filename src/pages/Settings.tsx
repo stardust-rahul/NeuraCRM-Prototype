@@ -100,7 +100,7 @@ export default function Settings() {
   const [fontSize, setFontSize] = useState("medium");
   const [sidebarBg, setSidebarBg] = useState("#1e293b");
   const [sidebarIconColor, setSidebarIconColor] = useState("#94a3b8");
-  const [screenRatio, setScreenRatio] = useState("100");
+  const [screenRatio, setScreenRatio] = useState("85");
   const [isCompactView, setIsCompactView] = useState(false);
 
   useEffect(() => {
@@ -589,8 +589,8 @@ export default function Settings() {
                     <SelectContent>
                       <SelectItem value="50">50% - Compact</SelectItem>
                       <SelectItem value="70">70% - Small</SelectItem>
-                      <SelectItem value="85">85% - Medium Small</SelectItem>
-                      <SelectItem value="100">100% - Default</SelectItem>
+                      <SelectItem value="85">85% - Default</SelectItem>
+                      <SelectItem value="100">100% - Standard</SelectItem>
                       <SelectItem value="115">115% - Medium Large</SelectItem>
                       <SelectItem value="135">135% - Large</SelectItem>
                       <SelectItem value="150">150% - Extra Large</SelectItem>

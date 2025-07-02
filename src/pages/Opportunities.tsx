@@ -20,7 +20,9 @@ import {
   Percent,
   FileText,
   Paperclip,
-  Users
+  Users,
+  Plus,
+  Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,6 +33,8 @@ import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useOpportunities } from "@/context/OpportunitiesContext";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 
 const InfoRow = ({ icon: Icon, label, value, isLink = false }) => (
   <div>
@@ -278,6 +282,15 @@ function OpportunitiesList({ opportunities, onSelect, onAddOpportunity, accounts
   const [newContact, setNewContact] = useState('');
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [creatingContact, setCreatingContact] = useState(false);
+  const [viewCount, setViewCount] = useState(10);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState([]);
+  const filtered = opportunities.filter(
+    (opp) =>
+      opp.title.toLowerCase().includes(search.toLowerCase()) ||
+      opp.account.toLowerCase().includes(search.toLowerCase())
+  );
 
   const handleFormChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -310,15 +323,44 @@ function OpportunitiesList({ opportunities, onSelect, onAddOpportunity, accounts
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">Opportunities</h1>
-        <div className="flex gap-2">
-          <Button onClick={() => setShowNewModal(true)}>New</Button>
+      <div className="flex items-center justify-between px-2 py-2">
+        <div className="flex items-center space-x-4">
+          <h1 className="text-2xl font-bold">Opportunities</h1>
+        </div>
+        <div className="flex items-center space-x-2">
+          <label className="text-sm text-muted-foreground">View</label>
+          <select className="border rounded px-2 py-1 text-sm" value={viewCount} onChange={e => { setViewCount(Number(e.target.value)); setPage(1); }}>
+            {[5, 10, 20, 50].map(n => <option key={n} value={n}>{n}</option>)}
+          </select>
+          <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>&lt;</Button>
+          <span className="text-xs">Page {page} of {Math.max(1, Math.ceil(filtered.length / viewCount))}</span>
+          <Button variant="outline" size="sm" disabled={page === Math.ceil(filtered.length / viewCount) || filtered.length === 0} onClick={() => setPage(p => Math.min(Math.ceil(filtered.length / viewCount), p + 1))}>&gt;</Button>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="     Search opportunities..."
+              className="w-56 pl-10"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
           <Button variant="outline">Import</Button>
-          <Button variant="outline">Assign Label</Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">Actions</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>Bulk Delete</DropdownMenuItem>
+              <DropdownMenuItem>Export Selected</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button onClick={() => setShowNewModal(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            New Opportunity
+          </Button>
         </div>
       </div>
-      <div className="mb-2 text-sm text-gray-500">{opportunities.length} items • Updated a few seconds ago</div>
+      <div className="mb-2 text-sm text-gray-500">{filtered.length} items • Updated a few seconds ago</div>
       <div className="px-8 py-8">
         <div className="overflow-x-auto rounded border border-border/50 bg-white shadow-sm">
           <table className="min-w-full border-separate border-spacing-0">
@@ -334,7 +376,7 @@ function OpportunitiesList({ opportunities, onSelect, onAddOpportunity, accounts
               </tr>
             </thead>
             <tbody>
-              {opportunities.map((opp, idx) => (
+              {filtered.slice((page-1)*viewCount, page*viewCount).map((opp, idx) => (
                 <tr
                   key={opp.id}
                   className="border-b border-gray-300 text-sm group hover:bg-blue-50 transition-colors"
