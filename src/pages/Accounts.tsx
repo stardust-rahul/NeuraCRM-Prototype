@@ -42,8 +42,9 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { useContacts } from "@/context/ContactsContext";
+import PropTypes from "prop-types";
 
-export default function Accounts() {
+export default function Accounts({ onAccountClick }) {
   const { accounts, addAccount } = useAccounts();
   const { contacts } = useContacts();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -206,7 +207,11 @@ export default function Accounts() {
                   <TableCell className="px-2 py-1"><input type="checkbox" /></TableCell>
                   <TableCell className="px-2 py-1 text-muted-foreground">{idx + 1}</TableCell>
                   <TableCell className="px-2 py-1 font-medium">
-                    <Link to={`/accounts/${account.id}`} className="text-blue-600 hover:underline">{account.name}</Link>
+                    {onAccountClick ? (
+                      <button className="text-blue-600 hover:underline" onClick={() => onAccountClick(account)}>{account.name}</button>
+                    ) : (
+                      <Link to={`/accounts/${account.id}`} className="text-blue-600 hover:underline">{account.name}</Link>
+                    )}
                   </TableCell>
                   <TableCell className="px-2 py-1">{account.industry}</TableCell>
                   <TableCell className="px-2 py-1">
@@ -252,3 +257,7 @@ export default function Accounts() {
     </div>
   );
 }
+
+Accounts.propTypes = {
+  onAccountClick: PropTypes.func,
+};

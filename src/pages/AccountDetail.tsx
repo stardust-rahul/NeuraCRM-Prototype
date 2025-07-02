@@ -34,10 +34,12 @@ import { useContacts } from "@/context/ContactsContext";
 import { useOpportunities } from "@/context/OpportunitiesContext";
 import { useState } from "react";
 import { OpportunityModal, OpportunitiesList } from "@/components/opportunities";
+import PropTypes from "prop-types";
 
-export default function AccountDetail() {
+export default function AccountDetail({ accountId: propAccountId }) {
   // EARLY DEBUG LOGGING
-  const { accountId } = useParams();
+  const params = useParams();
+  const accountId = propAccountId || params.accountId;
   const { accounts, updateAccount } = useAccounts();
   console.log('AccountDetail debug:', { accountId, accounts });
   if (!Array.isArray(accounts)) {
@@ -313,4 +315,8 @@ export default function AccountDetail() {
       </Dialog>
     </div>
   );
-} 
+}
+
+AccountDetail.propTypes = {
+  accountId: PropTypes.string,
+}; 

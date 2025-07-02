@@ -66,6 +66,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Contacts from "@/pages/Contacts";
 import { OpportunitiesList, initialOpportunities as sharedInitialOpportunities } from "./Opportunities";
 import { useOpportunities } from "@/context/OpportunitiesContext";
+import Accounts from "./Accounts";
+import AccountDetail from "./AccountDetail";
 
 const salesMetrics = [
   {
@@ -763,6 +765,7 @@ export default function Sales({ defaultTab = "analytics" }) {
   };
 
   const [viewOpportunity, setViewOpportunity] = useState(null);
+  const [viewAccount, setViewAccount] = useState(null);
   return (
     <div className="p-8 space-y-8 bg-background min-h-screen">
       {/* Header */}
@@ -802,54 +805,15 @@ export default function Sales({ defaultTab = "analytics" }) {
         onValueChange={setActiveTab}
         className="space-y-6"
       >
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="leads">Leads</TabsTrigger>
-          <TabsTrigger value="contacts">Contacts</TabsTrigger>
-          <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
-          <TabsTrigger value="quotes">Quotes</TabsTrigger>
-          <TabsTrigger value="products">Products</TabsTrigger>
-          <TabsTrigger value="orders">Orders</TabsTrigger>
+        <TabsList className="flex w-full">
+          <TabsTrigger className="flex-1" value="leads">Leads</TabsTrigger>
+          <TabsTrigger className="flex-1" value="accounts">Accounts</TabsTrigger>
+          <TabsTrigger className="flex-1" value="contacts">Contacts</TabsTrigger>
+          <TabsTrigger className="flex-1" value="opportunities">Opportunities</TabsTrigger>
+          <TabsTrigger className="flex-1" value="quotes">Quotes</TabsTrigger>
+          <TabsTrigger className="flex-1" value="orders">Orders</TabsTrigger>
+          <TabsTrigger className="flex-1" value="products">Products</TabsTrigger>
         </TabsList>
-
-        {/* Analytics Dashboard */}
-        <TabsContent value="analytics" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="border border-border/50">
-              <CardHeader>
-                <CardTitle>Revenue Trends</CardTitle>
-                <CardDescription>Monthly revenue performance</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 bg-muted/50 rounded flex items-center justify-center">
-                  <div className="text-center">
-                    <BarChart3 className="w-12 h-12 text-primary mx-auto mb-2" />
-                    <p className="text-muted-foreground">
-                      Bar Chart: Revenue Trends
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-border/50">
-              <CardHeader>
-                <CardTitle>Pipeline Distribution</CardTitle>
-                <CardDescription>Opportunities by stage</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 bg-muted/50 rounded flex items-center justify-center">
-                  <div className="text-center">
-                    <Target className="w-12 h-12 text-primary mx-auto mb-2" />
-                    <p className="text-muted-foreground">
-                      Pie Chart: Pipeline Stages
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
 
         {/* Leads Management */}
         <TabsContent value="leads" className="space-y-6">
@@ -1124,7 +1088,7 @@ export default function Sales({ defaultTab = "analytics" }) {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="     Search leads..."
+                  placeholder="Search leads..."
                   className="w-56 pl-10"
                   value={leadSearch}
                   onChange={(e) => setLeadSearch(e.target.value)}
@@ -1216,6 +1180,14 @@ export default function Sales({ defaultTab = "analytics" }) {
               <LeadsList leads={filteredLeads.slice((leadsPage-1)*leadsView, leadsPage*leadsView)} onLeadClick={handleLeadClick} />
             </>
           )}
+        </TabsContent>
+        {/* Accounts Tab */}
+        <TabsContent value="accounts" className="space-y-6">
+           {viewAccount ? (
+             <AccountDetail accountId={viewAccount.id} />
+           ) : (
+             <Accounts onAccountClick={setViewAccount} />
+           )}
         </TabsContent>
 
         {/* Contacts */}
@@ -1553,7 +1525,6 @@ export default function Sales({ defaultTab = "analytics" }) {
             </Table>
           </div>
         </TabsContent>
-
         {/* Products Catalog */}
         <TabsContent value="products" className="space-y-6">
           {/* Page Title and Filter Bar */}
