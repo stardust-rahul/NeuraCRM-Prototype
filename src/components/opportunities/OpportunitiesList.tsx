@@ -49,14 +49,14 @@ export default function OpportunitiesList({ opportunities, onSelect, onAddOpport
             <tbody>
               {opportunities.map((opp) => (
                 <tr key={opp.id} className="hover:bg-blue-50 cursor-pointer" onClick={() => onSelect && onSelect(opp)}>
-                  <td className="px-2 py-1">{opp.title}</td>
+                  <td className="px-2 py-1 text-blue-600 hover:underline cursor-pointer" onClick={e => { e.stopPropagation(); onSelect && onSelect(opp); }}>{opp.title}</td>
                   <td className="px-2 py-1">{opp.account}</td>
                   <td className="px-2 py-1">{opp.contact}</td>
                   <td className="px-2 py-1">{opp.stage}</td>
                   <td className="px-2 py-1">{opp.closeDate}</td>
                   <td className="px-2 py-1">{opp.owner}</td>
                   <td className="px-2 py-1 text-right">
-                    <Button variant="ghost" size="icon">View</Button>
+                    <Button variant="ghost" size="icon" onClick={e => { e.stopPropagation(); onSelect && onSelect(opp); }}>View</Button>
                   </td>
                 </tr>
               ))}

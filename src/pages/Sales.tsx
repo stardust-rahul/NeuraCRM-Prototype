@@ -65,6 +65,7 @@ import LeadsList from "@/components/LeadsList";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Contacts from "@/pages/Contacts";
 import { OpportunitiesList, initialOpportunities as sharedInitialOpportunities } from "./Opportunities";
+import OpportunityDetailView from "./Opportunities";
 import { useOpportunities } from "@/context/OpportunitiesContext";
 import Accounts from "./Accounts";
 import AccountDetail from "./AccountDetail";
@@ -1189,13 +1190,17 @@ export default function Sales({ defaultTab = "analytics" }) {
 
         {/* Opportunities Pipeline */}
         <TabsContent value="opportunities" className="space-y-6">
-          <OpportunitiesList
-            opportunities={opportunities}
-            onSelect={() => {}}
-            onAddOpportunity={addOpportunity}
-            accounts={[]}
-            contacts={[]}
-          />
+          {viewOpportunity ? (
+            <OpportunityDetailView opportunity={viewOpportunity} onBack={() => setViewOpportunity(null)} contacts={[]} />
+          ) : (
+            <OpportunitiesList
+              opportunities={opportunities}
+              onSelect={setViewOpportunity}
+              onAddOpportunity={addOpportunity}
+              accounts={[]}
+              contacts={[]}
+            />
+          )}
         </TabsContent>
 
         {/* Quotes */}
