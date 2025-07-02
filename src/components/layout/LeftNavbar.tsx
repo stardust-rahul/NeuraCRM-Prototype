@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+
 interface LeftNavbarProps {
   navigation: Array<{ name: string; href: string; icon: any; type: string }>;
   onDelete?: (name: string) => void;
@@ -283,63 +285,51 @@ export default function LeftNavbar({ navigation, onDelete }: LeftNavbarProps) {
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="space-y-2 flex flex-col gap-2">
-          <Button
-            style={{ color: "red" }}
-            variant="ghost"
-            onClick={handleLogout}
-            className={cn(
-              "w-full transition-all group relative text-red hover:text-white hover:bg-white/10",
-              isHovered ? "justify-start" : "justify-center px-2",
-            )}
-            title={!isHovered ? "Sign Out" : ""}
-          >
-            <LogOut
-              className={cn("w-4 h-4 sidebar-icon-color", isHovered && "mr-2")}
-            />
-            {isHovered && <span className="text-white">Sign Out</span>}
-
-            {/* Tooltip for collapsed state */}
-            {!isHovered && (
-              <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50 pointer-events-none">
-                Sign Out
-              </div>
-            )}
-          </Button>
-          {/* Edit Mode Toggle Button */}
-        </div>
-      </div>
-
-      {/* User Profile */}
-      <div
-        className={cn(
-          "flex items-center mb-4",
-          isHovered ? "space-x-3" : "justify-center",
-        )}
-      >
-        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-          <span className="text-xs font-medium text-white">JD</span>
-        </div>
-        {isHovered && (
-          <>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">
-                John Doe
-              </p>
-              <p className="text-xs text-sidebar-foreground/60 truncate">
-                john@company.com
-              </p>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-8 h-8 text-sidebar-foreground/60"
+        {/* User Profile with Sign Out Popover */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <div
+              className={cn(
+                "flex items-center mb-4 cursor-pointer",
+                isHovered ? "space-x-3" : "justify-center"
+              )}
             >
-              <Bell className="w-4 h-4 sidebar-icon-color" />
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-xs font-medium text-white">JD</span>
+              </div>
+              {isHovered && (
+                <>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-sidebar-foreground truncate">
+                      John Doe
+                    </p>
+                    <p className="text-xs text-sidebar-foreground/60 truncate">
+                      john@company.com
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-8 h-8 text-sidebar-foreground/60"
+                  >
+                    <Bell className="w-4 h-4 sidebar-icon-color" />
+                  </Button>
+                </>
+              )}
+            </div>
+          </PopoverTrigger>
+          <PopoverContent side="top" align="center" sideOffset={8} className="w-32 px-0 py-1 bg-sidebar-accent border border-sidebar-border rounded shadow-sm">
+            <Button
+              onClick={handleLogout}
+              className="w-full bg-transparent text-sidebar-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground rounded-none px-4 py-2 text-sm font-medium"
+              style={{justifyContent: 'flex-start'}}
+              variant="ghost"
+              title="Sign Out"
+            >
+              Sign Out
             </Button>
-          </>
-        )}
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );
