@@ -49,10 +49,10 @@
     --screen-zoom: 100%;
     
     /* Element size scaling variables */
-    --element-scale: 1;
-    --font-scale: 1;
-    --spacing-scale: 1;
-    --icon-scale: 1;
+    --element-scale: 0.85;
+    --font-scale: 0.85;
+    --spacing-scale: 0.85;
+    --icon-scale: 0.85;
     --compact-scale: 1;
   }
 

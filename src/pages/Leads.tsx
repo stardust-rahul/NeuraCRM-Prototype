@@ -745,7 +745,7 @@ export default function Leads() {
           <Button variant="outline">Actions</Button>
           <Button onClick={() => setShowLeadForm(true)}>
             <Plus className="w-4 h-4 mr-2" />
-            New
+            New Lead
           </Button>
         </div>
       </div>
@@ -794,7 +794,7 @@ export default function Leads() {
                 <select id="status" name="status" value={newLead.status} onChange={handleLeadInput} className="w-full border rounded px-2 py-1">
                   <option value="qualified">Qualified</option>
                   <option value="contacted">Contacted</option>
-                  <option value="new">New</option>
+                  <option value="new">New Lead</option>
                 </select>
               </div>
               <div className="col-span-2">
@@ -803,7 +803,7 @@ export default function Leads() {
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">Add Lead</Button>
+              <Button type="submit">New Lead</Button>
             </DialogFooter>
           </form>
         </DialogContent>

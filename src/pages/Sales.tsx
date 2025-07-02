@@ -1146,7 +1146,7 @@ export default function Sales({ defaultTab = "analytics" }) {
               </DropdownMenu>
               <Button onClick={() => setShowLeadForm(true)}>
                 <Plus className="w-4 h-4 mr-2" />
-                New
+                New Lead
               </Button>
             </div>
           </div>
@@ -1274,7 +1274,7 @@ export default function Sales({ defaultTab = "analytics" }) {
               </DropdownMenu>
               <Button onClick={() => setShowQuoteForm(true)}>
                 <Plus className="w-4 h-4 mr-2" />
-                Create Quote
+                New Quote
               </Button>
             </div>
           </div>
@@ -1282,7 +1282,7 @@ export default function Sales({ defaultTab = "analytics" }) {
           <Dialog open={showQuoteForm} onOpenChange={open => { if (!open) resetAllModals(); else setShowQuoteForm(true); }}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create Quote</DialogTitle>
+                <DialogTitle>New Quote</DialogTitle>
                 <DialogDescription>
                   Enter details for a new quote.
                 </DialogDescription>
@@ -1315,7 +1315,7 @@ export default function Sales({ defaultTab = "analytics" }) {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="submit">Create Quote</Button>
+                  <Button type="submit">New Quote</Button>
                 </DialogFooter>
               </form>
             </DialogContent>
@@ -1338,7 +1338,7 @@ export default function Sales({ defaultTab = "analytics" }) {
                   <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Status</TableHead>
                   <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Created</TableHead>
                   <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Owner</TableHead>
-                  <TableHead className="text-right px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
+                  <TableHead className="text-left px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -1360,7 +1360,7 @@ export default function Sales({ defaultTab = "analytics" }) {
                     </TableCell>
                     <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{quote.created}</TableCell>
                     <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{quote.owner}</TableCell>
-                    <TableCell className="px-2 py-1 text-right bg-white group-hover:bg-blue-50">
+                    <TableCell className="px-2 py-1 text-left bg-white group-hover:bg-blue-50">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
@@ -1432,7 +1432,7 @@ export default function Sales({ defaultTab = "analytics" }) {
               </Button>
             </div>
           </div>
-          {/* Add Order Modal */}
+          {/* New Order Modal */}
           <Dialog open={showOrderForm} onOpenChange={open => { if (!open) resetAllModals(); else setShowOrderForm(true); }}>
             <DialogContent>
               <DialogHeader>
@@ -1501,7 +1501,7 @@ export default function Sales({ defaultTab = "analytics" }) {
                   <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Payment</TableHead>
                   <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Shipment</TableHead>
                   <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Created</TableHead>
-                  <TableHead className="text-right px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
+                  <TableHead className="text-left px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -1526,7 +1526,7 @@ export default function Sales({ defaultTab = "analytics" }) {
                     </TableCell>
                     <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{order.shipment}</TableCell>
                     <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{order.created}</TableCell>
-                    <TableCell className="px-2 py-1 text-right bg-white group-hover:bg-blue-50">
+                    <TableCell className="px-2 py-1 text-left bg-white group-hover:bg-blue-50">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
@@ -1594,7 +1594,7 @@ export default function Sales({ defaultTab = "analytics" }) {
               </DropdownMenu>
               <Button onClick={() => { setShowProductForm(true); setEditingProduct(null); }}>
                 <Plus className="w-4 h-4 mr-2" />
-                Add Product
+                New Product
               </Button>
             </div>
           </div>
@@ -1602,7 +1602,7 @@ export default function Sales({ defaultTab = "analytics" }) {
           <Dialog open={showProductForm} onOpenChange={open => { if (!open) resetAllModals(); else setShowProductForm(true); }}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add Product</DialogTitle>
+                <DialogTitle>New Product</DialogTitle>
                 <DialogDescription>
                   Enter details for a new product.
                 </DialogDescription>
@@ -1631,7 +1631,7 @@ export default function Sales({ defaultTab = "analytics" }) {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="submit">Add Product</Button>
+                  <Button type="submit">New Product</Button>
                 </DialogFooter>
               </form>
             </DialogContent>
@@ -1654,7 +1654,7 @@ export default function Sales({ defaultTab = "analytics" }) {
                   <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Price</TableHead>
                   <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Stock</TableHead>
                   <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Category</TableHead>
-                  <TableHead className="text-right px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
+                  <TableHead className="text-left px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -1674,7 +1674,7 @@ export default function Sales({ defaultTab = "analytics" }) {
                     <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{product.price}</TableCell>
                     <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{product.stock}</TableCell>
                     <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{product.category}</TableCell>
-                    <TableCell className="px-2 py-1 text-right bg-white group-hover:bg-blue-50">
+                    <TableCell className="px-2 py-1 text-left bg-white group-hover:bg-blue-50">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
