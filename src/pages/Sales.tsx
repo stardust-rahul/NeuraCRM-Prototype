@@ -66,6 +66,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Contacts from "@/pages/Contacts";
 import { OpportunitiesList, initialOpportunities as sharedInitialOpportunities } from "./Opportunities";
 import { useOpportunities } from "@/context/OpportunitiesContext";
+import Accounts from "./Accounts";
+import AccountDetail from "./AccountDetail";
 
 const salesMetrics = [
   {
@@ -127,24 +129,24 @@ const initialLeads = [
   },
 ];
 
-const initialProducts = [
-  {
-    id: "P-001",
-    name: "NeuraCRM Enterprise",
-    image: "https://via.placeholder.com/150",
-    price: "$299/month",
-    stock: 50,
-    category: "Software",
-  },
-  {
-    id: "P-002",
-    name: "Professional Services",
-    image: "https://via.placeholder.com/150",
-    price: "$150/hour",
-    stock: "Unlimited",
-    category: "Services",
-  },
-];
+// const initialProducts = [
+//   {
+//     id: "P-001",
+//     name: "NeuraCRM Enterprise",
+//     image: "https://via.placeholder.com/150",
+//     price: "$299/month",
+//     stock: 50,
+//     category: "Software",
+//   },
+//   {
+//     id: "P-002",
+//     name: "Professional Services",
+//     image: "https://via.placeholder.com/150",
+//     price: "$150/hour",
+//     stock: "Unlimited",
+//     category: "Services",
+//   },
+// ];
 
 const initialQuotes = [
   {
@@ -315,7 +317,7 @@ export default function Sales({ defaultTab = "analytics" }) {
     notes: "",
     created: "",
   });
-  const [products, setProducts] = useState(initialProducts);
+  // const [products, setProducts] = useState(initialProducts);
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [newProduct, setNewProduct] = useState({
@@ -337,8 +339,8 @@ export default function Sales({ defaultTab = "analytics" }) {
   const [quotesPage, setQuotesPage] = useState(1);
   const [ordersView, setOrdersView] = useState(10);
   const [ordersPage, setOrdersPage] = useState(1);
-  const [productsView, setProductsView] = useState(10);
-  const [productsPage, setProductsPage] = useState(1);
+  // const [productsView, setProductsView] = useState(10);
+  // const [productsPage, setProductsPage] = useState(1);
   const [viewLead, setViewLead] = useState(null);
   const [selectedLead, setSelectedLead] = useState(null);
   const [editLead, setEditLead] = useState(null);
@@ -383,12 +385,12 @@ export default function Sales({ defaultTab = "analytics" }) {
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [selectedQuotes, setSelectedQuotes] = useState([]);
   const [selectedOrders, setSelectedOrders] = useState([]);
-  const [selectedProducts, setSelectedProducts] = useState([]);
+  // const [selectedProducts, setSelectedProducts] = useState([]);
 
   const filteredContacts = (contacts || []).filter(c => !contactSearch || c.name.toLowerCase().includes(contactSearch.toLowerCase()) || c.email.toLowerCase().includes(contactSearch.toLowerCase()) || c.account.toLowerCase().includes(contactSearch.toLowerCase()));
   const filteredQuotes = (quotes || []).filter(q => !quoteSearch || q.customer.toLowerCase().includes(quoteSearch.toLowerCase()));
   const filteredOrders = (orders || []).filter(o => !orderSearch || o.customer.toLowerCase().includes(orderSearch.toLowerCase()));
-  const filteredProducts = (products || []).filter(p => !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase()));
+  // const filteredProducts = (products || []).filter(p => !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase()));
 
   useEffect(() => {
     setActiveTab(defaultTab);
@@ -605,51 +607,51 @@ export default function Sales({ defaultTab = "analytics" }) {
     toast({ title: "Stage changed", description: `Opportunity moved to '${newStage.charAt(0).toUpperCase() + newStage.slice(1)}' stage.` });
   };
 
-  const handleProductInput = (e) => {
-    const { name, value } = e.target;
-    setNewProduct((prev) => ({ ...prev, [name]: value }));
-  };
+  // const handleProductInput = (e) => {
+  //   const { name, value } = e.target;
+  //   setNewProduct((prev) => ({ ...prev, [name]: value }));
+  // };
 
-  const handleAddProduct = (e) => {
-    e.preventDefault();
-    if (editingProduct) {
-      setProducts((prev) =>
-        prev.map((p) =>
-          p.id === editingProduct.id ? { ...p, ...newProduct } : p
-        )
-      );
-      toast({ title: "Product updated", description: `Product '${newProduct.name}' updated successfully!` });
-    } else {
-      setProducts((prev) => [
-        {
-          ...newProduct,
-          id: `P-${(prev.length + 1).toString().padStart(3, "0")}`,
-        },
-        ...prev,
-      ]);
-      toast({ title: "Product added", description: `Product '${newProduct.name}' added successfully!` });
-    }
-    setShowProductForm(false);
-    setEditingProduct(null);
-    setNewProduct({
-      name: "",
-      image: "https://via.placeholder.com/150",
-      price: "",
-      stock: "",
-      category: "Software",
-    });
-  };
+  // const handleAddProduct = (e) => {
+  //   e.preventDefault();
+  //   if (editingProduct) {
+  //     setProducts((prev) =>
+  //       prev.map((p) =>
+  //         p.id === editingProduct.id ? { ...p, ...newProduct } : p
+  //       )
+  //     );
+  //     toast({ title: "Product updated", description: `Product '${newProduct.name}' updated successfully!` });
+  //   } else {
+  //     setProducts((prev) => [
+  //       {
+  //         ...newProduct,
+  //         id: `P-${(prev.length + 1).toString().padStart(3, "0")}`,
+  //       },
+  //       ...prev,
+  //     ]);
+  //     toast({ title: "Product added", description: `Product '${newProduct.name}' added successfully!` });
+  //   }
+  //   setShowProductForm(false);
+  //   setEditingProduct(null);
+  //   setNewProduct({
+  //     name: "",
+  //     image: "https://via.placeholder.com/150",
+  //     price: "",
+  //     stock: "",
+  //     category: "Software",
+  //   });
+  // };
 
-  const handleEditProduct = (product) => {
-    setEditingProduct(product);
-    setNewProduct({ ...product });
-    setShowProductForm(true);
-  };
+  // const handleEditProduct = (product) => {
+  //   setEditingProduct(product);
+  //   setNewProduct({ ...product });
+  //   setShowProductForm(true);
+  // };
 
-  const handleDeleteProduct = (id) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
-    toast({ title: "Product deleted", description: `Product deleted successfully!` });
-  };
+  // const handleDeleteProduct = (id) => {
+  //   setProducts((prev) => prev.filter((p) => p.id !== id));
+  //   toast({ title: "Product deleted", description: `Product deleted successfully!` });
+  // };
 
   const handleDeleteLead = (id) => {
     removeLead(id);
@@ -763,6 +765,7 @@ export default function Sales({ defaultTab = "analytics" }) {
   };
 
   const [viewOpportunity, setViewOpportunity] = useState(null);
+  const [viewAccount, setViewAccount] = useState(null);
   return (
     <div className="p-8 space-y-8 bg-background min-h-screen">
       {/* Header */}
@@ -802,54 +805,15 @@ export default function Sales({ defaultTab = "analytics" }) {
         onValueChange={setActiveTab}
         className="space-y-6"
       >
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="leads">Leads</TabsTrigger>
-          <TabsTrigger value="contacts">Contacts</TabsTrigger>
-          <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
-          <TabsTrigger value="quotes">Quotes</TabsTrigger>
-          <TabsTrigger value="products">Products</TabsTrigger>
-          <TabsTrigger value="orders">Orders</TabsTrigger>
+        <TabsList className="flex w-full">
+          <TabsTrigger className="flex-1" value="leads">Leads</TabsTrigger>
+          <TabsTrigger className="flex-1" value="accounts">Accounts</TabsTrigger>
+          <TabsTrigger className="flex-1" value="contacts">Contacts</TabsTrigger>
+          <TabsTrigger className="flex-1" value="opportunities">Opportunities</TabsTrigger>
+          <TabsTrigger className="flex-1" value="quotes">Quotes</TabsTrigger>
+          {/* <TabsTrigger className="flex-1" value="products">Products</TabsTrigger> */}
+          <TabsTrigger className="flex-1" value="orders">Orders</TabsTrigger>
         </TabsList>
-
-        {/* Analytics Dashboard */}
-        <TabsContent value="analytics" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="border border-border/50">
-              <CardHeader>
-                <CardTitle>Revenue Trends</CardTitle>
-                <CardDescription>Monthly revenue performance</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 bg-muted/50 rounded flex items-center justify-center">
-                  <div className="text-center">
-                    <BarChart3 className="w-12 h-12 text-primary mx-auto mb-2" />
-                    <p className="text-muted-foreground">
-                      Bar Chart: Revenue Trends
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-border/50">
-              <CardHeader>
-                <CardTitle>Pipeline Distribution</CardTitle>
-                <CardDescription>Opportunities by stage</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 bg-muted/50 rounded flex items-center justify-center">
-                  <div className="text-center">
-                    <Target className="w-12 h-12 text-primary mx-auto mb-2" />
-                    <p className="text-muted-foreground">
-                      Pie Chart: Pipeline Stages
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
 
         {/* Leads Management */}
         <TabsContent value="leads" className="space-y-6">
@@ -1217,6 +1181,14 @@ export default function Sales({ defaultTab = "analytics" }) {
             </>
           )}
         </TabsContent>
+        {/* Accounts Tab */}
+        <TabsContent value="accounts" className="space-y-6">
+           {viewAccount ? (
+             <AccountDetail accountId={viewAccount.id} onBack={() => setViewAccount(null)} />
+           ) : (
+             <Accounts onAccountClick={setViewAccount} />
+           )}
+        </TabsContent>
 
         {/* Contacts */}
         <TabsContent value="contacts" className="space-y-6">
@@ -1542,154 +1514,6 @@ export default function Sales({ defaultTab = "analytics" }) {
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDeleteOrder(order.id)}>
-                            <Trash className="w-4 h-4 mr-2" /> Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-
-        {/* Products Catalog */}
-        <TabsContent value="products" className="space-y-6">
-          {/* Page Title and Filter Bar */}
-          <div className="flex items-center justify-between px-2 py-2">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold">Products</h1>
-            </div>
-            <div className="flex items-center space-x-2">
-              <label className="text-sm text-muted-foreground">View</label>
-              <select className="border rounded px-2 py-1 text-sm" value={productsView} onChange={e => { setProductsView(Number(e.target.value)); setProductsPage(1); }}>
-                {[5, 10, 20, 50].map(n => <option key={n} value={n}>{n}</option>)}
-              </select>
-              <Button variant="outline" size="sm" disabled={productsPage === 1} onClick={() => setProductsPage(p => Math.max(1, p - 1))}>&lt;</Button>
-              <span className="text-xs">Page {productsPage} of {Math.max(1, Math.ceil(filteredProducts.length / productsView))}</span>
-              <Button variant="outline" size="sm" disabled={productsPage === Math.ceil(filteredProducts.length / productsView) || filteredProducts.length === 0} onClick={() => setProductsPage(p => Math.min(Math.ceil(filteredProducts.length / productsView), p + 1))}>&gt;</Button>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="     Search products..."
-                  className="w-56 pl-10"
-                  value={productSearch || ''}
-                  onChange={e => setProductSearch(e.target.value)}
-                />
-              </div>
-              <Button variant="outline">Import</Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">Actions</Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => {
-                    setProducts(prev => prev.filter(p => !selectedProducts.includes(p.id)));
-                    setSelectedProducts([]);
-                    toast({ title: 'Products deleted', description: 'Selected products deleted successfully!' });
-                  }}>Bulk Delete</DropdownMenuItem>
-                  <DropdownMenuItem>Export Selected</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button onClick={() => { setShowProductForm(true); setEditingProduct(null); }}>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Product
-              </Button>
-            </div>
-          </div>
-          {/* Add/Edit Product Modal */}
-          <Dialog open={showProductForm} onOpenChange={open => { if (!open) resetAllModals(); else setShowProductForm(true); }}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add Product</DialogTitle>
-                <DialogDescription>
-                  Enter details for a new product.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleAddProduct} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="product-name">Name</Label>
-                    <Input id="product-name" name="name" value={newProduct.name} onChange={handleProductInput} required />
-                  </div>
-                  <div>
-                    <Label htmlFor="product-image">Image URL</Label>
-                    <Input id="product-image" name="image" value={newProduct.image} onChange={handleProductInput} required />
-                  </div>
-                  <div>
-                    <Label htmlFor="product-price">Price</Label>
-                    <Input id="product-price" name="price" value={newProduct.price} onChange={handleProductInput} required />
-                  </div>
-                  <div>
-                    <Label htmlFor="product-stock">Stock</Label>
-                    <Input id="product-stock" name="stock" value={newProduct.stock} onChange={handleProductInput} required />
-                  </div>
-                  <div className="col-span-2">
-                    <Label htmlFor="product-category">Category</Label>
-                    <Input id="product-category" name="category" value={newProduct.category} onChange={handleProductInput} required />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit">Add Product</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-          {/* Products Table (Grid View) */}
-          <div className="overflow-x-auto rounded border border-border/50 bg-white shadow-sm">
-            <Table className="min-w-full border-separate border-spacing-0">
-              <TableHeader>
-                <TableRow className="bg-gray-100 hover:bg-gray-100 border-b border-gray-300">
-                  <TableHead className="w-[40px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100"><input type="checkbox" checked={selectedProducts.length === filteredProducts.slice((productsPage-1)*productsView, productsPage*productsView).length && filteredProducts.length > 0} onChange={e => {
-                    if (e.target.checked) {
-                      setSelectedProducts(filteredProducts.slice((productsPage-1)*productsView, productsPage*productsView).map(p => p.id));
-                    } else {
-                      setSelectedProducts([]);
-                    }
-                  }} /></TableHead>
-                  <TableHead className="w-[50px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">#</TableHead>
-                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Image</TableHead>
-                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Name</TableHead>
-                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Price</TableHead>
-                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Stock</TableHead>
-                  <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Category</TableHead>
-                  <TableHead className="text-right px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredProducts.slice((productsPage-1)*productsView, productsPage*productsView).map((product, idx) => (
-                  <TableRow key={product.id || idx} className="border-b border-gray-300 text-sm group hover:bg-blue-50 transition-colors">
-                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
-                      <input type="checkbox" checked={selectedProducts.includes(product.id)} onChange={e => {
-                        if (e.target.checked) setSelectedProducts([...selectedProducts, product.id]);
-                        else setSelectedProducts(selectedProducts.filter(id => id !== product.id));
-                      }} />
-                    </TableCell>
-                    <TableCell className="px-2 py-1 text-muted-foreground border-r border-gray-200 bg-white group-hover:bg-blue-50">{idx + 1}</TableCell>
-                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50"><img src={product.image} alt={product.name} className="h-8 w-8 object-contain" /></TableCell>
-                    <TableCell className="px-2 py-1 font-medium border-r border-gray-200 bg-white group-hover:bg-blue-50">
-                      <a href="#" className="text-blue-600 hover:underline">{product.name}</a>
-                    </TableCell>
-                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{product.price}</TableCell>
-                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{product.stock}</TableCell>
-                    <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{product.category}</TableCell>
-                    <TableCell className="px-2 py-1 text-right bg-white group-hover:bg-blue-50">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => { resetAllModals(); setViewProduct({ ...product, stock: String(product.stock) }); }}>
-                            <Eye className="w-4 h-4 mr-2" /> View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => { resetAllModals(); setEditingProduct({ ...product }); setShowProductForm(true); setNewProduct({ ...product, stock: String(product.stock) }); }}>
-                            <Edit className="w-4 h-4 mr-2" /> Edit Product
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDeleteProduct(product.id)}>
                             <Trash className="w-4 h-4 mr-2" /> Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
