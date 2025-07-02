@@ -238,7 +238,7 @@ function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus }) 
   );
 }
 
-export default function Sales({ defaultTab = "leads" }) {
+export default function Sales({ defaultTab = "analytics" }) {
   const [activeTab, setActiveTab] = useState(defaultTab);
   const { leads, addLead, removeLead, updateLead } = useLeads();
   const { addAccount } = useAccounts();

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Edit, ChevronDown, Mail, Calendar, Clock, Check, Users, FileText, Crown, Info, RefreshCw, Settings2, ChevronLeft } from 'lucide-react';
+import { Edit, ChevronDown, Mail, Calendar, Clock, Check, Users, FileText, Crown, Info, RefreshCw, Settings2 } from 'lucide-react';
 import { findOpportunityById } from '@/data/mock-data';
 import { Switch } from "@/components/ui/switch";
 
@@ -47,7 +47,6 @@ const StageIndicator = ({ currentStage }) => {
 
 export default function OpportunityDetail() {
   const { opportunityId } = useParams();
-  const navigate = useNavigate();
   // Fetch opportunity data based on ID. Using mock data for now.
   const opportunity = findOpportunityById(opportunityId);
 
@@ -79,10 +78,6 @@ export default function OpportunityDetail() {
       {/* Header */}
       <div className="bg-white border-b p-4 flex justify-between items-center">
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="mr-2 flex items-center gap-1">
-            <ChevronLeft className="w-4 h-4" />
-            Back
-          </Button>
           <div className="p-3 bg-orange-100 rounded-lg">
             <Crown className="h-6 w-6 text-orange-500" />
           </div>
