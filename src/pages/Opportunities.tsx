@@ -35,6 +35,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { useOpportunities } from "@/context/OpportunitiesContext";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { useAccounts } from "@/context/AccountsContext";
+import { useContacts } from "@/context/ContactsContext";
 
 const InfoRow = ({ icon: Icon, label, value, isLink = false }) => (
   <div>
@@ -268,7 +270,15 @@ export const initialOpportunities = [
   },
 ];
 
-function OpportunitiesList({ opportunities, onSelect, onAddOpportunity, accounts, contacts }) {
+function OpportunitiesList({
+  opportunities,
+  onSelect,
+  onAddOpportunity,
+  accounts,
+  contacts,
+  addAccount,
+  addContact
+}) {
   const [showNewModal, setShowNewModal] = useState(false);
   const [form, setForm] = useState({
     title: '',
@@ -300,19 +310,35 @@ function OpportunitiesList({ opportunities, onSelect, onAddOpportunity, accounts
     e.preventDefault();
     let accountName = form.account;
     let contactName = form.contact;
-    if (creatingAccount && newAccount) accountName = newAccount;
-    if (creatingContact && newContact) contactName = newContact;
-    onAddOpportunity({
-      id: `O-${Math.floor(Math.random()*100000)}`,
-      title: form.title,
-      account: accountName,
-      company: accountName,
-      contact: contactName,
-      stage: form.stage,
-      closeDate: form.closeDate,
-      owner: form.owner,
-      ownerAlias: form.owner,
-    }, creatingAccount ? accountName : null, creatingContact ? contactName : null);
+    let createdAccount = null;
+    let createdContact = null;
+
+    if (creatingAccount && newAccount) {
+      accountName = newAccount;
+      createdAccount = newAccount;
+      addAccount(newAccount);
+    }
+    if (creatingContact && newContact) {
+      contactName = newContact;
+      createdContact = newContact;
+      addContact(newContact);
+    }
+
+    onAddOpportunity(
+      {
+        id: `O-${Math.floor(Math.random()*100000)}`,
+        title: form.title,
+        account: accountName,
+        company: accountName,
+        contact: contactName,
+        stage: form.stage,
+        closeDate: form.closeDate,
+        owner: form.owner,
+        ownerAlias: form.owner,
+      },
+      createdAccount,
+      createdContact
+    );
     setForm({ title: '', account: '', contact: '', stage: 'Qualify', closeDate: '', owner: '' });
     setNewAccount('');
     setNewContact('');
@@ -636,6 +662,8 @@ function OpportunityDetailView({ opportunity, onBack, contacts }) {
 
 export default function OpportunitiesPage() {
   const { opportunities, addOpportunity } = useOpportunities();
+  const { accounts, addAccount } = useAccounts();
+  const { contacts, addContact } = useContacts();
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
 
   if (selectedOpportunity) {
@@ -643,9 +671,19 @@ export default function OpportunitiesPage() {
       <OpportunityDetailView
         opportunity={selectedOpportunity}
         onBack={() => setSelectedOpportunity(null)}
-        contacts={[]}
+        contacts={contacts}
       />
     );
   }
-  return <OpportunitiesList opportunities={opportunities} onSelect={setSelectedOpportunity} onAddOpportunity={addOpportunity} accounts={[]} contacts={[]} />;
+  return (
+    <OpportunitiesList
+      opportunities={opportunities}
+      onSelect={setSelectedOpportunity}
+      onAddOpportunity={addOpportunity}
+      accounts={accounts}
+      contacts={contacts}
+      addAccount={addAccount}
+      addContact={addContact}
+    />
+  );
 } 
