@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,17 +11,29 @@ import { OpportunityModal, OpportunitiesList } from '@/components/opportunities'
 export default function ContactDetail() {
   const { contactId } = useParams();
   const { contacts } = useContacts();
-  const { opportunities } = useOpportunities();
+  const { fetchOpportunities, opportunities } = useOpportunities();
   const [showOppModal, setShowOppModal] = useState(false);
 
   const contact = contacts.find(c => c.id === contactId);
+
+  useEffect(() => {
+    // Fetch opportunities when the contact changes
+    fetchOpportunities && fetchOpportunities();
+  }, [contactId, fetchOpportunities]);
 
   if (!contact) {
     return <div>Contact not found</div>;
   }
 
-  // Filter opportunities related to this contact
-  const relatedOpportunities = opportunities.filter(o => o.contact === contact.name);
+  const accountName = contact.account?.toLowerCase().replace(/\s+/g, '');
+  const relatedOpportunities = opportunities.filter(
+    o =>
+      o.contactId === contact.id ||
+      o.contact === contact.name ||
+      (o.account && o.account.toLowerCase().replace(/\s+/g, '') === accountName) ||
+      (o.accountName && o.accountName.toLowerCase().replace(/\s+/g, '') === accountName) ||
+      (o.company && o.company.toLowerCase().replace(/\s+/g, '') === accountName)
+  );
 
   return (
     <div className="bg-gray-50/50 min-h-screen">

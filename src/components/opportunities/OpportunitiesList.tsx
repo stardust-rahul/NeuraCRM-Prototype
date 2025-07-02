@@ -11,6 +11,13 @@ interface Opportunity {
   closeDate: string;
   owner: string;
   ownerAlias?: string;
+  amount?: number;
+  probability?: number;
+  forecastCategory?: string;
+  createdBy?: string;
+  createdDate?: string;
+  accountName?: string;
+  name?: string;
 }
 
 interface OpportunitiesListProps {
@@ -34,34 +41,26 @@ export default function OpportunitiesList({ opportunities, onSelect, onAddOpport
         {opportunities.length === 0 ? (
           <div className="text-gray-500">No opportunities found.</div>
         ) : (
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr>
-                <th className="px-2 py-1 text-left">Title</th>
-                <th className="px-2 py-1 text-left">Account</th>
-                <th className="px-2 py-1 text-left">Contact</th>
-                <th className="px-2 py-1 text-left">Stage</th>
-                <th className="px-2 py-1 text-left">Close Date</th>
-                <th className="px-2 py-1 text-left">Owner</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {opportunities.map((opp) => (
-                <tr key={opp.id} className="hover:bg-blue-50 cursor-pointer" onClick={() => onSelect && onSelect(opp)}>
-                  <td className="px-2 py-1 text-blue-600 hover:underline cursor-pointer" onClick={e => { e.stopPropagation(); onSelect && onSelect(opp); }}>{opp.title}</td>
-                  <td className="px-2 py-1">{opp.account}</td>
-                  <td className="px-2 py-1">{opp.contact}</td>
-                  <td className="px-2 py-1">{opp.stage}</td>
-                  <td className="px-2 py-1">{opp.closeDate}</td>
-                  <td className="px-2 py-1">{opp.owner}</td>
-                  <td className="px-2 py-1 text-right">
-                    <Button variant="ghost" size="icon" onClick={e => { e.stopPropagation(); onSelect && onSelect(opp); }}>View</Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="space-y-3">
+            {opportunities.map((opp) => (
+              <Card key={opp.id} className="border border-gray-200 shadow-sm cursor-pointer hover:shadow-md transition" onClick={() => onSelect && onSelect(opp)}>
+                <CardContent className="py-3 px-4 flex flex-col gap-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-blue-700 text-base">{opp.title || opp.name}</span>
+                    <span className="px-2 py-1 rounded bg-gray-100 text-xs font-medium border border-gray-200">{opp.stage}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm mt-1">
+                    <span className="text-gray-500">Amount:</span>
+                    <span className="font-medium">{opp.amount != null ? opp.amount : '-'}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-500">Close Date:</span>
+                    <span className="font-medium">{opp.closeDate || '-'}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         )}
       </CardContent>
     </Card>

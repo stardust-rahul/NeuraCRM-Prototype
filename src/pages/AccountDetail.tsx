@@ -72,9 +72,23 @@ export default function AccountDetail({ accountId: propAccountId }) {
   const accountContacts = contacts.filter(contact => contact.account === accountToShow?.name);
 
   // Find related opportunities for this account
-  const relatedOpportunities = (opportunities || []).filter(
-    (opp) => opp.account === accountToShow?.name
+  let relatedOpportunities = (opportunities || []).filter(
+    (opp) => opp.account === accountToShow?.name || opp.accountName === accountToShow?.name || opp.company === accountToShow?.name
   );
+
+  // If no related opportunities, try to infer from all opportunities by loose matching
+  if (relatedOpportunities.length === 0 && accountToShow?.name) {
+    relatedOpportunities = (opportunities || []).filter(
+      (opp) => {
+        const accName = accountToShow.name.toLowerCase().replace(/\s+/g, '');
+        return (
+          (opp.account && opp.account.toLowerCase().replace(/\s+/g, '') === accName) ||
+          (opp.accountName && opp.accountName.toLowerCase().replace(/\s+/g, '') === accName) ||
+          (opp.company && opp.company.toLowerCase().replace(/\s+/g, '') === accName)
+        );
+      }
+    );
+  }
 
   // Modal state
   const [showContactModal, setShowContactModal] = useState(false);
