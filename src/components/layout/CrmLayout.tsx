@@ -47,10 +47,16 @@ const initialApps = [
   { name: "Pipelines", icon: ListChecks, description: "Visualize sales stages", href: "/pipelines", count: 3, status: "active", color: "bg-pink-600", type: "module" },
   { name: "Contacts", icon: Users, description: "All your contacts", href: "/contacts", count: 12, status: "active", color: "bg-indigo-600", type: "module" },
   { name: "Accounts", icon: Building2, description: "Manage accounts", href: "/accounts", count: 5, status: "active", color: "bg-cyan-600", type: "module" },
+  { name: "Products", icon: Building2, description: "Manage accounts", href: "/products", count: 6, status: "active", color: "bg-cyan-600", type: "module" },
+  { name: "Analytics", icon: Building2, description: "Manage accounts", href: "/analytics", count: 7, status: "active", color: "bg-cyan-600", type: "module" },
+  { name: "Cases", icon: Building2, description: "Manage accounts", href: "/cases", count: 8, status: "active", color: "bg-cyan-600", type: "module" },
+  { name: "Calender", icon: Building2, description: "Manage accounts", href: "/calender", count: 8, status: "active", color: "bg-cyan-600", type: "module" },
+  { name: "Campaigns", icon: Building2, description: "Manage accounts", href: "/campaigns", count: 14, status: "active", color: "bg-cyan-600", type: "module" },
   { name: "Opportunities", icon: Target, description: "Manage your sales pipeline", href: "/opportunities", count: 2, status: "active", color: "bg-teal-600", type: "module" },
   { name: "Email", icon: Mail, description: "Unified inbox", href: "/email", count: 12, status: "active", color: "bg-blue-500", type: "app" },
-  { name: "Chat", icon: MessageSquare, description: "Team messaging", href: "/chat", count: 3, status: "active", color: "bg-green-500", type: "app" },
-  { name: "VoIP", icon: Phone, description: "Business calls", href: "/voip", count: 2, status: "busy", color: "bg-orange-500", type: "app" },
+  { name: "Finance", icon: MessageSquare, description: "Team messaging", href: "/chat", count: 3, status: "active", color: "bg-green-500", type: "app" },
+  { name: "Service", icon: Phone, description: "service", href: "/service", count: 32, status: "busy", color: "bg-orange-500", type: "app" },
+  { name: "Legal", icon: Phone, description: "Business calls", href: "/voip", count: 2, status: "busy", color: "bg-orange-500", type: "app" },
 ];
 
 // Define all possible apps in one place
