@@ -35,9 +35,9 @@ const APP_NAMES = [
   "Dashboard",
   "Sales",
   "Marketing",
-  "Email",
-  "Chat",
-  "VoIP"
+  // "Email",
+  // "Chat",
+  // "VoIP"
 ];
 const initialApps = [
   { name: "Leads", icon: TrendingUp, description: "Manage potential customers", href: "/leads", count: 7, status: "active", color: "bg-blue-600", type: "module" },
