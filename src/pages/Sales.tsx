@@ -239,7 +239,8 @@ function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus }) 
 }
 
 export default function Sales({ defaultTab = "analytics" }) {
-  const [activeTab, setActiveTab] = useState(defaultTab);
+  // Change defaultTab to 'leads' always
+  const [activeTab, setActiveTab] = useState("leads");
   const { leads, addLead, removeLead, updateLead } = useLeads();
   const { addAccount } = useAccounts();
   const { contacts, addContact, updateContact, removeContact } = useContacts();
@@ -393,8 +394,8 @@ export default function Sales({ defaultTab = "analytics" }) {
   const filteredProducts = (products || []).filter(p => !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase()));
 
   useEffect(() => {
-    setActiveTab(defaultTab);
-  }, [defaultTab]);
+    setActiveTab("leads"); // Always set to 'leads' on mount
+  }, []);
 
   const handleLeadInput = (e) => {
     const { name, value } = e.target;
@@ -828,15 +829,7 @@ export default function Sales({ defaultTab = "analytics" }) {
               <div className="border-b bg-white px-8 py-4 mt-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <Button 
-                      variant="ghost" 
-                      onClick={() => setSelectedLead(null)}
-                      className="flex items-center space-x-2"
-                    >
-                      <ArrowLeft className="w-4 h-4" />
-                      <span>Back to Leads</span>
-                    </Button>
-                    <div className="h-6 w-px bg-border" />
+                    {/* Removed Back to Leads Button */}
                     <h1 className="text-xl font-semibold">{selectedLead.contact || selectedLead.name}</h1>
                     <Badge variant="outline">{selectedLead.company}</Badge>
                   </div>
