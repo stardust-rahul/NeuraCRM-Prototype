@@ -78,7 +78,7 @@ export default function Contacts() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search contacts..."
+              placeholder="     Search contacts..."
               className="w-56 pl-10 h-9"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
