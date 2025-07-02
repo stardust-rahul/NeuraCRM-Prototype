@@ -50,7 +50,7 @@ const initialApps = [
   { name: "Products", icon: Building2, description: "Manage accounts", href: "/products", count: 6, status: "active", color: "bg-cyan-600", type: "module" },
   { name: "Analytics", icon: Building2, description: "Manage accounts", href: "/analytics", count: 7, status: "active", color: "bg-cyan-600", type: "module" },
   { name: "Cases", icon: Building2, description: "Manage accounts", href: "/cases", count: 8, status: "active", color: "bg-cyan-600", type: "module" },
-  { name: "Calender", icon: Building2, description: "Manage accounts", href: "/calender", count: 8, status: "active", color: "bg-cyan-600", type: "module" },
+  { name: "Calls", icon: Building2, description: "Manage accounts", href: "/call", count: 8, status: "active", color: "bg-cyan-300", type: "module" },
   { name: "Campaigns", icon: Building2, description: "Manage accounts", href: "/campaigns", count: 14, status: "active", color: "bg-cyan-600", type: "module" },
   { name: "Opportunities", icon: Target, description: "Manage your sales pipeline", href: "/opportunities", count: 2, status: "active", color: "bg-teal-600", type: "module" },
   { name: "Email", icon: Mail, description: "Unified inbox", href: "/email", count: 12, status: "active", color: "bg-blue-500", type: "app" },
