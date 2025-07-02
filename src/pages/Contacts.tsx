@@ -33,7 +33,7 @@ import {
   TableHead,
 } from "@/components/ui/table";
 
-export default function Contacts() {
+export default function Contacts({ selectedLead }) {
   const { contacts, addContact } = useContacts();
   const [filter, setFilter] = useState("All Contacts");
   const [search, setSearch] = useState("");
@@ -155,16 +155,21 @@ export default function Contacts() {
             <DialogTitle>Add Contact</DialogTitle>
             <DialogDescription>Enter details for a new contact.</DialogDescription>
           </DialogHeader>
-          <AddContactForm onAdd={handleAdd} onCancel={() => setAddOpen(false)} />
+          <AddContactForm
+            key={`${selectedLead?.contact || selectedLead?.name || ''}-${addOpen ? 'open' : 'closed'}`}
+            onAdd={handleAdd}
+            onCancel={() => setAddOpen(false)}
+            initialName={selectedLead?.contact || selectedLead?.name || ""}
+          />
         </DialogContent>
       </Dialog>
     </div>
   );
 }
 
-function AddContactForm({ onAdd, onCancel }) {
+function AddContactForm({ onAdd, onCancel, initialName = "" }) {
   const [form, setForm] = useState({
-    name: "",
+    name: initialName,
     title: "",
     account: "",
     email: "",

@@ -41,6 +41,8 @@ import Pricing from "./pages/Pricing";
 import Opportunities from "./pages/Opportunities";
 import OpportunityDetail from "./pages/OpportunityDetail";
 import { OpportunitiesProvider } from "./context/OpportunitiesContext";
+import Quotes from "./pages/Quotes";
+import QuoteDetail from "./pages/QuoteDetail";
 
 const queryClient = new QueryClient();
 
@@ -55,49 +57,43 @@ const App = () => (
       <OpportunitiesProvider>
         <BrowserRouter>
           <Routes>
-                {/* Routes */}
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-                <Route path="*" element={
-                <ProtectedRoute>
-                  <CrmLayout>
-                      <Routes>
-                        <Route path="/dashboard" element={<Index />} />
-                        <Route path="/sales" element={<Sales />} />
-                        <Route path="/marketing" element={<Marketing />} />
-                        <Route path="/accounts" element={<Accounts />} />
-                        <Route path="/accounts/:accountId" element={<AccountDetail />} />
-                        <Route path="/settings" element={<Settings />} />
-                        <Route path="/workflow" element={<Workflow />} />
-                        <Route path="/workflow/intake" element={<Intake />} />
-                        <Route path="/workflow/assessment" element={<Assessment />} />
-                        <Route path="/workflow/repair" element={<Repair />} />
-                        <Route path="/workflow/returns" element={<Returns />} />
-                        <Route path="/workflow/warehouse" element={<Warehouse />} />
-                        <Route path="/workflow/recycling" element={<Recycling />} />
-                        <Route path="/contacts" element={<Contacts />} />
-                        <Route path="/contacts/:contactId" element={<ContactDetail />} />
-                        <Route path="/deals" element={<Deals />} />
-                        <Route path="/analytics" element={<Analytics />} />
-                        <Route path="/calendar" element={<Analytics />} />
-                        <Route path="/reports" element={<Reports />} />
-                        <Route path="/leads" element={<Leads />} />
-                        <Route path="/tasks" element={<Tasks />} />
-                        <Route path="/pipelines" element={<Pipelines />} />
-                        <Route path="/reports" element={<Reports />} />
-                        <Route path="/email" element={<Email />} />
-                        <Route path="/chat" element={<Chat />} />
-                        <Route path="/voip" element={<VoIP />} />
-                        <Route path="/automation" element={<Automation />} />
-            <Route path="/pricing" element={<Pricing />} />
-                        <Route path="/opportunities" element={<Opportunities />} />
-                        <Route path="/opportunities/:opportunityId" element={<OpportunityDetail />} />
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
-                  </CrmLayout>
-                </ProtectedRoute>
-                } />
+            <Route element={<ProtectedRoute><CrmLayout /></ProtectedRoute>}>
+              <Route path="/dashboard" element={<Index />} />
+              <Route path="/sales" element={<Sales />} />
+              <Route path="/marketing" element={<Marketing />} />
+              <Route path="/accounts" element={<Accounts />} />
+              <Route path="/accounts/:accountId" element={<AccountDetail />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/workflow" element={<Workflow />} />
+              <Route path="/workflow/intake" element={<Intake />} />
+              <Route path="/workflow/assessment" element={<Assessment />} />
+              <Route path="/workflow/repair" element={<Repair />} />
+              <Route path="/workflow/returns" element={<Returns />} />
+              <Route path="/workflow/warehouse" element={<Warehouse />} />
+              <Route path="/workflow/recycling" element={<Recycling />} />
+              <Route path="/contacts" element={<Contacts />} />
+              <Route path="/contacts/:contactId" element={<ContactDetail />} />
+              <Route path="/deals" element={<Deals />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/calendar" element={<Analytics />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/leads" element={<Leads />} />
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/pipelines" element={<Pipelines />} />
+              <Route path="/email" element={<Email />} />
+              <Route path="/chat" element={<Chat />} />
+              <Route path="/voip" element={<VoIP />} />
+              <Route path="/automation" element={<Automation />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/opportunities" element={<Opportunities />} />
+              <Route path="/opportunities/:opportunityId" element={<OpportunityDetail />} />
+              <Route path="/quotes" element={<Quotes />} />
+              <Route path="/quotes/:quoteId" element={<QuoteDetail />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </OpportunitiesProvider>

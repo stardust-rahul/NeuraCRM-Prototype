@@ -1,9 +1,10 @@
-import { ReactNode, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { Outlet } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import LeftNavbar from "./LeftNavbar";
 import RightAppsPanel from "./RightAppsPanel";
 import AIAssistantPanel from "./AIAssistantPanel";
-import { Bot, Menu, X, Grid3X3, Target, LayoutDashboard } from "lucide-react";
+import { Bot, Menu, X, Grid3X3, Target, LayoutDashboard, FileText } from "lucide-react";
 import {
   Mail,
   MessageSquare,
@@ -18,9 +19,6 @@ import {
 } from "lucide-react";
 import { LeadsProvider } from "@/context/LeadsContext";
 
-interface CrmLayoutProps {
-  children: ReactNode;
-}
 const MODULE_NAMES = [
   "Leads",
   "Contacts",
@@ -57,6 +55,7 @@ const initialApps = [
   { name: "Finance", icon: MessageSquare, description: "Team messaging", href: "/chat", count: 3, status: "active", color: "bg-green-500", type: "app" },
   { name: "Service", icon: Phone, description: "service", href: "/service", count: 32, status: "busy", color: "bg-orange-500", type: "app" },
   { name: "Legal", icon: Phone, description: "Business calls", href: "/voip", count: 2, status: "busy", color: "bg-orange-500", type: "app" },
+  { name: "Quotes", icon: FileText, description: "Manage sales quotes", href: "/quotes", count: 2, status: "active", color: "bg-orange-600", type: "module" },
 ];
 
 // Define all possible apps in one place
@@ -72,12 +71,12 @@ const allApps = [
     ...initialApps.filter(initialApp => !baseApps.some(app => app.name === initialApp.name))
 ];
 
-export default function CrmLayout({ children }: CrmLayoutProps) {
+export default function CrmLayout() {
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAppsOpen, setIsAppsOpen] = useState(true);
   // Start with the default visible apps
-  const [visibleApps, setVisibleApps] = useState(() => {
+  const [visibleApps, setVisibleApps] = useState<string[]>(() => {
     // Try to load from localStorage and clean up any legacy/incorrect entries
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('visibleApps');
@@ -154,7 +153,7 @@ export default function CrmLayout({ children }: CrmLayoutProps) {
   // For LeftNavbar, pass the app objects for visibleApps
   const visibleAppObjects = visibleApps
     .map((name) => allApps.find((app) => app.name === name))
-    .filter(Boolean);
+    .filter((app): app is typeof allApps[number] => Boolean(app));
 
   const addAppToNavbar = (app) => {
     if (!visibleApps.includes(app.name)) {
@@ -209,45 +208,8 @@ export default function CrmLayout({ children }: CrmLayoutProps) {
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Bar for Mobile */}
-        <div className="lg:hidden flex items-center justify-between p-4 border-b border-border bg-background">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsMobileMenuOpen(true)}
-          >
-            <Menu className="w-4 h-4" />
-          </Button>
-          <h1 className="text-lg font-semibold">NeuraCRM</h1>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsAppsOpen(!isAppsOpen)}
-            >
-              <Grid3X3 className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsAIOpen(!isAIOpen)}
-            >
-              <Bot className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 flex overflow-hidden">
-          <div className="flex-1 overflow-y-auto">{children}</div>
-
-          {/* AI Assistant Panel */}
-          <AIAssistantPanel
-            isOpen={isAIOpen}
-            onClose={() => setIsAIOpen(false)}
-          />
-        </div>
+      <main className="flex-1 flex flex-col min-w-0">
+        <Outlet />
       </main>
 
       {/* Right Apps Panel - Hidden on tablets and mobile */}
