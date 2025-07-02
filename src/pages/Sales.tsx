@@ -732,7 +732,25 @@ export default function Sales({ defaultTab = "analytics" }) {
         owner: convertForm.recordOwner,
       });
     }
-    // 3. (Optional) Create Opportunity - already handled in form
+    // 3. Create Opportunity (if not opted out)
+    if (
+      !convertForm.dontCreateOpportunity &&
+      convertForm.opportunityName &&
+      convertForm.accountName
+    ) {
+      addOpportunity({
+        id: `O-${Date.now()}`,
+        title: convertForm.opportunityName,
+        company: convertForm.accountName,
+        value: selectedLead?.value || '',
+        stage: 'prospect',
+        probability: 0,
+        closeDate: '',
+        owner: convertForm.recordOwner,
+        notes: '',
+        created: new Date().toLocaleDateString(),
+      });
+    }
     // 4. Set success step
     setConvertStep("success");
   };
