@@ -323,7 +323,7 @@ function OpportunitiesList({ opportunities, onSelect, onAddOpportunity, accounts
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex items-center justify-between px-2 py-2">
+      <div className="flex items-center justify-between px-8 py-3">
         <div className="flex items-center space-x-4">
           <h1 className="text-2xl font-bold">Opportunities</h1>
         </div>
@@ -360,8 +360,7 @@ function OpportunitiesList({ opportunities, onSelect, onAddOpportunity, accounts
           </Button>
         </div>
       </div>
-      <div className="mb-2 text-sm text-gray-500">{filtered.length} items • Updated a few seconds ago</div>
-      <div className="px-8 py-8">
+      <div className="px-8 pb-8">
         <div className="overflow-x-auto rounded border border-border/50 bg-white shadow-sm">
           <table className="min-w-full border-separate border-spacing-0">
             <thead>
@@ -372,7 +371,7 @@ function OpportunitiesList({ opportunities, onSelect, onAddOpportunity, accounts
                 <th className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Stage</th>
                 <th className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Close Date</th>
                 <th className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Opportunity Owner Alias</th>
-                <th className="text-right px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</th>
+                <th className="text-left px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -392,7 +391,7 @@ function OpportunitiesList({ opportunities, onSelect, onAddOpportunity, accounts
                   </td>
                   <td className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{opp.closeDate}</td>
                   <td className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{opp.ownerAlias}</td>
-                  <td className="px-2 py-1 text-right bg-white group-hover:bg-blue-50">
+                  <td className="px-2 py-1 text-left bg-white group-hover:bg-blue-50">
                     <Button variant="ghost" size="icon">
                       <ChevronDown className="h-4 w-4" />
                     </Button>

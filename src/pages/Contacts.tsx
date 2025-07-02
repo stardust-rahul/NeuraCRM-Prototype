@@ -59,7 +59,7 @@ export default function Contacts() {
 
   return (
     <div className="p-0 bg-background min-h-screen">
-      <div className="flex items-center justify-between px-4 py-3 border-b">
+      <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center space-x-4">
           <h1 className="text-2xl font-bold">Contacts</h1>
           <select
@@ -88,7 +88,7 @@ export default function Contacts() {
           <Button variant="outline" size="sm">Actions</Button>
           <Button size="sm" onClick={() => setAddOpen(true)}>
             <Plus className="w-4 h-4 mr-2" />
-            New
+            New Contact
           </Button>
         </div>
       </div>
@@ -106,7 +106,7 @@ export default function Contacts() {
                 <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Account</TableHead>
                 <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Last Contact</TableHead>
                 <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Status</TableHead>
-                <TableHead className="text-right px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
+                <TableHead className="text-left px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -128,7 +128,7 @@ export default function Contacts() {
                   <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
                     <Badge variant={contact.status === 'active' ? 'default' : 'secondary'}>{contact.status || 'unknown'}</Badge>
                   </TableCell>
-                  <TableCell className="px-2 py-1 text-right bg-white group-hover:bg-blue-50">
+                  <TableCell className="px-2 py-1 text-left bg-white group-hover:bg-blue-50">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">

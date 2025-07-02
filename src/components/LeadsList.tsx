@@ -36,7 +36,7 @@ export default function LeadsList({ leads, onLeadClick }) {
             <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Created</TableHead>
             <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Updated</TableHead>
             <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Notes</TableHead>
-            <TableHead className="text-right px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
+            <TableHead className="text-left px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -151,7 +151,7 @@ export default function LeadsList({ leads, onLeadClick }) {
                 <TableCell className="px-2 py-1 max-w-xs truncate border-r border-gray-200 bg-white group-hover:bg-blue-50" title={notes}>
                   {notes}
                 </TableCell>
-                <TableCell className="px-2 py-1 text-right bg-white group-hover:bg-blue-50">
+                <TableCell className="px-2 py-1 text-left bg-white group-hover:bg-blue-50">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon">
