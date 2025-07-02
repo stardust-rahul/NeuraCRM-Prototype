@@ -777,13 +777,13 @@ export default function Sales({ defaultTab = "analytics" }) {
             Sales
           </h1>
           
-          <p className="text-muted-foreground mt-1">
+          {/* <p className="text-muted-foreground mt-1">
             {activeTab === "leads"
               ? "Manage your leads and track their progress"
               : activeTab === "contacts"
               ? "All your contacts in one place"
-              : activeTab === "opportunities"
-              ? "Visualize and manage your sales pipeline"
+              // : activeTab === "opportunities"
+              / ? "Visualize and manage your sales pipeline"
               : activeTab === "quotes"
               ? "Create and manage sales quotes"
               : activeTab === "products"
@@ -791,7 +791,7 @@ export default function Sales({ defaultTab = "analytics" }) {
               : activeTab === "orders"
               ? "Track and fulfill customer orders"
               : "Manage your sales pipeline and track performance"}
-          </p>
+          </p> */}
         </div>
         <div className="flex items-center space-x-3">
           <Button variant="outline">
