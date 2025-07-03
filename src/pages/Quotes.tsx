@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,37 +49,22 @@ const stages = [
   "Closed Lost to Competition",
 ];
 
-const defaultQuoteFields = {
-  stage: "Qualification",
-  dealOwner: "Unassigned",
-  probability: 0,
-  expectedRevenue: "-",
-  closingDate: "",
-  contact: {
-    name: "-",
-    company: "-",
-    email: "-",
-    phone: "-",
-    avatar: "https://via.placeholder.com/48",
-  },
-  nextAction: {
-    date: "-",
-    action: "-",
-  },
-  notes: [],
-  attachments: [],
-};
+
 
 export default function Quotes() {
   const { quotes, addQuote, updateQuote, removeQuote } = useQuotes();
+  const navigate = useNavigate();
+
   const [search, setSearch] = useState("");
   const [addOpen, setAddOpen] = useState(false);
   const [newQuote, setNewQuote] = useState({
     customer: "",
     amount: "",
     status: "pending",
-    created: "",
+    created: new Date().toISOString().split("T")[0],
     owner: "",
+    contactName: "",
+    contactCompany: "",
     stage: stages[0],
   });
   const [selectedQuotes, setSelectedQuotes] = useState([]);
@@ -98,24 +83,32 @@ export default function Quotes() {
     if (editQuote) {
       updateQuote({ ...editQuote, ...newQuote });
     } else {
-      const sanitizedQuote = {
-        ...defaultQuoteFields,
-        ...Object.fromEntries(
-          Object.entries(newQuote).filter(([_, v]) => v !== "" && v !== undefined)
-        ),
-        id: `Q-${(quotes.length + 1).toString().padStart(3, "0")}`,
-        created: newQuote.created || new Date().toISOString().slice(0, 10),
+      const quoteToAdd = {
+        customer: newQuote.customer,
+        amount: newQuote.amount,
+        owner: newQuote.owner,
+        contact: {
+          name: newQuote.contactName,
+          company: newQuote.contactCompany,
+        },
+        stage: newQuote.stage,
       };
-      addQuote(sanitizedQuote);
+      const addedQuote = addQuote(quoteToAdd);
+      if (addedQuote && addedQuote.id) {
+        navigate(`/quotes/${addedQuote.id}`, { state: { quote: addedQuote } });
+      }
     }
+
     setAddOpen(false);
     setEditQuote(null);
     setNewQuote({
       customer: "",
       amount: "",
       status: "pending",
-      created: "",
+      created: new Date().toISOString().split("T")[0],
       owner: "",
+      contactName: "",
+      contactCompany: "",
       stage: stages[0],
     });
   };
@@ -140,8 +133,12 @@ export default function Quotes() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <Button variant="outline" size="sm">Import</Button>
-          <Button variant="outline" size="sm">Actions</Button>
+          <Button variant="outline" size="sm">
+            Import
+          </Button>
+          <Button variant="outline" size="sm">
+            Actions
+          </Button>
           <Button size="sm" onClick={() => setAddOpen(true)}>
             <Plus className="w-4 h-4 mr-2" />
             New Quote
@@ -155,44 +152,95 @@ export default function Quotes() {
             <TableHeader>
               <TableRow className="bg-gray-100 hover:bg-gray-100 border-b border-gray-300">
                 <TableHead className="w-[40px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">
-                  <input type="checkbox" checked={selectedQuotes.length === filteredQuotes.length && filteredQuotes.length > 0} onChange={e => {
-                    if (e.target.checked) {
-                      setSelectedQuotes(filteredQuotes.map(q => q.id));
-                    } else {
-                      setSelectedQuotes([]);
+                  <input
+                    type="checkbox"
+                    checked={
+                      selectedQuotes.length === filteredQuotes.length &&
+                      filteredQuotes.length > 0
                     }
-                  }} />
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedQuotes(filteredQuotes.map((q) => q.id));
+                      } else {
+                        setSelectedQuotes([]);
+                      }
+                    }}
+                  />
                 </TableHead>
-                <TableHead className="w-[50px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">#</TableHead>
-                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Customer</TableHead>
-                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Amount</TableHead>
-                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Status</TableHead>
-                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Created</TableHead>
-                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Owner</TableHead>
-                <TableHead className="text-left px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
+                <TableHead className="w-[50px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">
+                  #
+                </TableHead>
+                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">
+                  Customer
+                </TableHead>
+                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">
+                  Amount
+                </TableHead>
+                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">
+                  Status
+                </TableHead>
+                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">
+                  Created
+                </TableHead>
+                <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">
+                  Owner
+                </TableHead>
+                <TableHead className="text-left px-2 py-2 font-bold text-gray-700 bg-gray-100">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredQuotes.map((quote, idx) => (
-                <TableRow key={quote.id || idx} className="border-b border-gray-300 text-sm group hover:bg-blue-50 transition-colors">
+                <TableRow
+                  key={quote.id || idx}
+                  className="border-b border-gray-300 text-sm group hover:bg-blue-50 transition-colors cursor-pointer"
+                  onClick={() =>
+                    navigate(`/quotes/${quote.id}`, { state: { quote } })
+                  }
+                >
                   <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
-                    <input type="checkbox" checked={selectedQuotes.includes(quote.id)} onChange={e => {
-                      if (e.target.checked) setSelectedQuotes([...selectedQuotes, quote.id]);
-                      else setSelectedQuotes(selectedQuotes.filter(id => id !== quote.id));
-                    }} />
+                    <input
+                      type="checkbox"
+                      checked={selectedQuotes.includes(quote.id)}
+                      onChange={(e) => {
+                        if (e.target.checked)
+                          setSelectedQuotes([...selectedQuotes, quote.id]);
+                        else
+                          setSelectedQuotes(
+                            selectedQuotes.filter((id) => id !== quote.id)
+                          );
+                      }}
+                    />
                   </TableCell>
-                  <TableCell className="px-2 py-1 text-muted-foreground border-r border-gray-200 bg-white group-hover:bg-blue-50">{idx + 1}</TableCell>
-                  <TableCell className="px-2 py-1 font-medium border-r border-gray-200 bg-white group-hover:bg-blue-50">
-                    <Link to={`/quotes/${quote.id}`} className="text-blue-600 hover:underline cursor-pointer">
-                      {quote.customer}
-                    </Link>
+                  <TableCell className="px-2 py-1 text-muted-foreground border-r border-gray-200 bg-white group-hover:bg-blue-50">
+                    {idx + 1}
                   </TableCell>
-                  <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{quote.amount}</TableCell>
+                  <TableCell className="px-2 py-1 font-medium border-r border-gray-200 bg-white group-hover:bg-blue-50 text-blue-600">
+                    {quote.customer}
+                  </TableCell>
                   <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
-                    <Badge variant={quote.status === "approved" ? "default" : quote.status === "rejected" ? "destructive" : "secondary"}>{quote.status}</Badge>
+                    {quote.amount}
                   </TableCell>
-                  <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{quote.created}</TableCell>
-                  <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{quote.owner}</TableCell>
+                  <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
+                    <Badge
+                      variant={
+                        quote.status === "approved"
+                          ? "default"
+                          : quote.status === "rejected"
+                          ? "destructive"
+                          : "secondary"
+                      }
+                    >
+                      {quote.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
+                    {quote.created}
+                  </TableCell>
+                  <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
+                    {quote.owner}
+                  </TableCell>
                   <TableCell className="px-2 py-1 text-left bg-white group-hover:bg-blue-50">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -201,13 +249,24 @@ export default function Quotes() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setViewQuote(quote)}>
+                        <DropdownMenuItem
+                          onClick={() => setViewQuote(quote)}
+                        >
                           <Eye className="w-4 h-4 mr-2" /> View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => { setEditQuote(quote); setNewQuote(quote); setAddOpen(true); }}>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setEditQuote(quote);
+                            setNewQuote(quote);
+                            setAddOpen(true);
+                          }}
+                        >
                           <Edit className="w-4 h-4 mr-2" /> Edit Quote
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDelete(quote.id)}>
+                        <DropdownMenuItem
+                          className="text-red-600 focus:text-red-600"
+                          onClick={() => handleDelete(quote.id)}
+                        >
                           <Trash2 className="w-4 h-4 mr-2" /> Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -231,19 +290,70 @@ export default function Quotes() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Customer</label>
-                <Input value={newQuote.customer} onChange={e => setNewQuote(q => ({ ...q, customer: e.target.value }))} required />
+                <Input
+                  value={newQuote.customer}
+                  onChange={(e) =>
+                    setNewQuote((q) => ({ ...q, customer: e.target.value }))
+                  }
+                  required
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Amount</label>
-                <Input value={newQuote.amount} onChange={e => setNewQuote(q => ({ ...q, amount: e.target.value }))} required />
+                <Input
+                  value={newQuote.amount}
+                  onChange={(e) =>
+                    setNewQuote((q) => ({ ...q, amount: e.target.value }))
+                  }
+                  required
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Owner</label>
-                <Input value={newQuote.owner} onChange={e => setNewQuote(q => ({ ...q, owner: e.target.value }))} required />
+                <Input
+                  id="owner"
+                  value={newQuote.owner}
+                  onChange={(e) =>
+                    setNewQuote({ ...newQuote, owner: e.target.value })
+                  }
+                  placeholder="Owner ID"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Contact Name
+                </label>
+                <Input
+                  id="contactName"
+                  value={newQuote.contactName}
+                  onChange={(e) =>
+                    setNewQuote({ ...newQuote, contactName: e.target.value })
+                  }
+                  placeholder="e.g. Jane Doe"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Company
+                </label>
+                <Input
+                  id="contactCompany"
+                  value={newQuote.contactCompany}
+                  onChange={(e) =>
+                    setNewQuote({ ...newQuote, contactCompany: e.target.value })
+                  }
+                  placeholder="e.g. Acme Inc."
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Status</label>
-                <select className="w-full border rounded px-2 py-1" value={newQuote.status} onChange={e => setNewQuote(q => ({ ...q, status: e.target.value }))}>
+                <select
+                  className="w-full border rounded px-2 py-1"
+                  value={newQuote.status}
+                  onChange={(e) =>
+                    setNewQuote((q) => ({ ...q, status: e.target.value }))
+                  }
+                >
                   <option value="pending">Pending</option>
                   <option value="approved">Approved</option>
                   <option value="rejected">Rejected</option>

@@ -60,6 +60,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useLeads } from "@/context/LeadsContext";
 import { useAccounts } from "@/context/AccountsContext";
 import { useContacts } from "@/context/ContactsContext";
+import { useQuotes } from "@/context/QuotesContext";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import LeadsList from "@/components/LeadsList";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -150,24 +151,7 @@ const initialProducts = [
   },
 ];
 
-const initialQuotes = [
-  {
-    id: "Q-001",
-    customer: "Acme Corporation",
-    amount: "$12,500",
-    status: "pending",
-    created: "2024-06-01",
-    owner: "Sarah Johnson",
-  },
-  {
-    id: "Q-002",
-    customer: "TechFlow Inc",
-    amount: "$7,800",
-    status: "approved",
-    created: "2024-06-03",
-    owner: "Mike Chen",
-  },
-];
+
 
 const initialOrders = [
   {
@@ -246,6 +230,8 @@ export default function Sales({ defaultTab = "analytics" }) {
   const { leads, addLead, removeLead, updateLead } = useLeads();
   const { addAccount } = useAccounts();
   const { contacts, addContact, updateContact, removeContact } = useContacts();
+  const { quotes, addQuote, updateQuote, deleteQuote } = useQuotes();
+  const { opportunities, addOpportunity, removeOpportunity, updateOpportunity } = useOpportunities();
 
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [newLead, setNewLead] = useState({
@@ -285,7 +271,6 @@ export default function Sales({ defaultTab = "analytics" }) {
     status: "active",
     lastContact: "",
   });
-  const [quotes, setQuotes] = useState(initialQuotes);
   const [showQuoteForm, setShowQuoteForm] = useState(false);
   const [newQuote, setNewQuote] = useState({
     customer: "",
@@ -305,7 +290,6 @@ export default function Sales({ defaultTab = "analytics" }) {
     created: "",
     shipment: "pending",
   });
-  const { opportunities, addOpportunity, removeOpportunity, updateOpportunity } = useOpportunities();
   const [showOpportunityForm, setShowOpportunityForm] = useState(false);
   const [editingOpportunity, setEditingOpportunity] = useState(null);
   const [newOpportunity, setNewOpportunity] = useState({
@@ -378,7 +362,8 @@ export default function Sales({ defaultTab = "analytics" }) {
     removeContact(id);
   };
   const handleDeleteQuote = (id) => {
-    setQuotes((prev) => prev.filter((q) => q.id !== id));
+    deleteQuote(id);
+    toast({ title: "Quote Deleted", description: "The quote was deleted successfully." });
   };
   const handleDeleteOrder = (id) => {
     setOrders((prev) => prev.filter((o) => o.id !== id));
@@ -489,20 +474,13 @@ export default function Sales({ defaultTab = "analytics" }) {
   const handleAddQuote = (e) => {
     e.preventDefault();
     if (editQuote) {
-      setQuotes((prev) => prev.map((q) => q.id === editQuote.id ? { ...editQuote, ...newQuote } : q));
+      updateQuote({ ...editQuote, ...newQuote });
       toast({
         title: "Quote updated",
         description: `Quote for '${newQuote.customer}' was updated successfully!`,
       });
     } else {
-      setQuotes((prev) => [
-        {
-          ...newQuote,
-          id: `Q-${(prev.length + 1).toString().padStart(3, "0")}`,
-          created: newQuote.created || new Date().toISOString().slice(0, 10),
-        },
-        ...prev,
-      ]);
+      addQuote(newQuote);
       toast({
         title: "Quote created",
         description: `Quote for '${newQuote.customer}' was created successfully!`,
@@ -858,7 +836,7 @@ export default function Sales({ defaultTab = "analytics" }) {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     {/* Removed Back to Leads Button */}
-                    <h1 className="text-xl font-semibold">{selectedLead.contact || selectedLead.name}</h1>
+                    <h1 className="text-xl font-bold">{selectedLead.contact || selectedLead.name}</h1>
                     <Badge variant="outline">{selectedLead.company}</Badge>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -1243,8 +1221,8 @@ export default function Sales({ defaultTab = "analytics" }) {
                 {[5, 10, 20, 50].map(n => <option key={n} value={n}>{n}</option>)}
               </select>
               <Button variant="outline" size="sm" disabled={quotesPage === 1} onClick={() => setQuotesPage(p => Math.max(1, p - 1))}>&lt;</Button>
-              <span className="text-xs">Page {quotesPage} of {Math.max(1, Math.ceil(filteredQuotes.length / quotesView))}</span>
-              <Button variant="outline" size="sm" disabled={quotesPage === Math.ceil(filteredQuotes.length / quotesView) || filteredQuotes.length === 0} onClick={() => setQuotesPage(p => Math.min(Math.ceil(filteredQuotes.length / quotesView), p + 1))}>&gt;</Button>
+              <span className="text-xs">Page {quotesPage} of {Math.max(1, Math.ceil(quotes.length / quotesView))}</span>
+              <Button variant="outline" size="sm" disabled={quotesPage === Math.ceil(quotes.length / quotesView) || quotes.length === 0} onClick={() => setQuotesPage(p => Math.min(Math.ceil(quotes.length / quotesView), p + 1))}>&gt;</Button>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -1321,9 +1299,9 @@ export default function Sales({ defaultTab = "analytics" }) {
             <Table className="min-w-full border-separate border-spacing-0">
               <TableHeader>
                 <TableRow className="bg-gray-100 hover:bg-gray-100 border-b border-gray-300">
-                  <TableHead className="w-[40px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100"><input type="checkbox" checked={selectedQuotes.length === filteredQuotes.slice((quotesPage-1)*quotesView, quotesPage*quotesView).length && filteredQuotes.length > 0} onChange={e => {
+                  <TableHead className="w-[40px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100"><input type="checkbox" checked={selectedQuotes.length === quotes.slice((quotesPage-1)*quotesView, quotesPage*quotesView).length && quotes.length > 0} onChange={e => {
                     if (e.target.checked) {
-                      setSelectedQuotes(filteredQuotes.slice((quotesPage-1)*quotesView, quotesPage*quotesView).map(q => q.id));
+                      setSelectedQuotes(quotes.slice((quotesPage-1)*quotesView, quotesPage*quotesView).map(q => q.id));
                     } else {
                       setSelectedQuotes([]);
                     }
@@ -1338,7 +1316,7 @@ export default function Sales({ defaultTab = "analytics" }) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredQuotes.slice((quotesPage-1)*quotesView, quotesPage*quotesView).map((quote, idx) => (
+                {quotes.slice((quotesPage-1)*quotesView, quotesPage*quotesView).map((quote, idx) => (
                   <TableRow key={quote.id || idx} className="border-b border-gray-300 text-sm group hover:bg-blue-50 transition-colors">
                     <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
                       <input type="checkbox" checked={selectedQuotes.includes(quote.id)} onChange={e => {
