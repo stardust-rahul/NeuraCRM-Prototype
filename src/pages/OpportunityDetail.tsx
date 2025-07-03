@@ -10,6 +10,7 @@ import { useContacts } from '@/context/ContactsContext';
 import { useAccounts } from '@/context/AccountsContext';
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import OpportunityQuotes from '@/components/opportunities/OpportunityQuotes';
 
 const stages = ["Qualify", "Meet & Present", "Propose", "Negotiate", "Closed"];
 
@@ -264,6 +265,7 @@ export default function OpportunityDetail() {
               </div>
             </CardContent>
           </Card>
+          <OpportunityQuotes opportunity={safeOpportunity} />
         </div>
 
         {/* Middle Column */}

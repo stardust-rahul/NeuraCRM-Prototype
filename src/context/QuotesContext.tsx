@@ -20,6 +20,7 @@ const defaultQuoteFields = {
   probability: 0,
   expectedRevenue: "-",
   closingDate: "",
+  opportunityId: undefined,
   contact: {
     name: "-",
     company: "-",
@@ -70,10 +71,11 @@ export function QuotesProvider({ children }) {
       id: newId,
       dealOwner: quote.owner || 'Unassigned',
       created: quote.created || new Date().toISOString().slice(0, 10),
-      contact: { // Correctly merge contact details
+      opportunityId: quote.opportunityId,
+      contact: {
         ...defaultQuoteFields.contact,
         ...quote.contact,
-        avatar: `https://i.pravatar.cc/48?u=${newId}` // Assign a unique dummy avatar
+        avatar: `https://i.pravatar.cc/48?u=${newId}`
       },
       lineItems: [
         { id: 'LI-001', product: 'Standard CRM Package', description: 'Includes sales, marketing, and service modules.', quantity: 1, unitPrice: 8500, total: 8500 },
