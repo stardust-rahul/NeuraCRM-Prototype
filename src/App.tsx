@@ -43,6 +43,8 @@ import OpportunityDetail from "./pages/OpportunityDetail";
 import { OpportunitiesProvider } from "./context/OpportunitiesContext";
 import Quotes from "./pages/Quotes";
 import QuoteDetail from "./pages/QuoteDetail";
+import Orders from "./pages/Orders";
+import OrderDetail from "./pages/OrderDetail";
 
 const queryClient = new QueryClient();
 
@@ -74,7 +76,7 @@ const App = () => (
               <Route path="/workflow/returns" element={<Returns />} />
               <Route path="/workflow/warehouse" element={<Warehouse />} />
               <Route path="/workflow/recycling" element={<Recycling />} />
-              <Route path="/contacts" element={<Contacts />} />
+              <Route path="/contacts" element={<Contacts selectedLead={null} />} />
               <Route path="/contacts/:contactId" element={<ContactDetail />} />
               <Route path="/deals" element={<Deals />} />
               <Route path="/analytics" element={<Analytics />} />
@@ -92,6 +94,8 @@ const App = () => (
               <Route path="/opportunities/:opportunityId" element={<OpportunityDetail />} />
               <Route path="/quotes" element={<Quotes />} />
               <Route path="/quotes/:quoteId" element={<QuoteDetail />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/orders/:orderId" element={<OrderDetail />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
