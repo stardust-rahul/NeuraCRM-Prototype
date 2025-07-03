@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,11 +7,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronDown, Edit, Check, Crown, Mail, Calendar, Clock, RefreshCw, Settings2, Info, FileText } from 'lucide-react';
 import { useOpportunities } from '@/context/OpportunitiesContext';
 import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 const stages = ["Qualify", "Meet & Present", "Propose", "Negotiate", "Closed"];
 
 function StageIndicator({ currentStage, onStageChange }) {
-  const currentIndex = stages.indexOf(currentStage);
+  // If currentStage is Closed Won or Closed Lost, treat as Closed for index
+  const closedTypes = ["Closed Won", "Closed Lost"];
+  const isClosedType = closedTypes.includes(currentStage);
+  const currentIndex = isClosedType ? stages.length - 1 : stages.indexOf(currentStage);
   return (
     <div className="flex items-center">
       <Button variant="ghost" size="icon" className="border rounded-full mr-2">
@@ -22,7 +26,9 @@ function StageIndicator({ currentStage, onStageChange }) {
           if (!stage) return null;
           const isActive = index === currentIndex;
           const isCompleted = index < currentIndex;
-          const isClickable = index !== currentIndex && (stage !== 'Closed' || currentStage !== 'Closed');
+          const isClickable = index !== currentIndex && (stage !== 'Closed' || !isClosedType);
+          // Show Closed Won/Lost in place of Closed if selected
+          const displayStage = (stage === 'Closed' && isClosedType) ? currentStage : stage;
           return (
             <button
               key={stage}
@@ -35,7 +41,7 @@ function StageIndicator({ currentStage, onStageChange }) {
               {isCompleted && !isActive ? (
                 <Check className="w-5 h-5" />
               ) : (
-                <span>{stage}</span>
+                <span>{displayStage}</span>
               )}
             </button>
           );
@@ -68,6 +74,9 @@ export default function OpportunityDetail() {
     stage: opportunity?.stage ?? '-',
   };
 
+  // State for closed dialog
+  const [showClosedDialog, setShowClosedDialog] = useState(false);
+
   if (!opportunity) {
     return <div className="p-8 text-center text-lg text-red-600">Opportunity not found</div>;
   }
@@ -94,7 +103,17 @@ export default function OpportunityDetail() {
   // Handler to update the stage of the opportunity
   const handleStageChange = (newStage) => {
     if (!opportunity) return;
-    updateOpportunity({ ...opportunity, stage: newStage });
+    if (newStage === 'Closed') {
+      setShowClosedDialog(true);
+    } else {
+      updateOpportunity({ ...opportunity, stage: newStage });
+    }
+  };
+
+  // Handler for selecting closed type
+  const handleClosedTypeSelect = (type) => {
+    setShowClosedDialog(false);
+    updateOpportunity({ ...opportunity, stage: type });
   };
 
   return (
@@ -121,15 +140,45 @@ export default function OpportunityDetail() {
       </div>
       
       {/* Stage Tracker */}
-      <div className="bg-white border-b p-4 flex justify-between items-center">
-        <div className="w-full md:w-2/3 lg:w-3/4">
-          <StageIndicator currentStage={safeOpportunity.stage} onStageChange={stage => handleStageChange(stage)} />
+      <div className="bg-white border-b p-4 flex flex-col md:flex-row md:justify-between items-center">
+        <div className="flex justify-center w-full md:w-auto mb-2 md:mb-0">
+          <div className="max-w-3xl w-full">
+            <StageIndicator currentStage={safeOpportunity.stage} onStageChange={stage => handleStageChange(stage)} />
+          </div>
         </div>
-        <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
+        <Button
+          variant="default"
+          className="bg-blue-600 hover:bg-blue-700"
+          onClick={() => {
+            if (safeOpportunity.stage !== 'Closed' && safeOpportunity.stage !== 'Closed Won' && safeOpportunity.stage !== 'Closed Lost') {
+              // Move to Closed, which will trigger dialog
+              handleStageChange('Closed');
+            } else {
+              // Already at Closed, just open dialog
+              setShowClosedDialog(true);
+            }
+          }}
+        >
           <Check className="h-4 w-4 mr-2" />
           Mark Stage as Complete
         </Button>
       </div>
+
+      {/* Closed Stage Dialog */}
+      <Dialog open={showClosedDialog} onOpenChange={setShowClosedDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Select Closed Stage</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <Button variant="outline" className="w-full" onClick={() => handleClosedTypeSelect('Closed Won')}>Closed Won</Button>
+            <Button variant="outline" className="w-full" onClick={() => handleClosedTypeSelect('Closed Lost')}>Closed Lost</Button>
+          </div>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setShowClosedDialog(false)}>Cancel</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
         {/* Left Column */}
