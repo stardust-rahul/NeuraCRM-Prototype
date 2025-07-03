@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronDown, Edit, Check, Crown, Mail, Calendar, Clock, RefreshCw, Settings2, Info, FileText } from 'lucide-react';
 import { useOpportunities } from '@/context/OpportunitiesContext';
+import { useContacts } from '@/context/ContactsContext';
+import { useAccounts } from '@/context/AccountsContext';
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
@@ -54,6 +56,8 @@ function StageIndicator({ currentStage, onStageChange }) {
 
 export default function OpportunityDetail() {
   const { updateOpportunity } = useOpportunities();
+  const { contacts } = useContacts();
+  const { accounts } = useAccounts();
   const { opportunityId } = useParams();
   const navigate = useNavigate();
   const { opportunities } = useOpportunities();
@@ -73,6 +77,11 @@ export default function OpportunityDetail() {
     owner: opportunity?.owner ?? '-',
     stage: opportunity?.stage ?? '-',
   };
+
+  // Find full account info
+  const accountObj = accounts?.find(a => a.name === safeOpportunity.account);
+  // Find main contact info
+  const mainContact = contacts?.find(c => c.name === opportunity?.contact);
 
   // State for closed dialog
   const [showClosedDialog, setShowClosedDialog] = useState(false);
@@ -192,7 +201,30 @@ export default function OpportunityDetail() {
             </CardHeader>
             <CardContent className="text-sm space-y-1">
               <DetailRow label="Opportunity Name" value={safeOpportunity.title} />
-              <DetailRow label="Account Name" value={safeOpportunity.account} isLink to="/account/1" />
+              {accountObj ? (
+                <div className="flex justify-between items-center py-2 border-b">
+                  <span className="text-gray-500">Account Name</span>
+                  <Link to={`/account/${accountObj.id}`} className="text-blue-600 hover:underline font-medium text-right">{accountObj.name}</Link>
+                </div>
+              ) : (
+                <DetailRow label="Account Name" value={safeOpportunity.account} />
+              )}
+              {accountObj && (
+                <>
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <span className="text-gray-500">Industry</span>
+                    <span className="font-medium text-right">{accountObj.industry || '-'}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <span className="text-gray-500">Website</span>
+                    <a href={`http://${accountObj.website}`} className="text-blue-600 hover:underline font-medium text-right" target="_blank" rel="noopener noreferrer">{accountObj.website}</a>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <span className="text-gray-500">Account Owner</span>
+                    <span className="font-medium text-right">{accountObj.owner || '-'}</span>
+                  </div>
+                </>
+              )}
               <DetailRow label="Close Date" value={safeOpportunity.closeDate} />
               <DetailRow label="Amount" value={safeOpportunity.amount} />
               <DetailRow label="Description" value="-" />
@@ -278,24 +310,67 @@ export default function OpportunityDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {opportunity.contactRoles && opportunity.contactRoles.length > 0 ? (
-                opportunity.contactRoles.map((contact) => (
-                  <div key={contact.id} className="text-sm space-y-2 py-2 border-b last:border-b-0">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                         <Avatar className="h-8 w-8 mr-2">
-                            <AvatarFallback>{contact.name ? contact.name.charAt(0) : '?'}</AvatarFallback>
+              {(opportunity.contactRoles && opportunity.contactRoles.length > 0) ? (
+                opportunity.contactRoles.map((role) => {
+                  const fullContact = contacts?.find(c => c.id === role.id);
+                  return (
+                    <div key={role.id} className="text-sm space-y-2 py-2 border-b last:border-b-0">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Avatar className="h-8 w-8 mr-2">
+                            <AvatarFallback>{role.name ? role.name.charAt(0) : '?'}</AvatarFallback>
                           </Avatar>
-                         <Link to={`/contacts/${contact.id}`} className="font-semibold text-blue-600 hover:underline">{contact.name || '-'}</Link>
-                          <Badge variant="secondary" className="ml-2">{contact.role ? contact.role.toUpperCase() : '-'}</Badge>
+                          <Link to={`/contacts/${role.id}`} className="font-semibold text-blue-600 hover:underline">{role.name || (fullContact?.name) || '-'}</Link>
+                          <Badge variant="secondary" className="ml-2">{role.role ? role.role.toUpperCase() : '-'}</Badge>
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-7 w-7"><ChevronDown className="h-5 w-5"/></Button>
                       </div>
-                      <Button variant="ghost" size="icon" className="h-7 w-7"><ChevronDown className="h-5 w-5"/></Button>
+                      <div className="text-xs text-muted-foreground pl-10">
+                        Role: {role.title || fullContact?.title || '-'}<br/>
+                        {fullContact?.email && (<span>Email: {fullContact.email}<br/></span>)}
+                        {fullContact?.phone && (<span>Phone: {fullContact.phone}</span>)}
+                      </div>
                     </div>
-                     <div className="text-xs text-muted-foreground pl-10">Role: {contact.title}</div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
-                <p className="text-sm text-gray-500">No contact roles.</p>
+                (() => {
+                  if (mainContact) {
+                    return (
+                      <div className="text-sm space-y-2 py-2 border-b last:border-b-0">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <Avatar className="h-8 w-8 mr-2">
+                              <AvatarFallback>{mainContact.name ? mainContact.name.charAt(0) : '?'}</AvatarFallback>
+                            </Avatar>
+                            <Link to={`/contacts/${mainContact.id}`} className="font-semibold text-blue-600 hover:underline">{mainContact.name}</Link>
+                            <Badge variant="secondary" className="ml-2">MAIN</Badge>
+                          </div>
+                        </div>
+                        <div className="text-xs text-muted-foreground pl-10">
+                          Title: {mainContact.title || '-'}<br/>
+                          Email: {mainContact.email || '-'}<br/>
+                          Phone: {mainContact.phone || '-'}
+                        </div>
+                      </div>
+                    );
+                  } else if (opportunity.contact) {
+                    // Show just the name if not found in contacts
+                    return (
+                      <div className="text-sm space-y-2 py-2 border-b last:border-b-0">
+                        <div className="flex items-center">
+                          <Avatar className="h-8 w-8 mr-2">
+                            <AvatarFallback>{opportunity.contact.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <span className="font-semibold">{opportunity.contact}</span>
+                          <Badge variant="secondary" className="ml-2">MAIN</Badge>
+                        </div>
+                      </div>
+                    );
+                  } else {
+                    return <p className="text-sm text-gray-500">No contact roles.</p>;
+                  }
+                })()
               )}
                <Button variant="link" className="p-0 h-auto mt-2 text-sm text-blue-600">View All</Button>
             </CardContent>
