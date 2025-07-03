@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
-import { Filter, Plus, Search, Eye, Edit, Phone, Mail, Calendar, MoreHorizontal, ArrowUpRight, Trash, ArrowLeft, MapPin, Globe, Building, User, DollarSign, Tag, Clock, FileText, Check, CheckCircle, Building2, Contact2, Crown, Pencil, X, ChevronDown, ChevronRight, UploadCloud, PieChart } from "lucide-react";
+import { Filter, Plus, Search, Eye, Edit, Phone, Mail, Calendar, MoreHorizontal, ArrowUpRight, Trash, ArrowLeft, MapPin, Globe, Building, User, DollarSign, Tag, Clock, FileText, Check, CheckCircle, Building2, Contact2, Crown, Pencil, X, ChevronDown, ChevronRight, UploadCloud, PieChart, UserPlus } from "lucide-react";
 import { useLeads } from "@/context/LeadsContext";
 import { useAccounts } from "@/context/AccountsContext";
 import { useContacts } from "@/context/ContactsContext";
@@ -78,9 +78,9 @@ function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus, ma
       <div className="w-full flex flex-row items-center justify-center px-2 sm:px-8 pt-6 pb-2">
         <div className="relative w-full">
           <div className="flex-1 flex items-center w-full flex-nowrap overflow-x-auto bg-white border rounded-lg min-h-[54px]">
-            {stages.map((stage, idx) => {
-              const isCompleted = idx < currentIdx;
-              const isCurrent = idx === currentIdx;
+        {stages.map((stage, idx) => {
+          const isCompleted = idx < currentIdx;
+          const isCurrent = idx === currentIdx;
               // Arrow points for SVG
               let points =
                 idx === 0
@@ -89,19 +89,19 @@ function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus, ma
               // Fill and text color logic
               let fill = isCompleted
                 ? "#e7f0fd"
-                : isCurrent
+            : isCurrent
                 ? "#2563eb"
-                : "#f8fafc";
+                : "#e5e7eb";
               let textColor = isCurrent ? "#fff" : isCompleted ? "#2563eb" : "#334155";
               let fontWeight = isCurrent ? "bold" : "normal";
-              return (
+          return (
                 <div key={stage} style={{ minWidth: width, maxWidth: width, position: 'relative', zIndex: isCurrent ? 2 : 1 }}>
                   <svg
                     width={width}
                     height={height}
                     viewBox={`0 0 ${width} ${height}`}
                     style={{ display: 'block', cursor: 'pointer', minWidth: width }}
-                    onClick={() => onStageChange(stage)}
+                onClick={() => onStageChange(stage)}
                   >
                     <polygon
                       points={points}
@@ -123,23 +123,23 @@ function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus, ma
                       {isCompleted ? '\u2713 ' : ''}{stage}
                     </text>
                   </svg>
-                </div>
-              );
-            })}
-          </div>
+            </div>
+          );
+        })}
+      </div>
         </div>
         <div className="flex flex-col items-center ml-4" style={{ minWidth: 220 }}>
           {/* Remove green message from here, only keep the button */}
-          {currentIdx === stages.length - 1 && (
+      {currentIdx === stages.length - 1 && (
             <button
               className="px-6 py-2 rounded-full bg-[#22c55e] text-white font-semibold flex items-center gap-2 hover:bg-[#16a34a] transition whitespace-nowrap shadow"
               style={{ height: 44, fontSize: 16, minWidth: 0, alignSelf: 'center' }}
               onClick={onSelectConvertedStatus}
             >
               Mark Status as Complete
-            </button>
-          )}
-        </div>
+        </button>
+      )}
+    </div>
       </div>
     </>
   );
@@ -278,13 +278,13 @@ export default function Leads() {
   const resetConvertForm = () => {
     setConvertForm({
       accountType: "new",
-      accountName: selectedLead?.company || "",
+      accountName: selectedLead?.company || selectedLead?.name || "",
       existingAccount: "",
       contactType: "new",
       contactName: selectedLead?.contact || selectedLead?.name || "",
       existingContact: "",
       opportunityType: "new",
-      opportunityName: selectedLead?.company ? `${selectedLead.company}-` : "",
+      opportunityName: "",
       dontCreateOpportunity: false,
       recordOwner: "Vishal Paswan",
       convertedStatus: "Qualified",
@@ -319,7 +319,7 @@ export default function Leads() {
     contactName: selectedLead?.contact || selectedLead?.name || "",
     existingContact: "",
     opportunityType: "new",
-    opportunityName: selectedLead?.company ? `${selectedLead.company}-` : "",
+    opportunityName: "",
     dontCreateOpportunity: false,
     recordOwner: "Vishal Paswan",
     convertedStatus: "Qualified",
@@ -424,6 +424,15 @@ export default function Leads() {
   const [markedStage, setMarkedStage] = useState(null);
   const [showMarkedMsg, setShowMarkedMsg] = useState(false);
 
+  // Add at the top of the Leads component:
+  const [pieChartKey, setPieChartKey] = useState(Date.now());
+  useEffect(() => {
+    setPieChartKey(Date.now());
+  }, [selectedLead]);
+
+  // Add at the top of the Leads component, near other useState hooks
+  const [convertModalMode, setConvertModalMode] = useState(null); // 'contact' | 'account' | 'opportunity' | null
+
   // If a lead is selected, show the detail view
   if (selectedLead) {
     // Use localStatus if set, else selectedLead.status
@@ -457,7 +466,7 @@ export default function Leads() {
                 </DialogHeader>
                 <form className="divide-y divide-gray-200" onSubmit={e => { e.preventDefault(); handleLeadConversion(); }}>
                   {/* Contact Section (moved above Account Section) */}
-                  <div className="flex flex-col">
+                  <div className="flex flex-col" style={convertModalMode === 'account' || convertModalMode === 'opportunity' ? { opacity: 0.5, pointerEvents: 'none' } : {}}>
                     <div className="flex items-center border-l-4 border-blue-500 bg-gray-50 px-8 py-3">
                       <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
                       <span className="font-semibold text-base">Contact</span>
@@ -513,7 +522,7 @@ export default function Leads() {
                     </div>
                   </div>
                   {/* Account Section (now below Contact Section) */}
-                  <div className="flex flex-col">
+                  <div className="flex flex-col" style={convertModalMode === 'contact' || convertModalMode === 'opportunity' ? { opacity: 0.5, pointerEvents: 'none' } : {}}>
                     <div className="flex items-center border-l-4 border-blue-500 bg-gray-50 px-8 py-3">
                       <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
                       <span className="font-semibold text-base">Account</span>
@@ -522,17 +531,17 @@ export default function Leads() {
                       {/* Create New Account */}
                       <div className="pr-0 md:pr-4 border-b md:border-b-0 md:border-r border-gray-200 flex flex-col">
                         <label className="flex items-center gap-2 mb-2">
-                          <input type="radio" name="accountType" checked={convertForm.accountType === 'new'} onChange={() => setConvertForm(f => ({ ...f, accountType: 'new' }))} />
+                          <input type="radio" name="accountType" checked={convertForm.accountType === 'new'} onChange={() => setConvertForm(f => ({ ...f, accountType: 'new' }))} disabled={showConvertModal && convertForm.dontCreateOpportunity && convertForm.accountType === 'new'} />
                           <span className="font-semibold">Create New Account</span>
                         </label>
                         <div className="bg-white border rounded-lg p-4 mt-2">
-                          <input className="w-full border rounded px-3 py-2" value={convertForm.accountName} onChange={e => setConvertForm(f => ({ ...f, accountName: e.target.value }))} required />
+                          <input className="w-full border rounded px-3 py-2" value={convertForm.accountName} onChange={e => setConvertForm(f => ({ ...f, accountName: e.target.value }))} required disabled={showConvertModal && convertForm.dontCreateOpportunity && convertForm.accountType === 'new'} />
                         </div>
                       </div>
                       {/* Choose Existing Account */}
                       <div className="pl-0 md:pl-4 flex flex-col">
                         <label className="flex items-center gap-2 mb-2">
-                          <input type="radio" name="accountType" checked={convertForm.accountType === 'existing'} onChange={() => setConvertForm(f => ({ ...f, accountType: 'existing' }))} />
+                          <input type="radio" name="accountType" checked={convertForm.accountType === 'existing'} onChange={() => setConvertForm(f => ({ ...f, accountType: 'existing' }))} disabled={showConvertModal && convertForm.dontCreateOpportunity && convertForm.accountType === 'new'} />
                           <span className="font-semibold">Choose Existing Account</span>
                         </label>
                         <div className="bg-white border rounded-lg p-4 mt-2 relative">
@@ -544,6 +553,7 @@ export default function Leads() {
                               value={accountSearch}
                               onChange={e => setAccountSearch(e.target.value)}
                               onFocus={() => setConvertForm(f => ({ ...f, accountType: 'existing' }))}
+                              disabled={showConvertModal && convertForm.dontCreateOpportunity && convertForm.accountType === 'new'}
                             />
                             <Search className="w-4 h-4 text-gray-400" />
                           </div>
@@ -569,7 +579,7 @@ export default function Leads() {
                     </div>
                   </div>
                   {/* Opportunity Section */}
-                  <div className="flex flex-col">
+                  <div className="flex flex-col" style={convertModalMode === 'contact' || convertModalMode === 'account' || convertForm.convertedStatus === 'Unqualified' ? { opacity: 0.5, pointerEvents: 'none' } : {}}>
                     <div className="flex items-center border-l-4 border-blue-500 bg-gray-50 px-8 py-3">
                       <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
                       <span className="font-semibold text-base">Opportunity</span>
@@ -578,13 +588,13 @@ export default function Leads() {
                       {/* Create New Opportunity */}
                       <div className="pr-0 md:pr-4 border-b md:border-b-0 md:border-r border-gray-200 flex flex-col">
                         <label className="flex items-center gap-2 mb-2">
-                          <input type="radio" name="opportunityType" checked={convertForm.opportunityType === 'new'} onChange={() => setConvertForm(f => ({ ...f, opportunityType: 'new' }))} />
+                          <input type="radio" name="opportunityType" checked={convertForm.opportunityType === 'new'} onChange={() => setConvertForm(f => ({ ...f, opportunityType: 'new' }))} disabled={showConvertModal && convertForm.dontCreateOpportunity && convertForm.accountType === 'new' || convertForm.convertedStatus === 'Unqualified'} />
                           <span className="font-semibold">Create New Opportunity</span>
                         </label>
                         <div className="bg-white border rounded-lg p-4 mt-2">
-                          <input className="w-full border rounded px-3 py-2" value={convertForm.opportunityName} onChange={e => setConvertForm(f => ({ ...f, opportunityName: e.target.value }))} />
+                          <input className="w-full border rounded px-3 py-2" value={convertForm.opportunityName} onChange={e => setConvertForm(f => ({ ...f, opportunityName: e.target.value }))} disabled={showConvertModal && convertForm.dontCreateOpportunity && convertForm.accountType === 'new' || convertForm.convertedStatus === 'Unqualified'} />
                           <label className="flex items-center gap-2 mt-2 text-xs">
-                            <input type="checkbox" checked={convertForm.dontCreateOpportunity} onChange={e => setConvertForm(f => ({ ...f, dontCreateOpportunity: e.target.checked }))} />
+                            <input type="checkbox" checked={convertForm.dontCreateOpportunity} onChange={e => setConvertForm(f => ({ ...f, dontCreateOpportunity: e.target.checked }))} disabled={showConvertModal && convertForm.dontCreateOpportunity && convertForm.accountType === 'new' || convertForm.convertedStatus === 'Unqualified'} />
                             Don't create an opportunity upon conversion
                           </label>
                         </div>
@@ -592,7 +602,7 @@ export default function Leads() {
                       {/* Choose Existing Opportunity */}
                       <div className="pl-0 md:pl-4 flex flex-col">
                         <label className="flex items-center gap-2 mb-2">
-                          <input type="radio" name="opportunityType" checked={convertForm.opportunityType === 'existing'} onChange={() => setConvertForm(f => ({ ...f, opportunityType: 'existing' }))} />
+                          <input type="radio" name="opportunityType" checked={convertForm.opportunityType === 'existing'} onChange={() => setConvertForm(f => ({ ...f, opportunityType: 'existing' }))} disabled={showConvertModal && convertForm.dontCreateOpportunity && convertForm.accountType === 'new' || convertForm.convertedStatus === 'Unqualified'} />
                           <span className="font-semibold">Choose Existing Opportunity</span>
                         </label>
                         <div className="bg-white border rounded-lg p-4 mt-2 relative">
@@ -604,6 +614,7 @@ export default function Leads() {
                               value={opportunitySearch}
                               onChange={e => setOpportunitySearch(e.target.value)}
                               onFocus={() => setConvertForm(f => ({ ...f, opportunityType: 'existing' }))}
+                              disabled={showConvertModal && convertForm.dontCreateOpportunity && convertForm.accountType === 'new' || convertForm.convertedStatus === 'Unqualified'}
                             />
                             <Search className="w-4 h-4 text-gray-400" />
                           </div>
@@ -642,10 +653,7 @@ export default function Leads() {
                         <label className="block text-xs font-semibold mb-1 text-red-600">* Converted Status</label>
                         <select className="w-full border rounded px-3 py-2" value={convertForm.convertedStatus} onChange={e => setConvertForm(f => ({ ...f, convertedStatus: e.target.value }))}>
                           <option value="Qualified">Qualified</option>
-                          {/* <option value="Contacted">Contacted</option>
-                          <option value="Nurturing">Nurturing</option>
                           <option value="Unqualified">Unqualified</option>
-                          <option value="Converted">Converted</option> */}
                         </select>
                       </div>
                     </div>
@@ -1024,44 +1032,76 @@ export default function Leads() {
                 )}
               </Card>
 
-              {/* Tags (moved below Notes) */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('tags')}>
+              {/* Quick Actions */}
+              <Card className={collapsedTiles['quickActions'] ? 'min-h-[48px]' : ''}>
+                <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('quickActions')}>
                   <div className="flex items-center gap-2">
-                    <Tag className="w-5 h-5" />
-                    <span className="text-lg font-semibold">Tags</span>
+                    <MoreHorizontal className="w-5 h-5" />
+                    <span className="text-lg font-semibold">Quick Actions</span>
                   </div>
                   <Button size="icon" variant="ghost" tabIndex={-1} type="button">
-                    {collapsedTiles['tags'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    {collapsedTiles['quickActions'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                   </Button>
                 </CardHeader>
-                {!collapsedTiles['tags'] && (
-                <CardContent>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {selectedLead.tags && typeof selectedLead.tags === 'string' && selectedLead.tags.trim()
-                        ? selectedLead.tags.split(',').map((tag, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">{tag.trim()}</Badge>
-                          ))
-                        : <p className="text-sm text-muted-foreground">No tags assigned</p>
-                      }
-                  </div>
-                    <form className="flex gap-2" onSubmit={e => {
-                      e.preventDefault();
-                      if (tagInput.trim()) {
-                        const newTags = selectedLead.tags ? selectedLead.tags + ',' + tagInput : tagInput;
-                        setSelectedLead(prev => ({ ...prev, tags: newTags }));
-                        setTagInput("");
-                      }
-                    }}>
-                      <Input
-                        value={tagInput}
-                        onChange={e => setTagInput(e.target.value)}
-                        placeholder="Add tag keyword..."
-                        className="w-auto flex-1"
-                      />
-                      <Button type="submit" size="sm">Add</Button>
-                    </form>
-                </CardContent>
+                {!collapsedTiles['quickActions'] && (
+                  <CardContent>
+                    <div className="flex flex-col gap-4 items-center justify-center">
+                      <Button
+                        className="w-full py-4 rounded-lg bg-gray-100 text-gray-800 font-semibold text-base shadow transition-colors duration-150 hover:bg-blue-500 hover:text-white border-0"
+                        onClick={() => {
+                          setShowConvertModal(true);
+                          setConvertStep("form");
+                          setConvertModalMode('contact');
+                          setConvertForm(f => ({
+                            ...f,
+                            accountType: 'new',
+                            contactType: 'new',
+                            opportunityType: 'new',
+                            dontCreateOpportunity: true,
+                            convertedStatus: 'Qualified',
+                          }));
+                        }}
+                      >
+                        Add Contact
+                      </Button>
+                      <Button
+                        className="w-full py-4 rounded-lg bg-gray-100 text-gray-800 font-semibold text-base shadow transition-colors duration-150 hover:bg-blue-500 hover:text-white border-0"
+                        onClick={() => {
+                          setShowConvertModal(true);
+                          setConvertStep("form");
+                          setConvertModalMode('account');
+                          setConvertForm(f => ({
+                            ...f,
+                            accountType: 'new',
+                            contactType: 'new',
+                            opportunityType: 'new',
+                            dontCreateOpportunity: true,
+                            convertedStatus: 'Qualified',
+                          }));
+                        }}
+                      >
+                        Add Account
+                      </Button>
+                      <Button
+                        className="w-full py-4 rounded-lg bg-gray-100 text-gray-800 font-semibold text-base shadow transition-colors duration-150 hover:bg-blue-500 hover:text-white border-0"
+                        onClick={() => {
+                          setShowConvertModal(true);
+                          setConvertStep("form");
+                          setConvertModalMode('opportunity');
+                          setConvertForm(f => ({
+                            ...f,
+                            accountType: 'new',
+                            contactType: 'new',
+                            opportunityType: 'new',
+                            dontCreateOpportunity: false,
+                            convertedStatus: 'Qualified',
+                          }));
+                        }}
+                      >
+                        Add Opportunity
+                      </Button>
+                    </div>
+                  </CardContent>
                 )}
               </Card>
             </div>
@@ -1074,7 +1114,7 @@ export default function Leads() {
                   <div className="flex items-center gap-2">
                     <Calendar className="w-5 h-5" />
                     <span className="text-lg font-semibold">Activity Centre</span>
-                  </div>
+                    </div>
                   <Button size="icon" variant="ghost" tabIndex={-1} type="button">
                     {collapsedTiles['activity'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                   </Button>
@@ -1082,7 +1122,7 @@ export default function Leads() {
                 {!collapsedTiles['activity'] && (
                   <CardContent className="p-2">
                     <ActivityCentre lead={selectedLead} />
-                  </CardContent>
+                </CardContent>
                 )}
               </Card>
 
@@ -1118,7 +1158,7 @@ export default function Leads() {
                           ))}
                         </tbody>
                       </table>
-                    </div>
+                      </div>
                 </CardContent>
                 )}
               </Card>
@@ -1129,7 +1169,7 @@ export default function Leads() {
                   <div className="flex items-center gap-2">
                     <PieChart className="w-5 h-5" />
                     <span className="text-lg font-semibold">Lead Score</span>
-                  </div>
+                    </div>
                   <Button size="icon" variant="ghost" tabIndex={-1} type="button">
                     {collapsedTiles['score'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                   </Button>
@@ -1138,7 +1178,7 @@ export default function Leads() {
                   <CardContent>
                     <div className="flex flex-col items-center justify-center w-full h-full">
                       <div className="relative flex items-center justify-center" style={{ width: 160, height: 160 }}>
-                        <RechartsPieChart width={160} height={160}>
+                        <RechartsPieChart key={pieChartKey} width={160} height={160}>
                           <Pie
                             data={[{ name: 'Score', value: selectedLead.score }, { name: 'Remainder', value: 100 - selectedLead.score }]}
                             dataKey="value"
@@ -1165,11 +1205,11 @@ export default function Leads() {
                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                           <span className="text-3xl font-bold text-blue-600">{selectedLead.score}</span>
                           <span className="text-xs text-muted-foreground">out of 100</span>
-                        </div>
                       </div>
-                      <div className="mt-2 text-sm font-medium text-gray-700">Lead Score (AI/Algorithm)</div>
                     </div>
-                  </CardContent>
+                      <div className="mt-2 text-sm font-medium text-gray-700">Lead Score (AI/Algorithm)</div>
+                  </div>
+                </CardContent>
                 )}
               </Card>
 
@@ -1192,7 +1232,7 @@ export default function Leads() {
                         <Button variant="outline" className="flex items-center gap-3 px-8 py-4 text-lg" style={{ fontWeight: 500 }}>
                           <UploadCloud className="w-8 h-8 text-blue-400 mr-2" />
                           Upload File
-                        </Button>
+                  </Button>
                       </label>
                       {attachments.length > 0 && (
                         <ul className="mt-4 space-y-1 text-base w-full max-w-xs">
@@ -1202,6 +1242,47 @@ export default function Leads() {
                         </ul>
                       )}
                     </div>
+                </CardContent>
+                )}
+              </Card>
+
+              {/* Tags */}
+              <Card className={collapsedTiles['tags'] ? 'min-h-[48px]' : ''}>
+                <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('tags')}>
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-5 h-5" />
+                    <span className="text-lg font-semibold">Tags</span>
+                  </div>
+                  <Button size="icon" variant="ghost" tabIndex={-1} type="button">
+                    {collapsedTiles['tags'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  </Button>
+                </CardHeader>
+                {!collapsedTiles['tags'] && (
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {selectedLead.tags && typeof selectedLead.tags === 'string' && selectedLead.tags.trim()
+                        ? selectedLead.tags.split(',').map((tag, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">{tag.trim()}</Badge>
+                          ))
+                        : <p className="text-sm text-muted-foreground">No tags assigned</p>
+                      }
+                    </div>
+                    <form className="flex gap-2" onSubmit={e => {
+                      e.preventDefault();
+                      if (tagInput.trim()) {
+                        const newTags = selectedLead.tags ? selectedLead.tags + ',' + tagInput : tagInput;
+                        setSelectedLead(prev => ({ ...prev, tags: newTags }));
+                        setTagInput("");
+                      }
+                    }}>
+                      <Input
+                        value={tagInput}
+                        onChange={e => setTagInput(e.target.value)}
+                        placeholder="Add tag keyword..."
+                        className="w-auto flex-1"
+                      />
+                      <Button type="submit" size="sm">Add</Button>
+                    </form>
                   </CardContent>
                 )}
               </Card>
@@ -1316,7 +1397,7 @@ export default function Leads() {
       </div>
     </div>
   );
-}
+} 
 
 const getScoreGradient = (score) => {
   if (score >= 80) {
