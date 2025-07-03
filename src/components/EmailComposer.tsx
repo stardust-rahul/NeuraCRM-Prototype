@@ -6,10 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 export default function EmailComposer({ lead }) {
     return (
         <div className="space-y-4 pt-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
                 <div>
                     <Label htmlFor="from" className="text-xs">From:</Label>
-                    <Input id="from" defaultValue="john@company.com" />
+                    <Input id="from" defaultValue={(lead?.owner ? lead.owner.replace(/\s+/g, '') : 'SarahJohnson') + '@example.com'} />
                 </div>
                 <div>
                     <Label htmlFor="to" className="text-xs">To:</Label>
