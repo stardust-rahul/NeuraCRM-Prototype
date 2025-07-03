@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
-import { Filter, Plus, Search, Eye, Edit, Phone, Mail, Calendar, MoreHorizontal, ArrowUpRight, Trash, ArrowLeft, MapPin, Globe, Building, User, DollarSign, Tag, Clock, FileText, Check, CheckCircle, Building2, Contact2, Crown, Pencil, X, ChevronDown, ChevronRight, UploadCloud } from "lucide-react";
+import { Filter, Plus, Search, Eye, Edit, Phone, Mail, Calendar, MoreHorizontal, ArrowUpRight, Trash, ArrowLeft, MapPin, Globe, Building, User, DollarSign, Tag, Clock, FileText, Check, CheckCircle, Building2, Contact2, Crown, Pencil, X, ChevronDown, ChevronRight, UploadCloud, PieChart } from "lucide-react";
 import { useLeads } from "@/context/LeadsContext";
 import { useAccounts } from "@/context/AccountsContext";
 import { useContacts } from "@/context/ContactsContext";
@@ -25,6 +25,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import LeadsList from "@/components/LeadsList";
 import ActivityCentre from "@/components/ActivityCentre";
+import { PieChart as RechartsPieChart, Pie, Cell } from 'recharts';
 
 const CONTACT_SUGGESTIONS = [
   "Ankit", "Rahul", "Deepak", "Vishal", "John Smith", "Goyal Kumar", "Nidhi Sharma", "Emily Davis",
@@ -52,7 +53,7 @@ const OPPORTUNITY_SUGGESTIONS = [
   "Logitech MX", "Corsair K95", "SteelSeries Rival", "WD My Passport", "Seagate Backup Plus", "Sandisk Extreme", "Crucial MX500", "Samsung T7", "Kingston A2000", "HyperX Cloud"
 ];
 
-function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus }) {
+function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus, markedStage, showMarkedMsg }) {
   const stages = [
     "New",
     "Contacted",
@@ -61,94 +62,86 @@ function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus }) 
     "Converted",
   ];
   const currentIdx = stages.findIndex(
-    (s) => s.toLowerCase() === (currentStage?.toLowerCase() || "qualification")
+    (s) => s.toLowerCase() === (currentStage?.toLowerCase() || "new")
   );
   // Arrow SVG dimensions
   const width = 180;
   const height = 44;
-  // Add state for success message
-  const [markMessage, setMarkMessage] = useState("");
-  useEffect(() => {
-    if (markMessage) {
-      const timer = setTimeout(() => setMarkMessage(""), 2500);
-      return () => clearTimeout(timer);
-    }
-  }, [markMessage]);
-  // Handler to wrap onStageChange and show message
-  const handleStageClick = (stage) => {
-    onStageChange(stage);
-    setMarkMessage(`\u2713 Marked as ${stage}`);
-  };
   return (
-    <div className="w-full flex flex-row items-center justify-center px-2 sm:px-8 pt-6 pb-2">
-      <div className="relative w-full">
-        {/* Success message at top right of pipeline bar */}
-        {markMessage && (
-          <div className="absolute right-4 top-2 bg-green-100 text-green-700 px-4 py-2 rounded shadow flex items-center gap-2 z-20 text-sm font-semibold">
-            <span className="text-green-600 text-lg">&#10003;</span> {markMessage.replace(/^\u2713\s*/, "")}
-          </div>
-        )}
-        <div className="flex-1 flex items-center w-full flex-nowrap overflow-x-auto bg-white border rounded-lg min-h-[54px]">
-          {stages.map((stage, idx) => {
-            const isCompleted = idx < currentIdx;
-            const isCurrent = idx === currentIdx;
-            // Arrow points for SVG
-            let points =
-              idx === 0
-                ? `8,0 ${width-18},0 ${width},${height/2} ${width-18},${height} 8,${height} 0,${height/2}`
-                : `0,0 ${width-18},0 ${width},${height/2} ${width-18},${height} 0,${height} 18,${height/2}`;
-            // Fill and text color logic
-            let fill = isCompleted
-              ? "#e7f0fd"
-              : isCurrent
-              ? "#2563eb"
-              : "#f8fafc";
-            let textColor = isCurrent ? "#fff" : isCompleted ? "#2563eb" : "#334155";
-            let fontWeight = isCurrent ? "bold" : "normal";
-            return (
-              <div key={stage} style={{ minWidth: width, maxWidth: width, position: 'relative', zIndex: isCurrent ? 2 : 1 }}>
-                <svg
-                  width={width}
-                  height={height}
-                  viewBox={`0 0 ${width} ${height}`}
-                  style={{ display: 'block', cursor: 'pointer', minWidth: width }}
-                  onClick={() => handleStageClick(stage)}
-                >
-                  <polygon
-                    points={points}
-                    fill={fill}
-                    stroke="#e5e7eb"
-                    strokeWidth={1}
-                    style={{ transition: 'fill 0.2s, stroke 0.2s' }}
-                  />
-                  <text
-                    x="50%"
-                    y="50%"
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fontWeight={fontWeight}
-                    fontSize="16"
-                    fill={textColor}
-                    style={{ pointerEvents: 'none', userSelect: 'none' }}
+    <>
+      {/* Success message at very top right of the page */}
+      {showMarkedMsg && markedStage && (
+        <div className="fixed right-8 top-6 bg-green-100 text-green-700 px-4 py-2 rounded shadow flex items-center gap-2 z-50 text-sm font-semibold">
+          <span className="text-green-600 text-lg">&#10003;</span> Marked as {markedStage}
+        </div>
+      )}
+      <div className="w-full flex flex-row items-center justify-center px-2 sm:px-8 pt-6 pb-2">
+        <div className="relative w-full">
+          <div className="flex-1 flex items-center w-full flex-nowrap overflow-x-auto bg-white border rounded-lg min-h-[54px]">
+            {stages.map((stage, idx) => {
+              const isCompleted = idx < currentIdx;
+              const isCurrent = idx === currentIdx;
+              // Arrow points for SVG
+              let points =
+                idx === 0
+                  ? `8,0 ${width-18},0 ${width},${height/2} ${width-18},${height} 8,${height} 0,${height/2}`
+                  : `0,0 ${width-18},0 ${width},${height/2} ${width-18},${height} 0,${height} 18,${height/2}`;
+              // Fill and text color logic
+              let fill = isCompleted
+                ? "#e7f0fd"
+                : isCurrent
+                ? "#2563eb"
+                : "#f8fafc";
+              let textColor = isCurrent ? "#fff" : isCompleted ? "#2563eb" : "#334155";
+              let fontWeight = isCurrent ? "bold" : "normal";
+              return (
+                <div key={stage} style={{ minWidth: width, maxWidth: width, position: 'relative', zIndex: isCurrent ? 2 : 1 }}>
+                  <svg
+                    width={width}
+                    height={height}
+                    viewBox={`0 0 ${width} ${height}`}
+                    style={{ display: 'block', cursor: 'pointer', minWidth: width }}
+                    onClick={() => onStageChange(stage)}
                   >
-                    {isCompleted ? '\u2713 ' : ''}{stage}
-                  </text>
-                </svg>
-              </div>
-            );
-          })}
+                    <polygon
+                      points={points}
+                      fill={fill}
+                      stroke="#e5e7eb"
+                      strokeWidth={1}
+                      style={{ transition: 'fill 0.2s, stroke 0.2s' }}
+                    />
+                    <text
+                      x="50%"
+                      y="50%"
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fontWeight={fontWeight}
+                      fontSize="16"
+                      fill={textColor}
+                      style={{ pointerEvents: 'none', userSelect: 'none' }}
+                    >
+                      {isCompleted ? '\u2713 ' : ''}{stage}
+                    </text>
+                  </svg>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="flex flex-col items-center ml-4" style={{ minWidth: 220 }}>
+          {/* Remove green message from here, only keep the button */}
+          {currentIdx === stages.length - 1 && (
+            <button
+              className="px-6 py-2 rounded-full bg-[#22c55e] text-white font-semibold flex items-center gap-2 hover:bg-[#16a34a] transition whitespace-nowrap shadow"
+              style={{ height: 44, fontSize: 16, minWidth: 0, alignSelf: 'center' }}
+              onClick={onSelectConvertedStatus}
+            >
+              Mark Status as Complete
+            </button>
+          )}
         </div>
       </div>
-      {currentIdx === stages.length - 1 && (
-        <button
-          className="ml-4 px-6 py-2 rounded-full bg-[#22c55e] text-white font-semibold flex items-center gap-2 hover:bg-[#16a34a] transition whitespace-nowrap shadow"
-          style={{ height: 44, fontSize: 16, minWidth: 0, alignSelf: 'center' }}
-          onClick={onSelectConvertedStatus}
-        >
-          Mark Status as Complete
-        </button>
-      )}
-    </div>
+    </>
   );
 }
 
@@ -451,6 +444,8 @@ export default function Leads() {
             setTimeout(() => setShowMarkedMsg(false), 2000);
           }}
           onSelectConvertedStatus={() => { setShowConvertModal(true); setConvertStep("form"); }}
+          markedStage={markedStage}
+          showMarkedMsg={showMarkedMsg}
         />
         {/* Convert Lead Modal */}
         <Dialog open={showConvertModal} onOpenChange={setShowConvertModal}>
@@ -760,9 +755,9 @@ export default function Leads() {
               {/* Contact Information */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('contact')}>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <User className="w-5 h-5" />
-                    <span>Contact Information</span>
+                    <span className="text-lg font-semibold">Contact Information</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {!contactEditMode && (
@@ -849,9 +844,9 @@ export default function Leads() {
               {/* Company Information */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('company')}>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <Building className="w-5 h-5" />
-                    <span>Company Information</span>
+                    <span className="text-lg font-semibold">Company Information</span>
                   </div>
                   <Button size="icon" variant="ghost" tabIndex={-1} type="button">
                     {collapsedTiles['company'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
@@ -902,9 +897,9 @@ export default function Leads() {
               {/* Deal Information */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('deal')}>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <DollarSign className="w-5 h-5" />
-                    <span>Deal Information</span>
+                    <span className="text-lg font-semibold">Deal Information</span>
                   </div>
                   <Button size="icon" variant="ghost" tabIndex={-1} type="button">
                     {collapsedTiles['deal'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
@@ -1001,9 +996,9 @@ export default function Leads() {
               {/* Notes */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('notes')}>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <FileText className="w-5 h-5" />
-                    <span>Notes</span>
+                    <span className="text-lg font-semibold">Notes</span>
                   </div>
                   <Button size="icon" variant="ghost" tabIndex={-1} type="button">
                     {collapsedTiles['notes'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
@@ -1032,9 +1027,9 @@ export default function Leads() {
               {/* Tags (moved below Notes) */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('tags')}>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <Tag className="w-5 h-5" />
-                    <span>Tags</span>
+                    <span className="text-lg font-semibold">Tags</span>
                   </div>
                   <Button size="icon" variant="ghost" tabIndex={-1} type="button">
                     {collapsedTiles['tags'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
@@ -1076,7 +1071,10 @@ export default function Leads() {
               {/* Activity Centre */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('activity')}>
-                  <CardTitle>Activity Centre</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5" />
+                    <span className="text-lg font-semibold">Activity Centre</span>
+                  </div>
                   <Button size="icon" variant="ghost" tabIndex={-1} type="button">
                     {collapsedTiles['activity'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                   </Button>
@@ -1091,7 +1089,10 @@ export default function Leads() {
               {/* Logs History */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('logs')}>
-                  <CardTitle>Logs History</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-5 h-5" />
+                    <span className="text-lg font-semibold">Logs History</span>
+                  </div>
                   <Button size="icon" variant="ghost" tabIndex={-1} type="button">
                     {collapsedTiles['logs'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                   </Button>
@@ -1123,27 +1124,62 @@ export default function Leads() {
               </Card>
 
               {/* Lead Score */}
-              <Card>
+              <Card className={collapsedTiles['score'] ? 'min-h-[48px]' : 'min-h-[180px]'}>
                 <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('score')}>
-                  <CardTitle>Lead Score</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <PieChart className="w-5 h-5" />
+                    <span className="text-lg font-semibold">Lead Score</span>
+                  </div>
                   <Button size="icon" variant="ghost" tabIndex={-1} type="button">
                     {collapsedTiles['score'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                   </Button>
                 </CardHeader>
                 {!collapsedTiles['score'] && (
                   <CardContent>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-blue-600">{selectedLead.score}</div>
-                      <p className="text-sm text-muted-foreground">out of 100</p>
-                  </div>
-                </CardContent>
+                    <div className="flex flex-col items-center justify-center w-full h-full">
+                      <div className="relative flex items-center justify-center" style={{ width: 160, height: 160 }}>
+                        <RechartsPieChart width={160} height={160}>
+                          <Pie
+                            data={[{ name: 'Score', value: selectedLead.score }, { name: 'Remainder', value: 100 - selectedLead.score }]}
+                            dataKey="value"
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={55}
+                            outerRadius={75}
+                            startAngle={90}
+                            endAngle={-270}
+                            stroke="none"
+                            isAnimationActive={true}
+                          >
+                            <Cell key="score" fill="url(#scoreGradient)" />
+                            <Cell key="remainder" fill="#e5e7eb" />
+                          </Pie>
+                          <defs>
+                            <linearGradient id="scoreGradient" x1="0" y1="0" x2="1" y2="1">
+                              {getScoreGradient(selectedLead.score).map((stop, idx) => (
+                                <stop key={idx} offset={stop.offset} stopColor={stop.color} />
+                              ))}
+                            </linearGradient>
+                          </defs>
+                        </RechartsPieChart>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                          <span className="text-3xl font-bold text-blue-600">{selectedLead.score}</span>
+                          <span className="text-xs text-muted-foreground">out of 100</span>
+                        </div>
+                      </div>
+                      <div className="mt-2 text-sm font-medium text-gray-700">Lead Score (AI/Algorithm)</div>
+                    </div>
+                  </CardContent>
                 )}
               </Card>
 
               {/* Attachments */}
-              <Card className="min-h-[180px]">
+              <Card className={collapsedTiles['attachments'] ? 'min-h-[48px]' : 'min-h-[180px]'}>
                 <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('attachments')}>
-                  <span className="font-semibold">Attachments</span>
+                  <div className="flex items-center gap-2">
+                    <UploadCloud className="w-5 h-5" />
+                    <span className="text-lg font-semibold">Attachments</span>
+                  </div>
                   <Button size="icon" variant="ghost" tabIndex={-1} type="button">
                     {collapsedTiles['attachments'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                   </Button>
@@ -1280,4 +1316,26 @@ export default function Leads() {
       </div>
     </div>
   );
-} 
+}
+
+const getScoreGradient = (score) => {
+  if (score >= 80) {
+    // Green gradient
+    return [
+      { offset: '0%', color: '#22c55e' },
+      { offset: '100%', color: '#16a34a' },
+    ];
+  } else if (score >= 50) {
+    // Blue gradient
+    return [
+      { offset: '0%', color: '#3b82f6' },
+      { offset: '100%', color: '#2563eb' },
+    ];
+  } else {
+    // Orange/red gradient
+    return [
+      { offset: '0%', color: '#f59e42' },
+      { offset: '100%', color: '#ef4444' },
+    ];
+  }
+}; 
