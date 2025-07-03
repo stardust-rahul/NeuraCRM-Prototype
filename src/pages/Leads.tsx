@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
-import { Filter, Plus, Search, Eye, Edit, Phone, Mail, Calendar, MoreHorizontal, ArrowUpRight, Trash, ArrowLeft, MapPin, Globe, Building, User, DollarSign, Tag, Clock, FileText, Check, CheckCircle, Building2, Contact2, Crown } from "lucide-react";
+import { Filter, Plus, Search, Eye, Edit, Phone, Mail, Calendar, MoreHorizontal, ArrowUpRight, Trash, ArrowLeft, MapPin, Globe, Building, User, DollarSign, Tag, Clock, FileText, Check, CheckCircle, Building2, Contact2, Crown, Pencil, X } from "lucide-react";
 import { useLeads } from "@/context/LeadsContext";
 import { useAccounts } from "@/context/AccountsContext";
 import { useContacts } from "@/context/ContactsContext";
@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import LeadsList from "@/components/LeadsList";
+import ActivityCentre from "@/components/ActivityCentre";
 
 const CONTACT_SUGGESTIONS = [
   "Ankit", "Rahul", "Deepak", "Vishal", "John Smith", "Goyal Kumar", "Nidhi Sharma", "Emily Davis",
@@ -56,45 +57,93 @@ function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus }) 
   const currentIdx = stages.findIndex(
     (s) => s.toLowerCase() === (currentStage?.toLowerCase() || "new")
   );
+  // Add state for success message
+  const [markMessage, setMarkMessage] = useState("");
+  useEffect(() => {
+    if (markMessage) {
+      const timer = setTimeout(() => setMarkMessage(""), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [markMessage]);
+  // Handler to wrap onStageChange and show message
+  const handleStageClick = (stage) => {
+    onStageChange(stage);
+    setMarkMessage(`Marked as ${stage}`);
+  };
   return (
-    <div className="w-full flex flex-col sm:flex-row items-center px-2 sm:px-8 pt-6 pb-2">
-      <div className="flex-1 flex items-center w-full overflow-x-auto">
+    <div className="w-full flex flex-row items-center justify-center px-2 sm:px-8 pt-6 pb-2 relative gap-2">
+      {/* Success message at top right */}
+      {markMessage && (
+        <div className="fixed right-6 top-4 bg-green-100 text-green-700 px-4 py-2 rounded shadow flex items-center gap-2 z-50 text-sm font-semibold">
+          <span className="text-green-600 text-lg">&#10003;</span> {markMessage.replace(/^\u2713\s*/, "")}
+        </div>
+      )}
+      <div className="flex-1 flex items-center w-full flex-nowrap overflow-x-visible">
         {stages.map((stage, idx) => {
           const isCompleted = idx < currentIdx;
           const isCurrent = idx === currentIdx;
           const isFuture = idx > currentIdx;
-          let base = "flex-1 flex items-center min-w-[120px] max-w-full";
-          let btn =
-            "w-full h-12 flex items-center justify-center rounded-full transition-all duration-200 cursor-pointer select-none ";
-          let bg = isCompleted
-            ? "bg-teal-200 text-teal-900"
+          let base = "flex-1 flex items-center min-w-[240px] max-w-full";
+          // Arrow SVG dimensions
+          const width = 240;
+          const height = 48;
+          // Arrow points for SVG
+          let points =
+            idx === 0
+              ? `0,0 ${width-18},0 ${width},${height/2} ${width-18},${height} 0,${height} 18,${height/2}`
+              : `0,0 ${width-18},0 ${width},${height/2} ${width-18},${height} 0,${height} 18,${height/2}`;
+          // Fill and text color logic
+          let fill = isCompleted
+            ? "#8850f9"
             : isCurrent
-            ? "bg-white border-2 border-blue-500 text-blue-900 font-semibold"
-            : "bg-gray-200 text-gray-600";
-          let border = isCurrent ? "border-blue-500" : "border-transparent";
-          let hover = isFuture ? "hover:bg-gray-200" : isCompleted ? "hover:bg-teal-700" : "hover:bg-blue-50";
-          let ring = isCurrent ? "ring-2 ring-blue-400" : "";
+            ? "#f3edfd"
+            : "#e5e7eb";
+          let textColor = isCompleted
+            ? "#fff"
+            : isCurrent
+            ? "#8850f9"
+            : "#374151";
+          let border = "#8850f9";
           return (
-            <div key={stage} className={base}>
-              <button
-                className={`${btn} ${bg} ${border} ${hover} ${ring}`}
-                style={{ minWidth: 120 }}
-                onClick={() => onStageChange(stage)}
-                aria-current={isCurrent ? "step" : undefined}
+            <div key={stage} className={base} style={{ position: 'relative', marginRight: 0 }}>
+              <svg
+                width={width}
+                height={height}
+                viewBox={`0 0 ${width} ${height}`}
+                style={{ display: 'block', cursor: 'pointer', minWidth: 240 }}
+                onClick={() => handleStageClick(stage)}
               >
-                {isCompleted ? <Check className="w-4 h-4 mr-2" /> : null}
-                <span>{stage}</span>
-              </button>
-              {idx < stages.length - 1 && (
-                <div className="w-4 h-1 bg-gray-300 mx-1 rounded hidden sm:block" />
-              )}
+                <polygon
+                  points={points}
+                  fill={fill}
+                  stroke={border}
+                  strokeWidth={2}
+                  style={{ transition: 'fill 0.2s, stroke 0.2s' }}
+                />
+                <text
+                  x="50%"
+                  y="50%"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fontWeight={isCurrent || isCompleted ? 'bold' : 'normal'}
+                  fontSize="18"
+                  fill={textColor}
+                  style={{ pointerEvents: 'none', userSelect: 'none' }}
+                >
+                  {isCompleted ? '\u2713 ' : ''}{stage}
+                </text>
+              </svg>
             </div>
           );
         })}
       </div>
       {currentIdx === stages.length - 1 && (
-        <button className="ml-0 sm:ml-4 mt-2 sm:mt-0 px-5 py-2 rounded-full bg-blue-500 text-white font-semibold flex items-center gap-2 hover:bg-blue-600 transition whitespace-nowrap shadow" onClick={onSelectConvertedStatus}>
-          <Check className="w-5 h-5" /> Mark Status as Complete
+        <button
+          className="px-6 py-2 rounded-full bg-[#22c55e] text-white font-semibold flex items-center justify-center gap-2 hover:bg-[#16a34a] transition whitespace-nowrap shadow"
+          style={{ height: 44, fontSize: 16, minWidth: 0, alignSelf: 'center' }}
+          onClick={onSelectConvertedStatus}
+        >
+          Mark Status as Complete
         </button>
       )}
     </div>
@@ -311,12 +360,48 @@ export default function Leads() {
     name.toLowerCase().includes(opportunitySearch.toLowerCase())
   );
 
+  // Inside the Leads component, before the return statement for the detail view
+  const [editField, setEditField] = useState(null);
+  const [editValue, setEditValue] = useState("");
+
+  const handleEditClick = (field, value) => {
+    setEditField(field);
+    setEditValue(value);
+  };
+  const handleEditSave = (field) => {
+    setSelectedLead((prev) => ({ ...prev, [field]: editValue }));
+    setEditField(null);
+    setEditValue("");
+  };
+  const handleEditCancel = () => {
+    setEditField(null);
+    setEditValue("");
+  };
+
+  // Add log state and helper
+  const [logs, setLogs] = useState([
+    { datetime: selectedLead?.updated || new Date().toLocaleString(), owner: selectedLead?.owner || "Sarah Johnson", action: "Lead Updated" },
+    { datetime: selectedLead?.created || new Date().toLocaleString(), owner: selectedLead?.owner || "Sarah Johnson", action: "Lead Created" },
+    { datetime: selectedLead?.lastContact || new Date().toLocaleString(), owner: selectedLead?.owner || "Sarah Johnson", action: "Last Contact" },
+  ]);
+
+  const addLog = (action) => {
+    setLogs((prev) => [
+      { datetime: new Date().toLocaleString(), owner: selectedLead?.owner || "Sarah Johnson", action },
+      ...prev,
+    ]);
+  };
+
   // If a lead is selected, show the detail view
   if (selectedLead) {
     // Use localStatus if set, else selectedLead.status
     const statusToShow = localStatus || selectedLead.status;
-  return (
+    return (
       <div className="min-h-screen bg-background ">
+        {/* Page Title at the Top Left */}
+        <div className="w-full flex items-center px-2 sm:px-8 pt-6 pb-2">
+          <h1 className="text-3xl font-bold text-left">Leads</h1>
+        </div>
         {/* Pipeline/Progress Bar */}
         <LeadPipeline
           currentStage={statusToShow}
@@ -325,9 +410,7 @@ export default function Leads() {
         />
         {/* Convert Lead Modal */}
         <Dialog open={showConvertModal} onOpenChange={setShowConvertModal}>
-        <DialogContent className="w-full max-w-screen-lg max-h-[calc(100vh-4rem)] overflow-y-auto p-0 mx-2 sm:mx-4 my-8 sm:my-10 rounded-lg">
-
-
+          <DialogContent className="w-full max-w-screen-lg max-h-[calc(100vh-4rem)] overflow-y-auto p-0 mx-2 sm:mx-4 my-8 sm:my-10 rounded-lg">
             {convertStep === "form" ? (
               <>
                 <DialogHeader className="px-8 pt-6 pb-2 mt-6">
@@ -627,9 +710,9 @@ export default function Leads() {
 
         {/* Lead Details */}
         <div className="p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             {/* Main Information */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-3 space-y-6">
               {/* Contact Information */}
               <Card>
                 <CardHeader>
@@ -642,28 +725,80 @@ export default function Leads() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Full Name</Label>
-                      <p className="text-lg font-semibold">{selectedLead.contact || selectedLead.name}</p>
+                      <div className="flex items-center gap-2">
+                        {editField === "contact" ? (
+                          <>
+                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
+                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("contact")}> <Check className="w-4 h-4" /> </Button>
+                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-lg font-semibold">{selectedLead.contact || selectedLead.name}</p>
+                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("contact", selectedLead.contact || selectedLead.name)}> <Pencil className="w-4 h-4" /> </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Title</Label>
-                      <p className="text-lg">{selectedLead.title}</p>
+                      <div className="flex items-center gap-2">
+                        {editField === "title" ? (
+                          <>
+                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
+                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("title")}> <Check className="w-4 h-4" /> </Button>
+                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-lg">{selectedLead.title}</p>
+                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("title", selectedLead.title)}> <Pencil className="w-4 h-4" /> </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Email</Label>
-                      <div className="flex items-center space-x-2">
-                        <Mail className="w-4 h-4 text-muted-foreground" />
-                        <a href={`mailto:${selectedLead.email}`} className="text-blue-600 hover:underline">
-                          {selectedLead.email}
-                        </a>
+                      <div className="flex items-center gap-2">
+                        {editField === "email" ? (
+                          <>
+                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
+                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("email")}> <Check className="w-4 h-4" /> </Button>
+                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex items-center space-x-2">
+                              <Mail className="w-4 h-4 text-muted-foreground" />
+                              <a href={`mailto:${selectedLead.email}`} className="text-blue-600 hover:underline">
+                                {selectedLead.email}
+                              </a>
+                            </div>
+                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("email", selectedLead.email)}> <Pencil className="w-4 h-4" /> </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Phone</Label>
-                      <div className="flex items-center space-x-2">
-                        <Phone className="w-4 h-4 text-muted-foreground" />
-                        <a href={`tel:${selectedLead.phone}`} className="text-blue-600 hover:underline">
-                          {selectedLead.phone}
-                        </a>
+                      <div className="flex items-center gap-2">
+                        {editField === "phone" ? (
+                          <>
+                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
+                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("phone")}> <Check className="w-4 h-4" /> </Button>
+                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex items-center space-x-2">
+                              <Phone className="w-4 h-4 text-muted-foreground" />
+                              <a href={`tel:${selectedLead.phone}`} className="text-blue-600 hover:underline">
+                                {selectedLead.phone}
+                              </a>
+                            </div>
+                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("phone", selectedLead.phone)}> <Pencil className="w-4 h-4" /> </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -682,11 +817,37 @@ export default function Leads() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Company Name</Label>
-                      <p className="text-lg font-semibold">{selectedLead.company}</p>
+                      <div className="flex items-center gap-2">
+                        {editField === "company" ? (
+                          <>
+                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
+                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("company")}> <Check className="w-4 h-4" /> </Button>
+                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-lg font-semibold">{selectedLead.company}</p>
+                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("company", selectedLead.company)}> <Pencil className="w-4 h-4" /> </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Source</Label>
-                      <p className="text-lg capitalize">{selectedLead.source}</p>
+                      <div className="flex items-center gap-2">
+                        {editField === "source" ? (
+                          <>
+                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
+                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("source")}> <Check className="w-4 h-4" /> </Button>
+                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-lg capitalize">{selectedLead.source}</p>
+                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("source", selectedLead.source)}> <Pencil className="w-4 h-4" /> </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -704,23 +865,83 @@ export default function Leads() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Deal Value</Label>
-                      <p className="text-lg font-semibold">{selectedLead.value || "$0"}</p>
+                      <div className="flex items-center gap-2">
+                        {editField === "value" ? (
+                          <>
+                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
+                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("value")}> <Check className="w-4 h-4" /> </Button>
+                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-lg font-semibold">{selectedLead.value || "$0"}</p>
+                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("value", selectedLead.value)}> <Pencil className="w-4 h-4" /> </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Owner</Label>
-                      <p className="text-lg">{selectedLead.owner || "Unassigned"}</p>
+                      <div className="flex items-center gap-2">
+                        {editField === "owner" ? (
+                          <>
+                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
+                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("owner")}> <Check className="w-4 h-4" /> </Button>
+                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-lg">{selectedLead.owner || "Unassigned"}</p>
+                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("owner", selectedLead.owner)}> <Pencil className="w-4 h-4" /> </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Priority</Label>
-                      <Badge variant={selectedLead.priority === 'high' ? 'destructive' : selectedLead.priority === 'medium' ? 'secondary' : 'outline'}>
-                        {selectedLead.priority}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        {editField === "priority" ? (
+                          <>
+                            <select value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto">
+                              <option value="high">High</option>
+                              <option value="medium">Medium</option>
+                              <option value="low">Low</option>
+                            </select>
+                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("priority")}> <Check className="w-4 h-4" /> </Button>
+                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Badge variant={selectedLead.priority === 'high' ? 'destructive' : selectedLead.priority === 'medium' ? 'secondary' : 'outline'}>
+                              {selectedLead.priority}
+                            </Badge>
+                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("priority", selectedLead.priority)}> <Pencil className="w-4 h-4" /> </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Status</Label>
-                      <Badge variant={selectedLead.status === 'qualified' ? 'default' : selectedLead.status === 'hot' ? 'secondary' : selectedLead.status === 'cold' ? 'destructive' : 'outline'}>
-                        {selectedLead.status}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        {editField === "status" ? (
+                          <>
+                            <select value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto">
+                              <option value="qualified">Qualified</option>
+                              <option value="contacted">Contacted</option>
+                              <option value="new">New Lead</option>
+                            </select>
+                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("status")}> <Check className="w-4 h-4" /> </Button>
+                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Badge variant={selectedLead.status === 'qualified' ? 'default' : selectedLead.status === 'hot' ? 'secondary' : selectedLead.status === 'cold' ? 'destructive' : 'outline'}>
+                              {selectedLead.status}
+                            </Badge>
+                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("status", selectedLead.status)}> <Pencil className="w-4 h-4" /> </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -735,13 +956,65 @@ export default function Leads() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-700 leading-relaxed">{selectedLead.notes}</p>
+                  <div className="flex items-center gap-2">
+                    {editField === "notes" ? (
+                      <>
+                        <textarea value={editValue} onChange={e => setEditValue(e.target.value)} className="w-full" />
+                        <Button size="icon" variant="ghost" onClick={() => handleEditSave("notes")}> <Check className="w-4 h-4" /> </Button>
+                        <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-gray-700 leading-relaxed">{selectedLead.notes}</p>
+                        <Button size="icon" variant="ghost" onClick={() => handleEditClick("notes", selectedLead.notes)}> <Pencil className="w-4 h-4" /> </Button>
+                      </>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-6">
+            <div className="lg:col-span-2 space-y-6">
+              {/* Activity Centre */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Activity Centre</CardTitle>
+                </CardHeader>
+                <CardContent className="p-2">
+                  <ActivityCentre lead={selectedLead} />
+                </CardContent>
+              </Card>
+
+              {/* Logs History */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Logs History</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm border">
+                      <thead>
+                        <tr className="bg-gray-100">
+                          <th className="px-3 py-2 border">Date & Time</th>
+                          <th className="px-3 py-2 border">Owner Name</th>
+                          <th className="px-3 py-2 border">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {logs.map((log, idx) => (
+                          <tr key={idx}>
+                            <td className="px-3 py-2 border whitespace-nowrap">{log.datetime}</td>
+                            <td className="px-3 py-2 border whitespace-nowrap">{log.owner}</td>
+                            <td className="px-3 py-2 border">{log.action}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Lead Score */}
               <Card>
                 <CardHeader>
@@ -777,66 +1050,6 @@ export default function Leads() {
                   )}
                 </CardContent>
               </Card>
-
-              {/* Timeline */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Clock className="w-5 h-5" />
-                    <span>Timeline</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                      <div>
-                        <p className="text-sm font-medium">Lead Updated</p>
-                        <p className="text-xs text-muted-foreground">{selectedLead.updated}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                      <div>
-                        <p className="text-sm font-medium">Lead Created</p>
-                        <p className="text-xs text-muted-foreground">{selectedLead.created}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
-                      <div>
-                        <p className="text-sm font-medium">Last Contact</p>
-                        <p className="text-xs text-muted-foreground">{selectedLead.lastContact}</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Quick Actions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <Button className="w-full justify-start" variant="outline">
-                    <Phone className="w-4 h-4 mr-2" />
-                    Call Lead
-                  </Button>
-                  <Button className="w-full justify-start" variant="outline">
-                    <Mail className="w-4 h-4 mr-2" />
-                    Send Email
-                  </Button>
-                  <Button className="w-full justify-start" variant="outline">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Schedule Meeting
-                  </Button>
-                  <Button className="w-full justify-start" variant="outline">
-                    <ArrowUpRight className="w-4 h-4 mr-2" />
-                    Convert to Opportunity
-                  </Button>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </div>
@@ -846,10 +1059,15 @@ export default function Leads() {
 
   return (
     <div className="p-0 bg-background min-h-screen">
-      {/* Page Title and Filter Bar */}
+      {/* Page Title at the Top Left */}
+      <div className="w-full flex items-center px-2 sm:px-8 pt-6 pb-2">
+        <h1 className="text-3xl font-bold text-left">Leads</h1>
+      </div>
+      {/* Page details/content below pipeline */}
+      {/* Page Title and Filter Bar (now below pipeline) */}
       <div className="flex items-center justify-between px-8 py-6">
         <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-bold">Leads</h1>
+          {/* <h1 className="text-2xl font-bold">Leads</h1> */}
           <select
             className="border rounded px-2 py-1 text-sm bg-background"
             value={filter}
