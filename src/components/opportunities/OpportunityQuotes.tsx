@@ -13,7 +13,7 @@ export default function OpportunityQuotes({ opportunity }) {
   const { quotes, addQuote } = useQuotes();
   const [addOpen, setAddOpen] = useState(false);
   const [newQuote, setNewQuote] = useState({
-    customer: opportunity.account || '',
+    customer: opportunity.title || opportunity.account || '',
     amount: '',
     status: 'pending',
     created: new Date().toISOString().split("T")[0],
@@ -25,13 +25,13 @@ export default function OpportunityQuotes({ opportunity }) {
   });
 
   if (!opportunity) return null;
-  // Match quotes by customer or contact.company
+  // Match quotes by opportunityId (deal)
   const relatedQuotes = quotes.filter(q => q.opportunityId === opportunity.id);
 
   const handleAdd = (e) => {
     e.preventDefault();
     const quoteToAdd = {
-      customer: newQuote.customer,
+      customer: opportunity.title || newQuote.customer, // Always use deal name for customer field
       amount: newQuote.amount,
       owner: newQuote.owner,
       contact: {
@@ -46,7 +46,7 @@ export default function OpportunityQuotes({ opportunity }) {
     addQuote(quoteToAdd);
     setAddOpen(false);
     setNewQuote({
-      customer: opportunity.account || '',
+      customer: opportunity.title || opportunity.account || '',
       amount: '',
       status: 'pending',
       created: new Date().toISOString().split("T")[0],
@@ -82,7 +82,7 @@ export default function OpportunityQuotes({ opportunity }) {
               <TableHeader>
                 <TableRow>
                   <TableHead className="px-2 py-2">#</TableHead>
-                  <TableHead className="px-2 py-2">Customer</TableHead>
+                  <TableHead className="px-2 py-2">Deal</TableHead>
                   <TableHead className="px-2 py-2">Amount</TableHead>
                   <TableHead className="px-2 py-2">Status</TableHead>
                   <TableHead className="px-2 py-2">Created</TableHead>
@@ -134,7 +134,7 @@ export default function OpportunityQuotes({ opportunity }) {
           <form className="space-y-4" onSubmit={handleAdd}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Customer</label>
+                <label className="block text-sm font-medium mb-1">Deal</label>
                 <Input
                   value={newQuote.customer}
                   onChange={(e) => setNewQuote((q) => ({ ...q, customer: e.target.value }))}

@@ -54,7 +54,7 @@ export default function QuoteDetail() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="text-xl font-bold">
-            {quote.customer || 'No Customer'} 
+            {quote.opportunityTitle || quote.customer || 'No Deal'}
             <span className="text-muted-foreground font-normal"> - {quote.amount || 'N/A'}</span>
           </h1>
         </div>
@@ -128,6 +128,7 @@ export default function QuoteDetail() {
             <Card>
               <CardHeader><CardTitle>Quote Information</CardTitle></CardHeader>
               <CardContent className="space-y-2 text-sm">
+                <p><strong>Deal:</strong> {quote.opportunityTitle || quote.customer || 'No Deal'}</p>
                 <p><strong>Owner:</strong> {quote.owner || 'Unassigned'}</p>
                 <p><strong>Amount:</strong> {quote.amount || 'N/A'}</p>
                 <p><strong>Closing Date:</strong> {quote.closingDate || 'Not set'}</p>
