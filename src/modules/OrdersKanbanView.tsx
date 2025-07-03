@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Edit } from "lucide-react";
+import { Eye, Edit, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 const STAGES = ["Draft", "Pending", "Activated", "Completed", "Cancelled"];
 
+import { useOrders } from "@/context/OrdersContext";
+
 export default function OrdersKanbanView({ orders, onStatusChange }) {
+  const { removeOrder } = useOrders();
   const navigate = useNavigate();
   // Local state for drag-and-drop
   const [columns, setColumns] = useState(() => {
@@ -85,6 +88,12 @@ export default function OrdersKanbanView({ orders, onStatusChange }) {
                           <div className="flex items-center gap-2 mt-1">
                             <Button size="icon" variant="ghost" onClick={e => {e.stopPropagation();navigate(`/orders/${order.id}`);}} title="View"><Eye className="w-4 h-4" /></Button>
                             <Button size="icon" variant="ghost" onClick={e => {e.stopPropagation();navigate(`/orders/${order.id}?edit=true`);}} title="Edit"><Edit className="w-4 h-4" /></Button>
+                            <Button size="icon" variant="ghost" title="Delete" onClick={e => {
+                              e.stopPropagation();
+                              if (window.confirm('Are you sure you want to delete this order?')) {
+                                removeOrder(order.id);
+                              }
+                            }}><Trash className="w-4 h-4" /></Button>
                           </div>
                         </div>
                       )}

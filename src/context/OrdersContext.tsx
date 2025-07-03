@@ -32,6 +32,10 @@ export function OrdersProvider({ children }) {
     setOrders((prev) => prev.map((o) => (o.id === updatedOrder.id ? { ...o, ...updatedOrder } : o)));
   };
 
+  const removeOrder = (id) => {
+    setOrders((prev) => prev.filter((o) => o.id !== id));
+  };
+
   const getNewOrderId = (orders) => {
     const maxId = orders.reduce((max, o) => {
       if (o.id && o.id.startsWith("O-")) {
@@ -46,7 +50,7 @@ export function OrdersProvider({ children }) {
   };
 
   return (
-    <OrdersContext.Provider value={{ orders, addOrder, updateOrder }}>
+    <OrdersContext.Provider value={{ orders, addOrder, updateOrder, removeOrder }}>
       {children}
     </OrdersContext.Provider>
   );
