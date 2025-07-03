@@ -46,7 +46,7 @@ export default function LeftNavbar({ navigation, onDelete }: LeftNavbarProps) {
   return (
     <div
       className={cn(
-        "flex flex-col sidebar-bg border-r border-sidebar-border transition-all duration-300 ease-in-out h-screen",
+        "sidebar flex flex-col sidebar-bg border-r border-sidebar-border transition-all duration-300 ease-in-out h-screen",
         isHovered ? "w-48" : "w-16",
       )}
       onMouseEnter={() => setIsHovered(true)}
