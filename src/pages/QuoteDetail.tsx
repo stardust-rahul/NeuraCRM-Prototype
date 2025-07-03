@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Mail, Phone, MoreVertical } from "lucide-react";
+import { Mail, Phone, MoreVertical, ArrowLeft } from "lucide-react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useQuotes } from "@/context/QuotesContext";
 import ProgressTimeline from "@/components/OpportunityStageIndicator";
@@ -47,8 +47,10 @@ export default function QuoteDetail() {
     <div className="p-0 bg-background min-h-screen flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b bg-white">
-        <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon" className="mr-2" onClick={() => navigate('/quotes')}>←</Button>
+        <div className="flex items-center space-x-4">
+          <Button variant="outline" size="icon" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
           <h1 className="text-xl font-bold">
             {quote.customer || 'No Customer'} 
             <span className="text-muted-foreground font-normal"> - {quote.amount || 'N/A'}</span>
