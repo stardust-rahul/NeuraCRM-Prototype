@@ -392,6 +392,9 @@ export default function Leads() {
     ]);
   };
 
+  // Add tagInput state at the top of the Leads component
+  const [tagInput, setTagInput] = useState("");
+
   // If a lead is selected, show the detail view
   if (selectedLead) {
     // Use localStatus if set, else selectedLead.status
@@ -712,7 +715,7 @@ export default function Leads() {
         <div className="p-8">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             {/* Main Information */}
-            <div className="lg:col-span-3 space-y-6">
+            <div className="lg:col-span-2 space-y-6">
               {/* Contact Information */}
               <Card>
                 <CardHeader>
@@ -972,10 +975,46 @@ export default function Leads() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Tags (moved below Notes) */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Tag className="w-5 h-5" />
+                    <span>Tags</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {selectedLead.tags && typeof selectedLead.tags === 'string' && selectedLead.tags.trim()
+                      ? selectedLead.tags.split(',').map((tag, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">{tag.trim()}</Badge>
+                        ))
+                      : <p className="text-sm text-muted-foreground">No tags assigned</p>
+                    }
+                  </div>
+                  <form className="flex gap-2" onSubmit={e => {
+                    e.preventDefault();
+                    if (tagInput.trim()) {
+                      const newTags = selectedLead.tags ? selectedLead.tags + ',' + tagInput : tagInput;
+                      setSelectedLead(prev => ({ ...prev, tags: newTags }));
+                      setTagInput("");
+                    }
+                  }}>
+                    <Input
+                      value={tagInput}
+                      onChange={e => setTagInput(e.target.value)}
+                      placeholder="Add tag keyword..."
+                      className="w-auto flex-1"
+                    />
+                    <Button type="submit" size="sm">Add</Button>
+                  </form>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-3 space-y-6">
               {/* Activity Centre */}
               <Card>
                 <CardHeader>
@@ -1025,29 +1064,6 @@ export default function Leads() {
                     <div className="text-3xl font-bold text-blue-600">{selectedLead.score}</div>
                     <p className="text-sm text-muted-foreground">out of 100</p>
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Tags */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Tag className="w-5 h-5" />
-                    <span>Tags</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {selectedLead.tags && typeof selectedLead.tags === 'string' && selectedLead.tags.trim() ? (
-                    <div className="flex flex-wrap gap-2">
-                      {selectedLead.tags.split(',').map((tag, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {tag.trim()}
-                        </Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">No tags assigned</p>
-                  )}
                 </CardContent>
               </Card>
             </div>
