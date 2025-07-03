@@ -149,6 +149,39 @@ export default function OpportunityDetail() {
         </div>
       </div>
       
+      {/* Associated Contacts */}
+      <div className="bg-white border-b p-4 flex items-center space-x-4">
+        <span className="font-semibold text-gray-700">Associated Contact{(opportunity.contactRoles && opportunity.contactRoles.length > 1) ? 's' : ''}:</span>
+        {opportunity.contactRoles && opportunity.contactRoles.length > 0 ? (
+          opportunity.contactRoles.map((role) => {
+            const fullContact = contacts?.find(c => c.id === role.id);
+            return (
+              <div key={role.id} className="flex items-center space-x-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>{role.name ? role.name.charAt(0) : '?'}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <Link to={`/contacts/${role.id}`} className="text-blue-600 font-medium hover:underline">{role.name || fullContact?.name || '-'}</Link>
+                  <div className="text-xs text-gray-500">{fullContact?.email || '-'} | {fullContact?.phone || '-'}</div>
+                </div>
+              </div>
+            );
+          })
+        ) : mainContact ? (
+          <div className="flex items-center space-x-2">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback>{mainContact.name ? mainContact.name.charAt(0) : '?'}</AvatarFallback>
+            </Avatar>
+            <div>
+              <Link to={`/contacts/${mainContact.id}`} className="text-blue-600 font-medium hover:underline">{mainContact.name}</Link>
+              <div className="text-xs text-gray-500">{mainContact.email || '-'} | {mainContact.phone || '-'}</div>
+            </div>
+          </div>
+        ) : (
+          <span className="text-gray-500">No associated contacts.</span>
+        )}
+      </div>
+      
       {/* Stage Tracker */}
       <div className="bg-white border-b p-4 flex flex-col md:flex-row md:justify-between items-center">
         <div className="flex justify-center w-full md:w-auto mb-2 md:mb-0">

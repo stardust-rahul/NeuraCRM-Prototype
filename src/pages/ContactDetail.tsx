@@ -7,9 +7,12 @@ import { Mail, Phone, Building, User, Calendar, Edit, Plus, CaseSensitive, Brief
 import { useContacts } from '@/context/ContactsContext';
 import { useOpportunities } from '@/context/OpportunitiesContext';
 import { OpportunityModal, OpportunitiesList } from '@/components/opportunities';
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
-export default function ContactDetail() {
-  const { contactId } = useParams();
+export default function ContactDetail({ contactId: propContactId, onBack }) {
+  const params = useParams();
+  const contactId = propContactId || params.contactId;
   const { contacts } = useContacts();
   const { fetchOpportunities, opportunities } = useOpportunities();
   const [showOppModal, setShowOppModal] = useState(false);
@@ -38,123 +41,190 @@ export default function ContactDetail() {
   return (
     <div className="bg-gray-50/50 min-h-screen">
       {/* Header */}
-      <div className="bg-white border-b p-4 flex justify-between items-center">
-        <div className="flex items-center space-x-4">
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={`https://ui-avatars.com/api/?name=${contact.name}&background=random`} />
-            <AvatarFallback>{contact.name?.charAt(0) || 'A'}</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-sm text-gray-500">Contact</p>
-            <h1 className="text-2xl font-bold">Mr. {contact.name}</h1>
+      <div className="border-b bg-white px-8 py-4 mt-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Avatar className="h-12 w-12">
+              <AvatarImage src={`https://ui-avatars.com/api/?name=${contact.name}&background=random`} />
+              <AvatarFallback>{contact.name?.charAt(0) || 'A'}</AvatarFallback>
+            </Avatar>
+            <h1 className="text-xl font-bold">{contact.name}</h1>
+            {contact.account && (
+              <Badge variant="outline">{contact.account}</Badge>
+            )}
           </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={() => setShowOppModal(true)}>New Opportunity</Button>
-          <Button variant="outline">Edit</Button>
-          <Button variant="outline" size="icon">
-            <ChevronDown className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center space-x-2">
+            {onBack && (
+              <Button variant="outline" onClick={onBack}>Back to Contacts</Button>
+            )}
+            <Button variant="outline" onClick={() => setShowOppModal(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              New Opportunity
+            </Button>
+            <Button variant="outline">
+              <Edit className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
+          </div>
         </div>
       </div>
       {/* New Opportunity Modal */}
       <OpportunityModal open={showOppModal} onClose={() => setShowOppModal(false)} initialData={{ contact: contact.name, account: contact.account }} />
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
-        {/* Left Column */}
-        <div className="lg:col-span-1 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex justify-between items-center">
-                <span>About</span>
-                <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm space-y-4">
-              <div className="flex justify-between"><span>Name</span><span className="font-medium text-right">{contact.name}</span></div>
-              <div className="flex justify-between"><span>Account Name</span><Link to="/account/1" className="text-blue-600 hover:underline font-medium text-right">{contact.account}</Link></div>
-              <div className="flex justify-between"><span>Title</span><span className="font-medium text-right">{contact.title || 'N/A'}</span></div>
-              <div className="flex justify-between"><span>Reports To</span><span className="font-medium text-right">-</span></div>
-              <div className="flex justify-between"><span>Description</span><span className="font-medium text-right">-</span></div>
-              <div className="flex justify-between"><span>Contact Owner</span><span className="font-medium text-right">{contact.owner}</span></div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex justify-between items-center">
-                <span>Get in Touch</span>
-                <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm space-y-4">
-               <div className="flex justify-between"><span>Phone</span><span className="font-medium text-right">{contact.phone}</span></div>
-               <div className="flex justify-between"><span>Email</span><span className="font-medium text-right">{contact.email}</span></div>
-               <div className="flex justify-between"><span>Mailing Address</span><span className="font-medium text-right">-</span></div>
-            </CardContent>
-          </Card>
-           <Card>
-            <CardHeader>
-              <CardTitle>History</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm space-y-2">
-              <p>Created By {contact.owner}, 28/06/2025, 07:51</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Middle Column */}
-        <div className="lg:col-span-1 bg-white p-4 rounded-lg border">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex space-x-1">
-              <Button variant="outline" size="sm" className="bg-gray-200"><Mail className="h-4 w-4" /></Button>
-              <Button variant="outline" size="sm"><Calendar className="h-4 w-4" /></Button>
-              <Button variant="outline" size="sm"><Clock className="h-4 w-4" /></Button>
-            </div>
-            <div>
-              <label className="flex items-center space-x-2 text-sm">
-                <input type="checkbox" className="toggle-switch"/>
-                <span>Only show activities with insights</span>
-              </label>
-            </div>
+      {/* Main Content Grid */}
+      <div className="p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Info (Left, 2/3) */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Contact Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <User className="w-5 h-5" />
+                  <span>Contact Information</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-sm font-medium text-muted-foreground">Full Name</span>
+                    <p className="text-lg font-semibold">{contact.name}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-muted-foreground">Title</span>
+                    <p className="text-lg">{contact.title || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-muted-foreground">Email</span>
+                    <div className="flex items-center space-x-2">
+                      <Mail className="w-4 h-4 text-muted-foreground" />
+                      <a href={`mailto:${contact.email}`} className="text-blue-600 hover:underline">
+                        {contact.email}
+                      </a>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-muted-foreground">Phone</span>
+                    <div className="flex items-center space-x-2">
+                      <Phone className="w-4 h-4 text-muted-foreground" />
+                      <a href={`tel:${contact.phone}`} className="text-blue-600 hover:underline">
+                        {contact.phone}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            {/* Company Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Building className="w-5 h-5" />
+                  <span>Company Information</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-sm font-medium text-muted-foreground">Company Name</span>
+                    <p className="text-lg font-semibold">{contact.account}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-muted-foreground">Contact Owner</span>
+                    <p className="text-lg">{contact.owner}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            {/* Notes (optional, placeholder) */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <File className="w-5 h-5" />
+                  <span>Notes</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-700 leading-relaxed">No notes available.</p>
+              </CardContent>
+            </Card>
           </div>
-          <div className="text-center text-gray-500 py-10">
-            <p>No activities to show.</p>
-            <p className="text-xs">Get started by sending an email, scheduling a task, and more.</p>
-            <Button className="mt-4">Show All Activities</Button>
+          {/* Sidebar (Right, 1/3) */}
+          <div className="space-y-6">
+            {/* Opportunities */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Briefcase className="w-5 h-5" />
+                  <span>Opportunities</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <OpportunitiesList
+                  opportunities={relatedOpportunities}
+                  onAddOpportunity={() => setShowOppModal(true)}
+                />
+              </CardContent>
+            </Card>
+            {/* Tags */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <CaseSensitive className="w-5 h-5" />
+                  <span>Tags</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">No tags assigned</p>
+              </CardContent>
+            </Card>
+            {/* Timeline */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Clock className="w-5 h-5" />
+                  <span>Timeline</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                    <div>
+                      <p className="text-sm font-medium">Contact Created</p>
+                      <p className="text-xs text-muted-foreground">28/06/2025</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                    <div>
+                      <p className="text-sm font-medium">Last Updated</p>
+                      <p className="text-xs text-muted-foreground">28/06/2025</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button className="w-full justify-start" variant="outline">
+                  <Mail className="w-4 h-4 mr-2" />Send Email
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <PhoneCall className="w-4 h-4 mr-2" />Call
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <MessageSquare className="w-4 h-4 mr-2" />Message
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <Video className="w-4 h-4 mr-2" />Video Call
+                </Button>
+              </CardContent>
+            </Card>
           </div>
-        </div>
-
-        {/* Right Column */}
-        <div className="lg:col-span-1 space-y-6">
-          <OpportunitiesList
-            opportunities={relatedOpportunities}
-            onAddOpportunity={() => setShowOppModal(true)}
-          />
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex justify-between items-center">
-                <span>Cases (0)</span>
-                 <Button variant="ghost" size="icon"><ChevronDown className="h-4 w-4" /></Button>
-              </CardTitle>
-            </CardHeader>
-             <CardContent>
-               <p className="text-sm text-gray-500">No cases.</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex justify-between items-center">
-                <span>Files (0)</span>
-                 <Button variant="ghost" size="icon"><ChevronDown className="h-4 w-4" /></Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-6 border-2 border-dashed rounded-lg">
-                <Button variant="outline">Upload Files</Button>
-                <p className="text-sm text-gray-500 mt-2">Or drop files</p>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

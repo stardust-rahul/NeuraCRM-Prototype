@@ -71,6 +71,7 @@ import { useOpportunities } from "@/context/OpportunitiesContext";
 import Accounts from "./Accounts";
 import AccountDetail from "./AccountDetail";
 import Orders from "./Orders";
+import ContactDetail from "./ContactDetail";
 
 const salesMetrics = [
   {
@@ -772,6 +773,7 @@ export default function Sales({ defaultTab = "analytics" }) {
   const [viewOpportunity, setViewOpportunity] = useState(null);
   const [viewAccount, setViewAccount] = useState(null);
   const navigate = useNavigate();
+  const [selectedContactId, setSelectedContactId] = useState(null);
 
   return (
     <div className="p-8 space-y-8 bg-background min-h-screen">
@@ -1190,7 +1192,14 @@ export default function Sales({ defaultTab = "analytics" }) {
 
         {/* Contacts */}
         <TabsContent value="contacts" className="space-y-6">
-          <Contacts selectedLead={selectedLead} />
+          {selectedContactId ? (
+            <ContactDetail contactId={selectedContactId} onBack={() => setSelectedContactId(null)} />
+          ) : (
+            <Contacts
+              selectedLead={selectedLead}
+              onContactClick={contact => setSelectedContactId(contact.id)}
+            />
+          )}
         </TabsContent>
 
         {/* Opportunities Pipeline */}

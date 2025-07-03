@@ -33,7 +33,7 @@ import {
   TableHead,
 } from "@/components/ui/table";
 
-export default function Contacts({ selectedLead }) {
+export default function Contacts({ selectedLead, onContactClick }) {
   const { contacts, addContact } = useContacts();
   const [filter, setFilter] = useState("All Contacts");
   const [search, setSearch] = useState("");
@@ -117,9 +117,13 @@ export default function Contacts({ selectedLead }) {
                   </TableCell>
                   <TableCell className="px-2 py-1 text-muted-foreground border-r border-gray-200 bg-white group-hover:bg-blue-50">{idx + 1}</TableCell>
                   <TableCell className="px-2 py-1 font-medium border-r border-gray-200 bg-white group-hover:bg-blue-50">
-                    <Link to={`/contacts/${contact.id}`} className="text-blue-600 hover:underline">
-                      {contact.name}
-                    </Link>
+                    {onContactClick ? (
+                      <button className="text-blue-600 hover:underline" onClick={() => onContactClick(contact)}>{contact.name}</button>
+                    ) : (
+                      <Link to={`/contacts/${contact.id}`} className="text-blue-600 hover:underline">
+                        {contact.name}
+                      </Link>
+                    )}
                   </TableCell>
                   <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{contact.email}</TableCell>
                   <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{contact.phone}</TableCell>
