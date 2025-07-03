@@ -1,59 +1,34 @@
-import { useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-// Dummy data for demonstration
-const orders = [
-  {
-    id: "O-001",
-    customer: "Acme Corporation",
-    total: "$12,500",
-    status: "processing",
-    payment: "paid",
-    created: "2024-06-04",
-    shipment: "in transit",
-    accountName: "Amazon India",
-    orderStartDate: "01/08/2025",
-    orderAmount: "£0.00",
-    shippingAddress: "Village Telmunga PS kasmar district bokaro, Bokaro, 827302, Albania",
-    orderOwner: "Vishal Paswan",
-    customerAuthorizedBy: "Ankit Chandan",
-    companyAuthorizedBy: "Vishal Paswan",
-    orderNumber: "00000100",
-    statusLabel: "Draft",
-  },
-  {
-    id: "O-002",
-    customer: "TechFlow Inc",
-    total: "$7,800",
-    status: "completed",
-    payment: "paid",
-    created: "2024-06-05",
-    shipment: "delivered",
-    accountName: "Amazon India",
-    orderStartDate: "01/08/2025",
-    orderAmount: "£0.00",
-    shippingAddress: "Village Telmunga PS kasmar district bokaro, Bokaro, 827302, Albania",
-    orderOwner: "Vishal Paswan",
-    customerAuthorizedBy: "Ankit Chandan",
-    companyAuthorizedBy: "Vishal Paswan",
-    orderNumber: "00000101",
-    statusLabel: "Draft",
-  },
-];
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useOrders } from "@/context/OrdersContext";
+import OrderDetailsModule from "@/modules/OrderDetailsModule";
+import OrderEditLog from "@/modules/OrderEditLog";
 
 export default function OrderDetail() {
   const { orderId } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
-  const isEdit = new URLSearchParams(location.search).get("edit") === "true";
-  const order = orders.find((o) => o.id === orderId) || orders[0];
-  const [editMode, setEditMode] = useState(isEdit);
-  const [form, setForm] = useState({ ...order });
+  const { orders, updateOrder } = useOrders();
+  const order = orders.find(o => o.id === orderId);
+  const [editMode, setEditMode] = useState(false);
+  const [form, setForm] = useState(order ? { ...order } : {});
+
+  useEffect(() => {
+    if (order) setForm({ ...order });
+  }, [order]);
+
+  if (!order) {
+    return (
+      <div className="p-8 text-center">
+        <h1 className="text-lg text-red-600">Order not found.</h1>
+        <Button onClick={() => navigate('/orders')} className="mt-4">Go Back to Orders</Button>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,7 +36,7 @@ export default function OrderDetail() {
   };
 
   const handleSave = () => {
-    // Save logic here (API call or context update)
+    updateOrder(form);
     setEditMode(false);
   };
 
@@ -72,20 +47,24 @@ export default function OrderDetail() {
         <div>
           <div className="flex items-center space-x-2 text-lg text-muted-foreground">
             <span>Order</span>
-            <span className="font-mono text-xl text-blue-900 font-bold">{form.orderNumber || order.orderNumber}</span>
+            <span className="font-mono text-xl text-blue-900 font-bold">{form.id}</span>
+            <Badge variant="outline" className="ml-2">{form.status}</Badge>
           </div>
           <div className="flex space-x-8 mt-2 text-sm text-muted-foreground">
             <div>
-              <span className="font-semibold">Account Name:</span> {form.accountName}
+              <span className="font-semibold">Customer:</span> {form.customer}
             </div>
             <div>
-              <span className="font-semibold">Order Start Date:</span> {form.orderStartDate}
+              <span className="font-semibold">Company:</span> {form.company}
             </div>
             <div>
-              <span className="font-semibold">Status:</span> {form.statusLabel}
+              <span className="font-semibold">Contact Name:</span> {form.contactName}
             </div>
             <div>
-              <span className="font-semibold">Order Amount:</span> {form.orderAmount}
+              <span className="font-semibold">Owner:</span> {form.owner}
+            </div>
+            <div>
+              <span className="font-semibold">Created:</span> {form.createdDate ? new Date(form.createdDate).toLocaleDateString() : '-'}
             </div>
           </div>
         </div>
@@ -94,111 +73,38 @@ export default function OrderDetail() {
           <Button variant="outline" onClick={() => navigate(-1)}>Back</Button>
         </div>
       </div>
-      {/* Progress Bar */}
-      <div className="w-full bg-gray-200 rounded-full h-6 flex items-center">
-        <div className="bg-blue-900 h-6 rounded-full flex items-center justify-center text-white font-semibold px-8" style={{ width: "40%" }}>
-          Draft
-        </div>
-        <div className="flex-1 text-center text-gray-600">Activated</div>
-      </div>
-      {/* Tabs */}
-      <Tabs defaultValue="related" className="mt-4">
-        <TabsList>
-          <TabsTrigger value="related">Related</TabsTrigger>
-          <TabsTrigger value="details">Details</TabsTrigger>
-        </TabsList>
-        <TabsContent value="related">
-          {/* Related Tab Content (placeholders) */}
-          <div className="space-y-4 mt-4">
-            <Card className="p-4">
-              <div className="font-semibold text-lg mb-2">Order Delivery Groups (0)</div>
-              <Button variant="outline" size="sm">New</Button>
-            </Card>
-            <Card className="p-4">
-              <div className="font-semibold text-lg mb-2">Order Products (0)</div>
-              <Button variant="outline" size="sm">Add Products</Button>
-              <Button variant="outline" size="sm" className="ml-2">Edit Products</Button>
-            </Card>
-            <Card className="p-4">
-              <div className="font-semibold text-lg mb-2">Order History (1)</div>
-              <div className="text-sm">03/07/2025, 06:09 - Created by Vishal Paswan</div>
-            </Card>
-            <Card className="p-4">
-              <div className="font-semibold text-lg mb-2">Notes & Attachments (0)</div>
-              <Button variant="outline" size="sm">Upload Files</Button>
-            </Card>
+
+      {/* Quote Summary Card */}
+      <Card className="mt-4">
+        <CardHeader>
+          <CardTitle>Quote Summary</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col md:flex-row md:items-center md:space-x-8 space-y-2 md:space-y-0">
+          <div>
+            <div><span className="font-semibold">Quote ID:</span> {form.quoteId}</div>
+            <div><span className="font-semibold">Amount:</span> {form.amount}</div>
+            <div><span className="font-semibold">Stage:</span> {form.stage}</div>
           </div>
-        </TabsContent>
-        <TabsContent value="details">
-          {/* Details Tab Content */}
-          <div className="bg-white rounded-lg shadow p-6 mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <div className="mb-2 font-semibold">Order Owner</div>
-                {editMode ? (
-                  <Input name="orderOwner" value={form.orderOwner} onChange={handleChange} />
-                ) : (
-                  <div>{form.orderOwner}</div>
-                )}
-              </div>
-              <div>
-                <div className="mb-2 font-semibold">Order Amount</div>
-                {editMode ? (
-                  <Input name="orderAmount" value={form.orderAmount} onChange={handleChange} />
-                ) : (
-                  <div>{form.orderAmount}</div>
-                )}
-              </div>
-              <div>
-                <div className="mb-2 font-semibold">Order Type</div>
-                {editMode ? (
-                  <Input name="orderType" value={form.orderType || ""} onChange={handleChange} />
-                ) : (
-                  <div>{form.orderType || "-"}</div>
-                )}
-              </div>
-              <div>
-                <div className="mb-2 font-semibold">Status</div>
-                {editMode ? (
-                  <Input name="statusLabel" value={form.statusLabel} onChange={handleChange} />
-                ) : (
-                  <div>{form.statusLabel}</div>
-                )}
-              </div>
-              <div className="md:col-span-2">
-                <div className="mb-2 font-semibold">Shipping Address</div>
-                {editMode ? (
-                  <Input name="shippingAddress" value={form.shippingAddress} onChange={handleChange} />
-                ) : (
-                  <div>{form.shippingAddress}</div>
-                )}
-              </div>
-              <div>
-                <div className="mb-2 font-semibold">Customer Authorized By</div>
-                {editMode ? (
-                  <Input name="customerAuthorizedBy" value={form.customerAuthorizedBy} onChange={handleChange} />
-                ) : (
-                  <div>{form.customerAuthorizedBy}</div>
-                )}
-              </div>
-              <div>
-                <div className="mb-2 font-semibold">Company Authorized By</div>
-                {editMode ? (
-                  <Input name="companyAuthorizedBy" value={form.companyAuthorizedBy} onChange={handleChange} />
-                ) : (
-                  <div>{form.companyAuthorizedBy}</div>
-                )}
-              </div>
-            </div>
-            {editMode && (
-              <div className="flex justify-end mt-6">
-                <Button onClick={handleSave}>Save</Button>
-                <Button variant="outline" className="ml-2" onClick={() => setEditMode(false)}>Cancel</Button>
-              </div>
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
+        </CardContent>
+      </Card>
+
+      {/* Editable Order Details (Modular) */}
+      <OrderDetailsModule
+        form={form}
+        editMode={editMode}
+        handleChange={handleChange}
+        handleSave={handleSave}
+        setEditMode={setEditMode}
+      />
+
+      {/* Order Edit Log */}
+      <OrderEditLog
+        log={[
+          { date: '2025-07-03T17:21:00+05:30', user: 'Vishal Paswan', changes: 'Created order from quote.' },
+          { date: '2025-07-03T17:23:00+05:30', user: 'Vishal Paswan', changes: 'Changed status from Draft to Activated.' },
+          { date: '2025-07-03T17:25:00+05:30', user: 'Vishal Paswan', changes: 'Updated quantity from 1 to 3.' },
+        ]}
+      />
     </div>
   );
-} 
+}
