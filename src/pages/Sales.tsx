@@ -837,7 +837,9 @@ export default function Sales({ defaultTab = "analytics" }) {
               <div className="border-b bg-white px-8 py-4 mt-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    {/* Removed Back to Leads Button */}
+                    <Button variant="ghost" size="icon" onClick={() => setSelectedLead(null)}>
+                      <ArrowLeft className="w-5 h-5" />
+                    </Button>
                     <h1 className="text-xl font-bold">{selectedLead.contact || selectedLead.name}</h1>
                     <Badge variant="outline">{selectedLead.company}</Badge>
                   </div>
@@ -1075,6 +1077,9 @@ export default function Sales({ defaultTab = "analytics" }) {
           {/* Page Title and Filter Bar */}
           <div className="flex items-center justify-between px-2 py-2">
             <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
               <h1 className="text-2xl font-bold">Leads</h1>
             </div>
             <div className="flex items-center space-x-2">
@@ -1222,6 +1227,9 @@ export default function Sales({ defaultTab = "analytics" }) {
           {/* Page Title and Filter Bar */}
           <div className="flex items-center justify-between px-2 py-2">
             <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
               <h1 className="text-2xl font-bold">Quotes</h1>
             </div>
             <div className="flex items-center space-x-2">
@@ -1379,6 +1387,12 @@ export default function Sales({ defaultTab = "analytics" }) {
 
         {/* Orders */}
         <TabsContent value="orders" className="space-y-6">
+          <div className="flex items-center space-x-4 px-2 py-2">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <h1 className="text-2xl font-bold">Orders</h1>
+          </div>
           <Orders />
         </TabsContent>
       </Tabs>
@@ -1386,12 +1400,15 @@ export default function Sales({ defaultTab = "analytics" }) {
       {/* View Lead Details Modal */}
       <Dialog open={!!viewLead} onOpenChange={open => { if (!open) resetAllModals(); else setViewLead(viewLead); }}>
         <DialogContent>
-          <DialogHeader>
+          <DialogHeader className="flex flex-row items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => setViewLead(null)}>
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <DialogTitle>Lead Details</DialogTitle>
-            <DialogDescription>
-              Detailed information about the selected lead.
-            </DialogDescription>
           </DialogHeader>
+          <DialogDescription>
+            Detailed information about the selected lead.
+          </DialogDescription>
           {viewLead && (
             <div className="space-y-2">
               <div><b>Name:</b> {viewLead.name}</div>
@@ -1608,12 +1625,15 @@ export default function Sales({ defaultTab = "analytics" }) {
       {/* View Contact Details Modal */}
       <Dialog open={!!viewContact} onOpenChange={open => { if (!open) resetAllModals(); else setViewContact(viewContact); }}>
         <DialogContent>
-          <DialogHeader>
+          <DialogHeader className="flex flex-row items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => setViewContact(null)}>
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <DialogTitle>Contact Details</DialogTitle>
-            <DialogDescription>
-              Detailed information about the selected contact.
-            </DialogDescription>
           </DialogHeader>
+          <DialogDescription>
+            Detailed information about the selected contact.
+          </DialogDescription>
           {viewContact && (
             <div className="space-y-2">
               <div><b>Name:</b> {viewContact.name}</div>
@@ -1631,12 +1651,15 @@ export default function Sales({ defaultTab = "analytics" }) {
       {/* View Quote Details Modal */}
       <Dialog open={!!viewQuote} onOpenChange={open => { if (!open) resetAllModals(); else setViewQuote(viewQuote); }}>
         <DialogContent>
-          <DialogHeader>
+          <DialogHeader className="flex flex-row items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => setViewQuote(null)}>
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <DialogTitle>Quote Details</DialogTitle>
-            <DialogDescription>
-              Detailed information about the selected quote.
-            </DialogDescription>
           </DialogHeader>
+          <DialogDescription>
+            Detailed information about the selected quote.
+          </DialogDescription>
           {viewQuote && (
             <div className="space-y-2">
               <div><b>Customer:</b> {viewQuote.customer}</div>
@@ -1652,12 +1675,15 @@ export default function Sales({ defaultTab = "analytics" }) {
       {/* View Order Details Modal */}
       <Dialog open={!!viewOrder} onOpenChange={open => { if (!open) resetAllModals(); else setViewOrder(viewOrder); }}>
         <DialogContent>
-          <DialogHeader>
+          <DialogHeader className="flex flex-row items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => setViewOrder(null)}>
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <DialogTitle>Order Details</DialogTitle>
-            <DialogDescription>
-              Detailed information about the selected order.
-            </DialogDescription>
           </DialogHeader>
+          <DialogDescription>
+            Detailed information about the selected order.
+          </DialogDescription>
           {viewOrder && (
             <div className="space-y-2">
               <div><b>Customer:</b> {viewOrder.customer}</div>
@@ -1674,12 +1700,15 @@ export default function Sales({ defaultTab = "analytics" }) {
       {/* View Product Details Modal */}
       <Dialog open={!!viewProduct} onOpenChange={open => { if (!open) resetAllModals(); else setViewProduct(viewProduct); }}>
         <DialogContent>
-          <DialogHeader>
+          <DialogHeader className="flex flex-row items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => setViewProduct(null)}>
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <DialogTitle>Product Details</DialogTitle>
-            <DialogDescription>
-              Detailed information about the selected product.
-            </DialogDescription>
           </DialogHeader>
+          <DialogDescription>
+            Detailed information about the selected product.
+          </DialogDescription>
           {viewProduct && (
             <div className="space-y-2">
               <div><b>Name:</b> {viewProduct.name}</div>

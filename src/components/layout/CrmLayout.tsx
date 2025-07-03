@@ -181,48 +181,41 @@ export default function CrmLayout() {
   };
 
   return (
-    <div className="flex h-screen bg-background">
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm" />
-          <div className="fixed left-0 top-0 h-full w-64 bg-background border-r border-border">
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <h2 className="text-lg font-semibold">Menu</h2>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-            <LeftNavbar navigation={visibleAppObjects} onDelete={removeAppFromNavbar} />
+    <>
+      {/* Fixed Left Sidebar */}
+      <div className="hidden lg:block">
+        <div className="fixed left-0 top-0 h-screen z-30 transition-all duration-300"
+             style={{ width: 'var(--sidebar-width, 4rem)' }} // fallback to 16 (w-16)
+             id="fixed-left-navbar-wrapper">
+          <LeftNavbar navigation={visibleAppObjects} onDelete={removeAppFromNavbar} />
+        </div>
+      </div>
+
+      {/* Fixed Right Sidebar */}
+      {isAppsOpen && (
+        <div className="hidden xl:block">
+          <div className="fixed right-0 top-0 h-screen z-30 w-80 border-l border-border bg-card"
+               id="fixed-right-apps-panel-wrapper">
+            <RightAppsPanel 
+              apps={rightPanelApps}
+              modules={rightPanelModules}
+              onAddApp={addAppToNavbar}
+              addedItems={addedItems}
+            />
           </div>
         </div>
       )}
 
-      {/* Left Sidebar - Hidden on mobile */}
-      <div className="hidden lg:block">
-        <LeftNavbar navigation={visibleAppObjects} onDelete={removeAppFromNavbar} />
-      </div>
-
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0">
+      {/* Main Content Area with margins for fixed sidebars */}
+      <main
+        className="flex-1 flex flex-col min-w-0"
+        style={{
+          marginLeft: 'var(--sidebar-width, 4rem)', // 4rem = 64px = w-16
+          marginRight: isAppsOpen ? '20rem' : 0 // 20rem = 320px = w-80
+        }}
+      >
         <Outlet />
       </main>
-
-      {/* Right Apps Panel - Hidden on tablets and mobile */}
-      {isAppsOpen && (
-        <div className="hidden xl:block">
-          <RightAppsPanel 
-            apps={rightPanelApps}
-            modules={rightPanelModules}
-            onAddApp={addAppToNavbar}
-            addedItems={addedItems}
-          />
-        </div>
-      )}
 
       {/* Toggle Buttons for Desktop */}
       <div className="hidden lg:block fixed bottom-6 right-6 z-40">
@@ -245,6 +238,6 @@ export default function CrmLayout() {
           </Button>
         </div>
       </div>
-    </div>
+    </>
   );
 }

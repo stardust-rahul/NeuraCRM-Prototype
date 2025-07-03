@@ -46,9 +46,10 @@ export default function LeftNavbar({ navigation, onDelete }: LeftNavbarProps) {
   return (
     <div
       className={cn(
-        "sidebar flex flex-col sidebar-bg border-r border-sidebar-border transition-all duration-300 ease-in-out h-screen",
-        isHovered ? "w-48" : "w-16",
+        "sidebar flex flex-col sidebar-bg transition-all duration-300 ease-in-out",
+        isHovered ? "w-48" : "w-16"
       )}
+      style={{ height: '100vh' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
