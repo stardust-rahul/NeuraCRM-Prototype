@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { initialOpportunities } from "../pages/Opportunities";
+import { initialOpportunities } from "../data/initialOpportunities";
 
 const OpportunitiesContext = createContext(null);
 

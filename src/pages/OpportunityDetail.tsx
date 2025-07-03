@@ -1,18 +1,17 @@
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Edit, ChevronDown, Mail, Calendar, Clock, Check, Users, FileText, Crown, Info, RefreshCw, Settings2 } from 'lucide-react';
-import { findOpportunityById } from '@/data/mock-data';
+import { ChevronDown, Edit, Check, Crown, Mail, Calendar, Clock, RefreshCw, Settings2, Info, FileText } from 'lucide-react';
+import { useOpportunities } from '@/context/OpportunitiesContext';
 import { Switch } from "@/components/ui/switch";
 
-const stages = ["", "Propose", "Negotiate", "Closed"];
+const stages = ["Qualify", "Meet & Present", "Propose", "Negotiate", "Closed"];
 
-const StageIndicator = ({ currentStage }) => {
+function StageIndicator({ currentStage }) {
   const currentIndex = stages.indexOf(currentStage);
-
   return (
     <div className="flex items-center">
       <Button variant="ghost" size="icon" className="border rounded-full mr-2">
@@ -23,35 +22,48 @@ const StageIndicator = ({ currentStage }) => {
           if (!stage) return null;
           const isActive = index === currentIndex;
           const isCompleted = index < currentIndex;
-          
           return (
             <div
               key={stage}
-              className={`h-full flex items-center justify-center flex-1 first:rounded-l-full last:rounded-r-full relative
-                ${isActive ? 'bg-primary text-primary-foreground' : isCompleted ? 'bg-green-400 text-white' : 'bg-gray-200 text-gray-500'}
-                ${!isActive && !isCompleted ? 'hover:bg-gray-300' : ''}
-                transition-all duration-300`}
-              style={{ clipPath: index < stages.length -1 && index > 0 ? 'polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%)' : ''}}
+              className={`relative flex items-center justify-center h-8 px-8 min-w-[120px] text-sm font-medium transition-all duration-200 ${isActive ? 'bg-[#001A3A] text-white' : isCompleted ? 'bg-teal-200 text-black' : 'bg-gray-200 text-black'} ${index === 0 ? 'rounded-l-full' : ''} ${index === stages.length - 1 ? 'rounded-r-full' : ''}`}
+              style={{ zIndex: 2 }}
             >
-              <div className={`absolute w-full h-full ${index < stages.length -1 && index > 0 ? 'bg-inherit' : ''}`} style={{zIndex: -1, right: '-1px',  clipPath: index < stages.length - 1 && index > 0 ? 'polygon(calc(100% - 10px) 0, 100% 0, 100% 100%, calc(100% - 10px) 100%)' : ''}}></div>
-              {isCompleted && <Check className="h-5 w-5 mr-1" />}
-              <span className="font-semibold text-sm">{stage}</span>
+              {isCompleted && !isActive ? (
+                <Check className="w-5 h-5" />
+              ) : (
+                <span>{stage}</span>
+              )}
             </div>
           );
         })}
       </div>
     </div>
   );
-};
-
+}
 
 export default function OpportunityDetail() {
   const { opportunityId } = useParams();
-  // Fetch opportunity data based on ID. Using mock data for now.
-  const opportunity = findOpportunityById(opportunityId);
+  const navigate = useNavigate();
+  const { opportunities } = useOpportunities();
+  const opportunity = opportunities.find(o => o.id === opportunityId);
+
+  // Provide fallback values for missing fields
+  const safeOpportunity = {
+    ...opportunity,
+    probability: opportunity?.probability ?? '-',
+    forecastCategory: opportunity?.forecastCategory ?? '-',
+    createdBy: opportunity?.createdBy ?? 'User',
+    createdDate: opportunity?.createdDate ?? opportunity?.created ?? '-',
+    amount: opportunity?.amount ?? '-',
+    title: opportunity?.title ?? '-',
+    account: opportunity?.account ?? '-',
+    closeDate: opportunity?.closeDate ?? '-',
+    owner: opportunity?.owner ?? '-',
+    stage: opportunity?.stage ?? '-',
+  };
 
   if (!opportunity) {
-    return <div>Opportunity not found</div>;
+    return <div className="p-8 text-center text-lg text-red-600">Opportunity not found</div>;
   }
 
   const DetailRow = ({ label, value, isLink = false, to = "#", hasIcon = false }) => (
@@ -60,7 +72,7 @@ export default function OpportunityDetail() {
       <div className="flex items-center">
         {hasIcon && (
           <Avatar className="h-6 w-6 mr-2">
-            <AvatarFallback>{value.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{value && value.charAt ? value.charAt(0) : '?'} </AvatarFallback>
           </Avatar>
         )}
         {isLink ? (
@@ -83,7 +95,7 @@ export default function OpportunityDetail() {
           </div>
           <div>
              <p className="text-sm text-gray-500">Opportunity</p>
-             <h1 className="text-2xl font-bold">{opportunity.name}</h1>
+             <h1 className="text-2xl font-bold">{safeOpportunity.title}</h1>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -99,7 +111,7 @@ export default function OpportunityDetail() {
       {/* Stage Tracker */}
       <div className="bg-white border-b p-4 flex justify-between items-center">
         <div className="w-full md:w-2/3 lg:w-3/4">
-          <StageIndicator currentStage={opportunity.stage} />
+          <StageIndicator currentStage={safeOpportunity.stage} />
         </div>
         <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
           <Check className="h-4 w-4 mr-2" />
@@ -118,12 +130,12 @@ export default function OpportunityDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-1">
-              <DetailRow label="Opportunity Name" value={opportunity.name} />
-              <DetailRow label="Account Name" value={opportunity.accountName} isLink to="/account/1" />
-              <DetailRow label="Close Date" value={opportunity.closeDate} />
-              <DetailRow label="Amount" value={opportunity.amount || '-'} />
+              <DetailRow label="Opportunity Name" value={safeOpportunity.title} />
+              <DetailRow label="Account Name" value={safeOpportunity.account} isLink to="/account/1" />
+              <DetailRow label="Close Date" value={safeOpportunity.closeDate} />
+              <DetailRow label="Amount" value={safeOpportunity.amount} />
               <DetailRow label="Description" value="-" />
-              <DetailRow label="Opportunity Owner" value={opportunity.owner} hasIcon />
+              <DetailRow label="Opportunity Owner" value={safeOpportunity.owner} hasIcon />
             </CardContent>
           </Card>
           <Card>
@@ -134,9 +146,9 @@ export default function OpportunityDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-1">
-               <DetailRow label="Stage" value={opportunity.stage} />
-               <DetailRow label="Probability (%)" value={`${opportunity.probability}%`} />
-               <DetailRow label="Forecast Category" value={opportunity.forecastCategory} />
+               <DetailRow label="Stage" value={safeOpportunity.stage} />
+               <DetailRow label="Probability (%)" value={safeOpportunity.probability !== '-' ? `${safeOpportunity.probability}%` : '-'} />
+               <DetailRow label="Forecast Category" value={safeOpportunity.forecastCategory} />
                <DetailRow label="Next Step" value="-" />
             </CardContent>
           </Card>
@@ -150,11 +162,11 @@ export default function OpportunityDetail() {
             <CardContent className="text-sm space-y-2">
               <div className="flex items-center">
                 <Avatar className="h-8 w-8 mr-2">
-                  <AvatarFallback>{opportunity.createdBy.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{safeOpportunity.createdBy.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p>Created By <span className="font-semibold">{opportunity.createdBy}</span></p>
-                  <p className="text-xs text-gray-500">{opportunity.createdDate}</p>
+                  <p>Created By <span className="font-semibold">{safeOpportunity.createdBy}</span></p>
+                  <p className="text-xs text-gray-500">{safeOpportunity.createdDate}</p>
                 </div>
               </div>
             </CardContent>
@@ -200,7 +212,7 @@ export default function OpportunityDetail() {
           <Card>
             <CardHeader>
               <CardTitle className="flex justify-between items-center text-base font-semibold">
-                <span>Contact Roles ({opportunity.contactRoles?.length || 0})</span>
+                <span>Contact Roles ({opportunity.contactRoles ? opportunity.contactRoles.length : 0})</span>
                 <ChevronDown className="h-5 w-5" />
               </CardTitle>
             </CardHeader>
@@ -211,10 +223,10 @@ export default function OpportunityDetail() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                          <Avatar className="h-8 w-8 mr-2">
-                            <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
+                            <AvatarFallback>{contact.name ? contact.name.charAt(0) : '?'}</AvatarFallback>
                           </Avatar>
-                        <Link to={`/contacts/${contact.id}`} className="font-semibold text-blue-600 hover:underline">{contact.name}</Link>
-                         <Badge variant="secondary" className="ml-2">{contact.role.toUpperCase()}</Badge>
+                         <Link to={`/contacts/${contact.id}`} className="font-semibold text-blue-600 hover:underline">{contact.name || '-'}</Link>
+                          <Badge variant="secondary" className="ml-2">{contact.role ? contact.role.toUpperCase() : '-'}</Badge>
                       </div>
                       <Button variant="ghost" size="icon" className="h-7 w-7"><ChevronDown className="h-5 w-5"/></Button>
                     </div>
