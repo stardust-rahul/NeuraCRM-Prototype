@@ -25,6 +25,7 @@ import {
   Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { initialOpportunities } from "../data/initialOpportunities";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -187,89 +188,6 @@ const ProductsCard = () => (
     </Card>
 );
 
-export const initialOpportunities = [
-  {
-    id: "O-001",
-    title: "Eire-",
-    company: "Amazon India",
-    stage: "Closed Won",
-    closeDate: "30/06/2025",
-    owner: "User",
-    account: "Amazon India",
-    ownerAlias: "User",
-  },
-  {
-    id: "O-002",
-    title: "Amazon-",
-    company: "Amazon",
-    stage: "Qualify",
-    closeDate: "30/06/2025",
-    owner: "User",
-    account: "Amazon",
-    ownerAlias: "User",
-  },
-  {
-    id: "O-003",
-    title: "Eayo-",
-    company: "Eayo",
-    stage: "Closed Lost",
-    closeDate: "09/06/2025",
-    owner: "User",
-    account: "Eayo",
-    ownerAlias: "User",
-  },
-  {
-    id: "O-004",
-    title: "Flipkart-",
-    company: "Flipkart",
-    stage: "Closed Won",
-    closeDate: "07/06/2025",
-    owner: "User",
-    account: "Flipkart",
-    ownerAlias: "User",
-  },
-  {
-    id: "O-005",
-    title: "atome-",
-    company: "atome",
-    stage: "Closed Won",
-    closeDate: "06/06/2025",
-    owner: "User",
-    account: "atome",
-    ownerAlias: "User",
-  },
-  {
-    id: "O-006",
-    title: "Spring Promo 2025",
-    company: "Vishal Kumar",
-    stage: "Propose",
-    closeDate: "06/06/2025",
-    owner: "User",
-    account: "Vishal Kumar",
-    ownerAlias: "User",
-  },
-  {
-    id: "O-007",
-    title: "New Business",
-    company: "Vishal Kumar",
-    stage: "Propose",
-    closeDate: "03/08/2025",
-    owner: "User",
-    account: "Vishal Kumar",
-    ownerAlias: "User",
-  },
-  {
-    id: "O-008",
-    title: "Vishal Kumar",
-    company: "Vishal Kumar",
-    stage: "Closed Won",
-    closeDate: "03/06/2025",
-    owner: "User",
-    account: "Vishal Kumar",
-    ownerAlias: "User",
-  },
-];
-
 function OpportunitiesList({
   opportunities,
   onSelect,
@@ -405,7 +323,8 @@ function OpportunitiesList({
                 <tr
                   key={opp.id}
                   className="border-b border-gray-300 text-sm group hover:bg-blue-50 transition-colors"
-                  onClick={() => onSelect(opp)}
+                  onClick={() => { console.log('Row clicked:', opp); onSelect(opp); }}
+                  style={{ cursor: 'pointer' }}
                 >
                   <td className="px-2 py-1 text-muted-foreground border-r border-gray-200 bg-white group-hover:bg-blue-50">{idx + 1}</td>
                   <td className="px-2 py-1 font-medium border-r border-gray-200 bg-white group-hover:bg-blue-50">
@@ -418,7 +337,14 @@ function OpportunitiesList({
                   <td className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{opp.closeDate}</td>
                   <td className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{opp.ownerAlias}</td>
                   <td className="px-2 py-1 text-left bg-white group-hover:bg-blue-50">
-                    <Button variant="ghost" size="icon">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={e => {
+                        e.stopPropagation();
+                        // Dropdown logic here (if any)
+                      }}
+                    >
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </td>
@@ -509,7 +435,25 @@ function OpportunitiesList({
 
 export { OpportunitiesList };
 
+
 function OpportunityDetailView({ opportunity, onBack, contacts }) {
+  // Debug: Log the received opportunity prop
+  React.useEffect(() => {
+    console.log('[OpportunityDetailView] Received opportunity:', opportunity);
+  }, [opportunity]);
+
+  const { updateOpportunity } = useOpportunities();
+  const [showClosedDialog, setShowClosedDialog] = useState(false);
+  const [pendingStageIdx, setPendingStageIdx] = useState(null);
+  const [pendingClosedType, setPendingClosedType] = useState(null);
+
+  if (!opportunity) {
+    return (
+      <div className="p-8 text-center text-lg text-red-600">
+        No opportunity selected or opportunity data missing.
+      </div>
+    );
+  }
   // Stages for the progress bar
   const stages = [
     "Qualify",
@@ -518,37 +462,40 @@ function OpportunityDetailView({ opportunity, onBack, contacts }) {
     "Negotiate",
     "Closed",
   ];
-  const [currentStageIdx, setCurrentStageIdx] = useState(0); // User can set this
-  const [pendingStageIdx, setPendingStageIdx] = useState(null);
-  const [closedType, setClosedType] = useState(null); // 'Closed Won' or 'Closed Lost'
-  const [showClosedDialog, setShowClosedDialog] = useState(false);
+
+  // Compute current stage from opportunity.stage
+  let currentStageIdx = 0;
+  let closedType = null;
+  if (opportunity.stage === "Closed Won") {
+    currentStageIdx = stages.length - 1;
+    closedType = "Closed Won";
+  } else if (opportunity.stage === "Closed Lost") {
+    currentStageIdx = stages.length - 1;
+    closedType = "Closed Lost";
+  } else {
+    currentStageIdx = stages.findIndex(s => s === opportunity.stage);
+  }
 
   const handleStageClick = (idx) => {
-    setPendingStageIdx(idx);
-  };
-
-  const handleMarkCurrentStage = () => {
-    if (pendingStageIdx !== null) {
-      if (stages[pendingStageIdx] === "Closed") {
-        setShowClosedDialog(true);
+    if (idx === currentStageIdx) return;
+    if (stages[idx] === "Closed") {
+      setPendingStageIdx(idx);
+      setShowClosedDialog(true);
     } else {
-        setCurrentStageIdx(pendingStageIdx);
-        setClosedType(null);
-        setPendingStageIdx(null);
-      }
+      updateOpportunity({ ...opportunity, stage: stages[idx] });
     }
   };
 
   const handleClosedTypeSelect = (type) => {
-    setClosedType(type);
-    setCurrentStageIdx(stages.length - 1);
     setShowClosedDialog(false);
     setPendingStageIdx(null);
+    setPendingClosedType(null);
+    updateOpportunity({ ...opportunity, stage: type });
   };
 
   // For display, if current is closed, show closedType
   const getStageDisplay = (idx) => {
-    if (idx === stages.length - 1 && currentStageIdx === idx && closedType) {
+    if (idx === stages.length - 1 && closedType) {
       return closedType;
     }
     return stages[idx];
@@ -564,7 +511,7 @@ function OpportunityDetailView({ opportunity, onBack, contacts }) {
           </Avatar>
         <div>
             <p className="text-sm text-gray-500">Opportunity</p>
-            <h1 className="text-2xl font-bold text-gray-800">{opportunity.title}</h1>
+            <h1 className="text-2xl font-bold text-gray-800">{opportunity.title || 'Untitled Opportunity'}</h1>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -660,30 +607,32 @@ function OpportunityDetailView({ opportunity, onBack, contacts }) {
   );
 }
 
+import { useNavigate } from "react-router-dom";
+
 export default function OpportunitiesPage() {
   const { opportunities, addOpportunity } = useOpportunities();
   const { accounts, addAccount } = useAccounts();
   const { contacts, addContact } = useContacts();
-  const [selectedOpportunity, setSelectedOpportunity] = useState(null);
+  const navigate = useNavigate();
 
-  if (selectedOpportunity) {
-    return (
-      <OpportunityDetailView
-        opportunity={selectedOpportunity}
-        onBack={() => setSelectedOpportunity(null)}
-        contacts={contacts}
-      />
-    );
-  }
   return (
     <OpportunitiesList
       opportunities={opportunities}
-      onSelect={setSelectedOpportunity}
-      onAddOpportunity={addOpportunity}
+      onSelect={opp => navigate(`/opportunities/${opp.id}`)}
+      onAddOpportunity={opp => {
+        addOpportunity({ ...opp });
+        setTimeout(() => {
+          // After adding, navigate to the most recent opportunity
+          if (Array.isArray(opportunities) && opportunities.length > 0) {
+            navigate(`/opportunities/${opportunities[0].id}`);
+          }
+        }, 100);
+      }}
       accounts={accounts}
       contacts={contacts}
       addAccount={addAccount}
       addContact={addContact}
     />
   );
-} 
+}
+ 
