@@ -66,57 +66,78 @@ function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus }) 
   // Arrow SVG dimensions
   const width = 180;
   const height = 44;
+  // Add state for success message
+  const [markMessage, setMarkMessage] = useState("");
+  useEffect(() => {
+    if (markMessage) {
+      const timer = setTimeout(() => setMarkMessage(""), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [markMessage]);
+  // Handler to wrap onStageChange and show message
+  const handleStageClick = (stage) => {
+    onStageChange(stage);
+    setMarkMessage(`\u2713 Marked as ${stage}`);
+  };
   return (
     <div className="w-full flex flex-row items-center justify-center px-2 sm:px-8 pt-6 pb-2">
-      <div className="flex-1 flex items-center w-full flex-nowrap overflow-x-auto bg-white border rounded-lg min-h-[54px]">
-        {stages.map((stage, idx) => {
-          const isCompleted = idx < currentIdx;
-          const isCurrent = idx === currentIdx;
-          // Arrow points for SVG
-          let points =
-            idx === 0
-              ? `8,0 ${width-18},0 ${width},${height/2} ${width-18},${height} 8,${height} 0,${height/2}`
-              : `0,0 ${width-18},0 ${width},${height/2} ${width-18},${height} 0,${height} 18,${height/2}`;
-          // Fill and text color logic
-          let fill = isCompleted
-            ? "#e7f0fd"
-            : isCurrent
-            ? "#2563eb"
-            : "#f8fafc";
-          let textColor = isCurrent ? "#fff" : isCompleted ? "#2563eb" : "#334155";
-          let fontWeight = isCurrent ? "bold" : "normal";
-          return (
-            <div key={stage} style={{ minWidth: width, maxWidth: width, position: 'relative', zIndex: isCurrent ? 2 : 1 }}>
-              <svg
-                width={width}
-                height={height}
-                viewBox={`0 0 ${width} ${height}`}
-                style={{ display: 'block', cursor: 'pointer', minWidth: width }}
-                onClick={() => onStageChange(stage)}
-              >
-                <polygon
-                  points={points}
-                  fill={fill}
-                  stroke="#e5e7eb"
-                  strokeWidth={1}
-                  style={{ transition: 'fill 0.2s, stroke 0.2s' }}
-                />
-                <text
-                  x="50%"
-                  y="50%"
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontWeight={fontWeight}
-                  fontSize="16"
-                  fill={textColor}
-                  style={{ pointerEvents: 'none', userSelect: 'none' }}
+      <div className="relative w-full">
+        {/* Success message at top right of pipeline bar */}
+        {markMessage && (
+          <div className="absolute right-4 top-2 bg-green-100 text-green-700 px-4 py-2 rounded shadow flex items-center gap-2 z-20 text-sm font-semibold">
+            <span className="text-green-600 text-lg">&#10003;</span> {markMessage.replace(/^\u2713\s*/, "")}
+          </div>
+        )}
+        <div className="flex-1 flex items-center w-full flex-nowrap overflow-x-auto bg-white border rounded-lg min-h-[54px]">
+          {stages.map((stage, idx) => {
+            const isCompleted = idx < currentIdx;
+            const isCurrent = idx === currentIdx;
+            // Arrow points for SVG
+            let points =
+              idx === 0
+                ? `8,0 ${width-18},0 ${width},${height/2} ${width-18},${height} 8,${height} 0,${height/2}`
+                : `0,0 ${width-18},0 ${width},${height/2} ${width-18},${height} 0,${height} 18,${height/2}`;
+            // Fill and text color logic
+            let fill = isCompleted
+              ? "#e7f0fd"
+              : isCurrent
+              ? "#2563eb"
+              : "#f8fafc";
+            let textColor = isCurrent ? "#fff" : isCompleted ? "#2563eb" : "#334155";
+            let fontWeight = isCurrent ? "bold" : "normal";
+            return (
+              <div key={stage} style={{ minWidth: width, maxWidth: width, position: 'relative', zIndex: isCurrent ? 2 : 1 }}>
+                <svg
+                  width={width}
+                  height={height}
+                  viewBox={`0 0 ${width} ${height}`}
+                  style={{ display: 'block', cursor: 'pointer', minWidth: width }}
+                  onClick={() => handleStageClick(stage)}
                 >
-                  {isCompleted ? '\u2713 ' : ''}{stage}
-                </text>
-              </svg>
-            </div>
-          );
-        })}
+                  <polygon
+                    points={points}
+                    fill={fill}
+                    stroke="#e5e7eb"
+                    strokeWidth={1}
+                    style={{ transition: 'fill 0.2s, stroke 0.2s' }}
+                  />
+                  <text
+                    x="50%"
+                    y="50%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontWeight={fontWeight}
+                    fontSize="16"
+                    fill={textColor}
+                    style={{ pointerEvents: 'none', userSelect: 'none' }}
+                  >
+                    {isCompleted ? '\u2713 ' : ''}{stage}
+                  </text>
+                </svg>
+              </div>
+            );
+          })}
+        </div>
       </div>
       {currentIdx === stages.length - 1 && (
         <button
@@ -999,78 +1020,46 @@ export default function Leads() {
                 )}
               </Card>
 
-              {/* Tags and Attachments */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Tags */}
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('tags')}>
-                    <div className="flex items-center space-x-2">
-                      <Tag className="w-5 h-5" />
-                      <span>Tags</span>
-                    </div>
-                    <Button size="icon" variant="ghost" tabIndex={-1} type="button">
-                      {collapsedTiles['tags'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                    </Button>
-                  </CardHeader>
-                  {!collapsedTiles['tags'] && (
-                    <CardContent>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {selectedLead.tags && typeof selectedLead.tags === 'string' && selectedLead.tags.trim()
-                          ? selectedLead.tags.split(',').map((tag, index) => (
-                              <Badge key={index} variant="outline" className="text-xs">{tag.trim()}</Badge>
-                            ))
-                          : <p className="text-sm text-muted-foreground">No tags assigned</p>
-                        }
-                      </div>
-                      <form className="flex gap-2" onSubmit={e => {
-                        e.preventDefault();
-                        if (tagInput.trim()) {
-                          const newTags = selectedLead.tags ? selectedLead.tags + ',' + tagInput : tagInput;
-                          setSelectedLead(prev => ({ ...prev, tags: newTags }));
-                          setTagInput("");
-                        }
-                      }}>
-                        <Input
-                          value={tagInput}
-                          onChange={e => setTagInput(e.target.value)}
-                          placeholder="Add tag keyword..."
-                          className="w-auto flex-1"
-                        />
-                        <Button type="submit" size="sm">Add</Button>
-                      </form>
-                    </CardContent>
-                  )}
-                </Card>
-                {/* Attachments */}
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('attachments')}>
-                    <span className="font-semibold">Attachments</span>
-                    <Button size="icon" variant="ghost" tabIndex={-1} type="button">
-                      {collapsedTiles['attachments'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                    </Button>
-                  </CardHeader>
-                  {!collapsedTiles['attachments'] && (
-                    <CardContent>
-                      <div className="flex flex-col items-center justify-center min-h-[120px]">
-                        <label className="flex flex-col items-center gap-3 cursor-pointer">
-                          <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
-                          <Button variant="outline" className="flex items-center gap-3 px-8 py-4 text-lg" style={{ fontWeight: 500 }}>
-                            <UploadCloud className="w-8 h-8 text-blue-400 mr-2" />
-                            Upload File
-                          </Button>
-                        </label>
-                        {attachments.length > 0 && (
-                          <ul className="mt-4 space-y-1 text-base w-full max-w-xs">
-                            {attachments.map((file, idx) => (
-                              <li key={idx} className="truncate text-gray-700">{file.name}</li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    </CardContent>
-                  )}
-                </Card>
-              </div>
+              {/* Tags (moved below Notes) */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('tags')}>
+                  <div className="flex items-center space-x-2">
+                    <Tag className="w-5 h-5" />
+                    <span>Tags</span>
+                  </div>
+                  <Button size="icon" variant="ghost" tabIndex={-1} type="button">
+                    {collapsedTiles['tags'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  </Button>
+                </CardHeader>
+                {!collapsedTiles['tags'] && (
+                <CardContent>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {selectedLead.tags && typeof selectedLead.tags === 'string' && selectedLead.tags.trim()
+                        ? selectedLead.tags.split(',').map((tag, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">{tag.trim()}</Badge>
+                          ))
+                        : <p className="text-sm text-muted-foreground">No tags assigned</p>
+                      }
+                  </div>
+                    <form className="flex gap-2" onSubmit={e => {
+                      e.preventDefault();
+                      if (tagInput.trim()) {
+                        const newTags = selectedLead.tags ? selectedLead.tags + ',' + tagInput : tagInput;
+                        setSelectedLead(prev => ({ ...prev, tags: newTags }));
+                        setTagInput("");
+                      }
+                    }}>
+                      <Input
+                        value={tagInput}
+                        onChange={e => setTagInput(e.target.value)}
+                        placeholder="Add tag keyword..."
+                        className="w-auto flex-1"
+                      />
+                      <Button type="submit" size="sm">Add</Button>
+                    </form>
+                </CardContent>
+                )}
+              </Card>
             </div>
 
             {/* Sidebar */}
@@ -1139,6 +1128,36 @@ export default function Leads() {
                       <p className="text-sm text-muted-foreground">out of 100</p>
                   </div>
                 </CardContent>
+                )}
+              </Card>
+
+              {/* Attachments */}
+              <Card className="min-h-[180px]">
+                <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('attachments')}>
+                  <span className="font-semibold">Attachments</span>
+                  <Button size="icon" variant="ghost" tabIndex={-1} type="button">
+                    {collapsedTiles['attachments'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  </Button>
+                </CardHeader>
+                {!collapsedTiles['attachments'] && (
+                  <CardContent>
+                    <div className="flex flex-col items-center justify-center min-h-[120px]">
+                      <label className="flex flex-col items-center gap-3 cursor-pointer">
+                        <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
+                        <Button variant="outline" className="flex items-center gap-3 px-8 py-4 text-lg" style={{ fontWeight: 500 }}>
+                          <UploadCloud className="w-8 h-8 text-blue-400 mr-2" />
+                          Upload File
+                        </Button>
+                      </label>
+                      {attachments.length > 0 && (
+                        <ul className="mt-4 space-y-1 text-base w-full max-w-xs">
+                          {attachments.map((file, idx) => (
+                            <li key={idx} className="truncate text-gray-700">{file.name}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </CardContent>
                 )}
               </Card>
             </div>
