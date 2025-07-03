@@ -442,6 +442,11 @@ function OpportunityDetailView({ opportunity, onBack, contacts }) {
     console.log('[OpportunityDetailView] Received opportunity:', opportunity);
   }, [opportunity]);
 
+  const { updateOpportunity } = useOpportunities();
+  const [showClosedDialog, setShowClosedDialog] = useState(false);
+  const [pendingStageIdx, setPendingStageIdx] = useState(null);
+  const [pendingClosedType, setPendingClosedType] = useState(null);
+
   if (!opportunity) {
     return (
       <div className="p-8 text-center text-lg text-red-600">
@@ -457,37 +462,40 @@ function OpportunityDetailView({ opportunity, onBack, contacts }) {
     "Negotiate",
     "Closed",
   ];
-  const [currentStageIdx, setCurrentStageIdx] = useState(0); // User can set this
-  const [pendingStageIdx, setPendingStageIdx] = useState(null);
-  const [closedType, setClosedType] = useState(null); // 'Closed Won' or 'Closed Lost'
-  const [showClosedDialog, setShowClosedDialog] = useState(false);
+
+  // Compute current stage from opportunity.stage
+  let currentStageIdx = 0;
+  let closedType = null;
+  if (opportunity.stage === "Closed Won") {
+    currentStageIdx = stages.length - 1;
+    closedType = "Closed Won";
+  } else if (opportunity.stage === "Closed Lost") {
+    currentStageIdx = stages.length - 1;
+    closedType = "Closed Lost";
+  } else {
+    currentStageIdx = stages.findIndex(s => s === opportunity.stage);
+  }
 
   const handleStageClick = (idx) => {
-    setPendingStageIdx(idx);
-  };
-
-  const handleMarkCurrentStage = () => {
-    if (pendingStageIdx !== null) {
-      if (stages[pendingStageIdx] === "Closed") {
-        setShowClosedDialog(true);
+    if (idx === currentStageIdx) return;
+    if (stages[idx] === "Closed") {
+      setPendingStageIdx(idx);
+      setShowClosedDialog(true);
     } else {
-        setCurrentStageIdx(pendingStageIdx);
-        setClosedType(null);
-        setPendingStageIdx(null);
-      }
+      updateOpportunity({ ...opportunity, stage: stages[idx] });
     }
   };
 
   const handleClosedTypeSelect = (type) => {
-    setClosedType(type);
-    setCurrentStageIdx(stages.length - 1);
     setShowClosedDialog(false);
     setPendingStageIdx(null);
+    setPendingClosedType(null);
+    updateOpportunity({ ...opportunity, stage: type });
   };
 
   // For display, if current is closed, show closedType
   const getStageDisplay = (idx) => {
-    if (idx === stages.length - 1 && currentStageIdx === idx && closedType) {
+    if (idx === stages.length - 1 && closedType) {
       return closedType;
     }
     return stages[idx];

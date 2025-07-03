@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 
 const stages = ["Qualify", "Meet & Present", "Propose", "Negotiate", "Closed"];
 
-function StageIndicator({ currentStage }) {
+function StageIndicator({ currentStage, onStageChange }) {
   const currentIndex = stages.indexOf(currentStage);
   return (
     <div className="flex items-center">
@@ -22,18 +22,22 @@ function StageIndicator({ currentStage }) {
           if (!stage) return null;
           const isActive = index === currentIndex;
           const isCompleted = index < currentIndex;
+          const isClickable = index !== currentIndex && (stage !== 'Closed' || currentStage !== 'Closed');
           return (
-            <div
+            <button
               key={stage}
-              className={`relative flex items-center justify-center h-8 px-8 min-w-[120px] text-sm font-medium transition-all duration-200 ${isActive ? 'bg-[#001A3A] text-white' : isCompleted ? 'bg-teal-200 text-black' : 'bg-gray-200 text-black'} ${index === 0 ? 'rounded-l-full' : ''} ${index === stages.length - 1 ? 'rounded-r-full' : ''}`}
+              className={`relative flex items-center justify-center h-8 px-8 min-w-[120px] text-sm font-medium transition-all duration-200 focus:outline-none ${isActive ? 'bg-[#001A3A] text-white' : isCompleted ? 'bg-teal-200 text-black' : 'bg-gray-200 text-black'} ${index === 0 ? 'rounded-l-full' : ''} ${index === stages.length - 1 ? 'rounded-r-full' : ''} ${isClickable ? 'hover:bg-blue-100 cursor-pointer' : 'cursor-default'}`}
               style={{ zIndex: 2 }}
+              onClick={() => isClickable && onStageChange(stage)}
+              disabled={!isClickable}
+              type="button"
             >
               {isCompleted && !isActive ? (
                 <Check className="w-5 h-5" />
               ) : (
                 <span>{stage}</span>
               )}
-            </div>
+            </button>
           );
         })}
       </div>
@@ -41,7 +45,9 @@ function StageIndicator({ currentStage }) {
   );
 }
 
+
 export default function OpportunityDetail() {
+  const { updateOpportunity } = useOpportunities();
   const { opportunityId } = useParams();
   const navigate = useNavigate();
   const { opportunities } = useOpportunities();
@@ -85,6 +91,12 @@ export default function OpportunityDetail() {
     </div>
   );
 
+  // Handler to update the stage of the opportunity
+  const handleStageChange = (newStage) => {
+    if (!opportunity) return;
+    updateOpportunity({ ...opportunity, stage: newStage });
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen">
       {/* Header */}
@@ -111,7 +123,7 @@ export default function OpportunityDetail() {
       {/* Stage Tracker */}
       <div className="bg-white border-b p-4 flex justify-between items-center">
         <div className="w-full md:w-2/3 lg:w-3/4">
-          <StageIndicator currentStage={safeOpportunity.stage} />
+          <StageIndicator currentStage={safeOpportunity.stage} onStageChange={stage => handleStageChange(stage)} />
         </div>
         <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
           <Check className="h-4 w-4 mr-2" />
