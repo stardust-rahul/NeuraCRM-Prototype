@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -792,6 +792,8 @@ export default function Sales({ defaultTab = "analytics" }) {
 
   const [viewOpportunity, setViewOpportunity] = useState(null);
   const [viewAccount, setViewAccount] = useState(null);
+  const navigate = useNavigate();
+
   return (
     <div className="p-8 space-y-8 bg-background min-h-screen">
       {/* Header */}
@@ -1209,7 +1211,7 @@ export default function Sales({ defaultTab = "analytics" }) {
 
         {/* Contacts */}
         <TabsContent value="contacts" className="space-y-6">
-          <Contacts />
+          <Contacts selectedLead={selectedLead} />
         </TabsContent>
 
         {/* Opportunities Pipeline */}
@@ -1345,7 +1347,13 @@ export default function Sales({ defaultTab = "analytics" }) {
                     </TableCell>
                     <TableCell className="px-2 py-1 text-muted-foreground border-r border-gray-200 bg-white group-hover:bg-blue-50">{idx + 1}</TableCell>
                     <TableCell className="px-2 py-1 font-medium border-r border-gray-200 bg-white group-hover:bg-blue-50">
-                      <a href="#" className="text-blue-600 hover:underline">{quote.customer}</a>
+                      <button
+                        className="text-blue-600 hover:underline cursor-pointer bg-transparent border-none p-0 m-0"
+                        style={{ background: 'none' }}
+                        onClick={() => navigate(`/quotes/${quote.id}`)}
+                      >
+                        {quote.customer}
+                      </button>
                     </TableCell>
                     <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{quote.amount}</TableCell>
                     <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">

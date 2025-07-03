@@ -5,6 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useState } from "react";
 import { Eye, Edit, Trash2, MoreVertical, Mail, Phone } from "lucide-react";
 import { useParams } from "react-router-dom";
+import ProgressTimeline from "@/components/OpportunityStageIndicator";
+import { useQuotes } from "@/context/QuotesContext";
 
 const initialQuotes = [
   {
@@ -63,7 +65,8 @@ const initialQuotes = [
 
 export default function QuoteDetail() {
   const { quoteId } = useParams();
-  const quote = initialQuotes.find(q => q.id === quoteId);
+  const { quotes } = useQuotes();
+  const quote = quotes.find(q => q.id === quoteId);
   if (!quote) {
     return <div className="p-8 text-center text-lg text-red-600">Quote not found.</div>;
   }
@@ -108,25 +111,21 @@ export default function QuoteDetail() {
         <div className="flex-1 p-8 bg-background">
           {/* Stage Bar */}
           <div className="mb-6">
-            <div className="flex items-center space-x-2 text-xs font-medium">
-              <span className="text-muted-foreground">START</span>
-              <span className="text-muted-foreground">{quote.created}</span>
-              <div className="flex-1 flex items-center ml-4">
-                <div className="flex items-center space-x-2">
-                  <Badge variant={quote.stage === "Qualification" ? "default" : "secondary"}>Qualification</Badge>
-                  <Badge variant={quote.stage === "Needs Analysis" ? "default" : "secondary"}>Needs Analysis</Badge>
-                  <Badge variant={quote.stage === "Value Proposition" ? "default" : "secondary"}>Value Proposition</Badge>
-                  <Badge variant={quote.stage === "Identify Decision Makers" ? "default" : "secondary"}>Identify Decision Makers</Badge>
-                  <Badge variant={quote.stage === "Proposal/Price Quote" ? "default" : "secondary"}>Proposal/Price Quote</Badge>
-                  <Badge variant={quote.stage === "Negotiation/Review" ? "default" : "secondary"}>Negotiation/Review</Badge>
-                  <Badge variant={quote.stage === "Closed Won" ? "default" : "secondary"}>Closed Won</Badge>
-                  <Badge variant={quote.stage === "Closed Lost" ? "destructive" : "secondary"}>Closed Lost</Badge>
-                  <Badge variant={quote.stage === "Closed Lost to Competition" ? "destructive" : "secondary"}>Closed Lost to Competition</Badge>
-                </div>
-              </div>
-              <span className="ml-4 text-xs font-bold text-red-600">CLOSING</span>
-              <span className="text-xs font-bold">{quote.closingDate}</span>
-            </div>
+            <ProgressTimeline
+              stages={[
+                "Qualification",
+                "Needs Analysis",
+                "Value Proposition",
+                "Identify Decision Makers",
+                "Proposal/Price Quote",
+                "Negotiation/Review",
+                "Closed Won",
+                "Closed Lost",
+                "Closed Lost to Competition",
+              ]}
+              currentStage={quote.stage}
+              startDate={quote.created}
+            />
           </div>
           {/* Deal Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">

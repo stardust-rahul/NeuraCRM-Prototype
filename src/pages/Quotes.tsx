@@ -34,28 +34,44 @@ import {
   TableCell,
   TableHead,
 } from "@/components/ui/table";
+import ProgressTimeline from "@/components/OpportunityStageIndicator";
+import { useQuotes } from "@/context/QuotesContext";
 
-const initialQuotes = [
-  {
-    id: "Q-001",
-    customer: "Acme Corporation",
-    amount: "$12,500",
-    status: "pending",
-    created: "2024-06-01",
-    owner: "Sarah Johnson",
-  },
-  {
-    id: "Q-002",
-    customer: "TechFlow Inc",
-    amount: "$7,800",
-    status: "approved",
-    created: "2024-06-03",
-    owner: "Mike Chen",
-  },
+const stages = [
+  "Qualification",
+  "Needs Analysis",
+  "Value Proposition",
+  "Identify Decision Makers",
+  "Proposal/Price Quote",
+  "Negotiation/Review",
+  "Closed Won",
+  "Closed Lost",
+  "Closed Lost to Competition",
 ];
 
+const defaultQuoteFields = {
+  stage: "Qualification",
+  dealOwner: "Unassigned",
+  probability: 0,
+  expectedRevenue: "-",
+  closingDate: "",
+  contact: {
+    name: "-",
+    company: "-",
+    email: "-",
+    phone: "-",
+    avatar: "https://via.placeholder.com/48",
+  },
+  nextAction: {
+    date: "-",
+    action: "-",
+  },
+  notes: [],
+  attachments: [],
+};
+
 export default function Quotes() {
-  const [quotes, setQuotes] = useState(initialQuotes);
+  const { quotes, addQuote, updateQuote, removeQuote } = useQuotes();
   const [search, setSearch] = useState("");
   const [addOpen, setAddOpen] = useState(false);
   const [newQuote, setNewQuote] = useState({
@@ -64,6 +80,7 @@ export default function Quotes() {
     status: "pending",
     created: "",
     owner: "",
+    stage: stages[0],
   });
   const [selectedQuotes, setSelectedQuotes] = useState([]);
   const [editQuote, setEditQuote] = useState(null);
@@ -79,18 +96,17 @@ export default function Quotes() {
   const handleAdd = (e) => {
     e.preventDefault();
     if (editQuote) {
-      setQuotes((prev) =>
-        prev.map((q) => (q.id === editQuote.id ? { ...editQuote, ...newQuote } : q))
-      );
+      updateQuote({ ...editQuote, ...newQuote });
     } else {
-      setQuotes((prev) => [
-        {
-          ...newQuote,
-          id: `Q-${(prev.length + 1).toString().padStart(3, "0")}`,
-          created: newQuote.created || new Date().toISOString().slice(0, 10),
-        },
-        ...prev,
-      ]);
+      const sanitizedQuote = {
+        ...defaultQuoteFields,
+        ...Object.fromEntries(
+          Object.entries(newQuote).filter(([_, v]) => v !== "" && v !== undefined)
+        ),
+        id: `Q-${(quotes.length + 1).toString().padStart(3, "0")}`,
+        created: newQuote.created || new Date().toISOString().slice(0, 10),
+      };
+      addQuote(sanitizedQuote);
     }
     setAddOpen(false);
     setEditQuote(null);
@@ -100,11 +116,12 @@ export default function Quotes() {
       status: "pending",
       created: "",
       owner: "",
+      stage: stages[0],
     });
   };
 
   const handleDelete = (id) => {
-    setQuotes((prev) => prev.filter((q) => q.id !== id));
+    removeQuote(id);
   };
 
   return (
@@ -232,6 +249,14 @@ export default function Quotes() {
                   <option value="rejected">Rejected</option>
                 </select>
               </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Stage</label>
+                <select className="w-full border rounded px-2 py-1" value={newQuote.stage} onChange={e => setNewQuote(q => ({ ...q, stage: e.target.value }))}>
+                  {stages.map(stage => (
+                    <option key={stage} value={stage}>{stage}</option>
+                  ))}
+                </select>
+              </div>
               <div className="col-span-2">
                 <label className="block text-sm font-medium mb-1">Created Date</label>
                 <Input type="date" value={newQuote.created} onChange={e => setNewQuote(q => ({ ...q, created: e.target.value }))} />
@@ -258,6 +283,32 @@ export default function Quotes() {
               <div><b>Status:</b> {viewQuote.status}</div>
               <div><b>Created:</b> {viewQuote.created}</div>
               <div><b>Owner:</b> {viewQuote.owner}</div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Stage</label>
+                <select
+                  className="w-full border rounded px-2 py-1"
+                  value={viewQuote.stage || stages[0]}
+                  onChange={e => {
+                    const updated = { ...viewQuote, stage: e.target.value };
+                    setViewQuote(updated);
+                    updateQuote(updated);
+                  }}
+                >
+                  {stages.map(stage => (
+                    <option key={stage} value={stage}>{stage}</option>
+                  ))}
+                </select>
+              </div>
+              <ProgressTimeline
+                stages={stages}
+                currentStage={viewQuote.stage || stages[0]}
+                startDate={viewQuote.created}
+                onStageChange={stage => {
+                  const updated = { ...viewQuote, stage };
+                  setViewQuote(updated);
+                  updateQuote(updated);
+                }}
+              />
             </div>
           )}
         </DialogContent>

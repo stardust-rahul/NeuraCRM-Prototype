@@ -52,25 +52,35 @@ const Stage = ({ name, isFirst, isLast, isActive, isCompleted }) => {
   );
 };
 
+interface ProgressTimelineProps {
+  stages: string[];
+  currentStage: string;
+  startDate: string;
+  onStageChange?: (stage: string) => void;
+}
 
-export default function OpportunityStageIndicator({ currentStage }) {
-  const currentIndex = stages.indexOf(currentStage);
-
+const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ stages, currentStage, startDate }) => {
+  const currentIdx = stages.findIndex(
+    (s) => s.toLowerCase() === currentStage.toLowerCase()
+  );
   return (
-    <div className="flex items-center w-full">
-      {stages.map((stage, index) => {
-        if (!stage) return null;
-        return (
-          <Stage 
+    <div className="flex items-center space-x-2 text-xs font-medium">
+      <span className="text-muted-foreground">START</span>
+      <span className="text-muted-foreground">{startDate}</span>
+      <div className="flex items-center ml-4 space-x-2">
+        {stages.map((stage, idx) => (
+          <span
             key={stage}
-            name={stage}
-            isFirst={index === 1}
-            isLast={index === stages.length - 1}
-            isActive={index === currentIndex}
-            isCompleted={index < currentIndex}
-          />
-        );
-      })}
+            className={`px-4 py-2 rounded-full transition-all duration-200 whitespace-nowrap
+              ${idx === currentIdx ? "bg-blue-600 text-white font-bold" : "bg-gray-100 text-gray-800"}
+            `}
+          >
+            {stage}
+          </span>
+        ))}
+      </div>
     </div>
   );
-}; 
+};
+
+export default ProgressTimeline; 
