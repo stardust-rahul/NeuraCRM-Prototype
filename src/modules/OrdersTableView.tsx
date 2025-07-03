@@ -3,8 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Edit, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useOrders } from "@/context/OrdersContext";
 
 export default function OrdersTableView({ orders, selectedOrders, setSelectedOrders, page, pageSize }) {
+  const { removeOrder } = useOrders();
   const navigate = useNavigate();
   const pagedOrders = orders.slice((page-1)*pageSize, page*pageSize);
   return (
@@ -64,7 +66,11 @@ export default function OrdersTableView({ orders, selectedOrders, setSelectedOrd
               <TableCell className="px-2 py-1 text-left bg-white group-hover:bg-blue-50">
                 <Button size="icon" variant="ghost" onClick={() => navigate(`/orders/${order.id}`)} title="View Details"><Eye className="w-4 h-4" /></Button>
                 <Button size="icon" variant="ghost" onClick={() => navigate(`/orders/${order.id}?edit=true`)} title="Edit"><Edit className="w-4 h-4" /></Button>
-                <Button size="icon" variant="ghost" title="Delete" disabled><Trash className="w-4 h-4" /></Button>
+                <Button size="icon" variant="ghost" title="Delete" onClick={() => {
+                  if (window.confirm('Are you sure you want to delete this order?')) {
+                    removeOrder(order.id);
+                  }
+                }}><Trash className="w-4 h-4" /></Button>
               </TableCell>
             </TableRow>
           ))}

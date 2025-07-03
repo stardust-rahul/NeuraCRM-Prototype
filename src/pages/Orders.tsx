@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Eye, Edit, Trash, Plus, Search, Download } from "lucide-react";
+import { useOrders } from "@/context/OrdersContext";
 import { Input } from "@/components/ui/input";
 import OrdersTableView from "@/modules/OrdersTableView";
 import OrdersKanbanView from "@/modules/OrdersKanbanView";
@@ -14,7 +15,7 @@ import OrdersTimelineView from "@/modules/OrdersTimelineView";
 import OrdersSplitView from "@/modules/OrdersSplitView";
 
 export default function Orders() {
-  const { orders } = useOrders();
+  const { orders, removeOrder } = useOrders();
   const [orderSearch, setOrderSearch] = useState("");
   const [ordersView, setOrdersView] = useState(10);
   const [ordersPage, setOrdersPage] = useState(1);
@@ -106,7 +107,11 @@ export default function Orders() {
                   <div className="flex space-x-2">
                     <Button size="icon" variant="ghost" onClick={() => navigate(`/orders/${order.id}`)} title="View Details"><Eye className="w-4 h-4" /></Button>
                     <Button size="icon" variant="ghost" onClick={() => navigate(`/orders/${order.id}?edit=true`)} title="Edit"><Edit className="w-4 h-4" /></Button>
-                    <Button size="icon" variant="ghost" title="Edit Log" disabled><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z"/></svg></Button>
+                    <Button size="icon" variant="ghost" title="Delete" onClick={() => {
+  if (window.confirm('Are you sure you want to delete this order?')) {
+    removeOrder(order.id);
+  }
+}}><Trash className="w-4 h-4" /></Button>
                   </div>
                 </div>
               </div>
