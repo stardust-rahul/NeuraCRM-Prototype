@@ -27,6 +27,20 @@ const initialLeads = [
     tags: ["SMB", "Follow-up"],
     lastContact: "1 week ago",
   },
+  // Dummy leads
+  ...Array.from({ length: 18 }, (_, i) => ({
+    id: `L-${(i + 3).toString().padStart(3, "0")}`,
+    name: `Company ${i + 3}`,
+    contact: `Contact ${i + 3}`,
+    email: `contact${i + 3}@company.com`,
+    phone: `+1 (555) 000-${(1000 + i).toString().padStart(4, "0")}`,
+    status: ["qualified", "contacted", "new", "hot", "cold"][i % 5],
+    priority: ["high", "medium", "low"][i % 3],
+    value: `$${(10000 + i * 1000).toLocaleString()}`,
+    owner: ["Sarah Johnson", "Mike Chen", "Alex Lee", "Priya Patel"][i % 4],
+    tags: ["Enterprise", "SMB", "Hot Lead", "Follow-up", "Cold Lead"][i % 5],
+    lastContact: `${i + 1} days ago`,
+  })),
 ];
 
 const LeadsContext = createContext(null);

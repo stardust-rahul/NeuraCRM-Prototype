@@ -1,6 +1,35 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-const initialQuotes = [];
+const initialQuotes = [
+  {
+    id: "Q-001",
+    customer: "Acme Corporation",
+    amount: "$12,000",
+    status: "pending",
+    created: "2024-06-01",
+    owner: "Sarah Johnson",
+    shipment: "pending",
+  },
+  {
+    id: "Q-002",
+    customer: "TechFlow Inc",
+    amount: "$8,500",
+    status: "approved",
+    created: "2024-06-02",
+    owner: "Mike Chen",
+    shipment: "shipped",
+  },
+  // Dummy quotes
+  ...Array.from({ length: 18 }, (_, i) => ({
+    id: `Q-${(i + 3).toString().padStart(3, "0")}`,
+    customer: `Company ${i + 3}`,
+    amount: `$${(5000 + i * 500).toLocaleString()}`,
+    status: ["pending", "approved", "rejected"][i % 3],
+    created: `2024-06-${(3 + i).toString().padStart(2, "0")}`,
+    owner: ["Sarah Johnson", "Mike Chen", "Alex Lee", "Priya Patel"][i % 4],
+    shipment: ["pending", "shipped", "delivered"][i % 3],
+  })),
+];
 
 const stages = [
   "Qualification",

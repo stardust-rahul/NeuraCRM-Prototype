@@ -28,6 +28,16 @@ const initialContacts = [
     owner: "Vishal Paswan",
     title: "Developer"
   },
+  // Dummy contacts
+  ...Array.from({ length: 17 }, (_, i) => ({
+    id: `C-${(i + 4).toString().padStart(3, "0")}`,
+    name: `Contact ${i + 4}`,
+    account: `Company ${i + 4}`,
+    email: `contact${i + 4}@company.com`,
+    phone: `+1 (555) 111-${(2000 + i).toString().padStart(4, "0")}`,
+    owner: ["Sarah Johnson", "Mike Chen", "Alex Lee", "Priya Patel"][i % 4],
+    title: ["Manager", "Director", "VP", "Engineer"][i % 4],
+  })),
 ];
 
 const ContactsContext = createContext(null);

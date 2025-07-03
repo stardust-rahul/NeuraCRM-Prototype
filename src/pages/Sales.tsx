@@ -131,6 +131,20 @@ const initialLeads = [
     tags: ["SMB", "Follow-up"],
     lastContact: "1 week ago",
   },
+  // Dummy leads
+  ...Array.from({ length: 18 }, (_, i) => ({
+    id: `L-${(i + 3).toString().padStart(3, "0")}`,
+    name: `Company ${i + 3}`,
+    contact: `Contact ${i + 3}`,
+    email: `contact${i + 3}@company.com`,
+    phone: `+1 (555) 000-${(1000 + i).toString().padStart(4, "0")}`,
+    status: ["qualified", "contacted", "new", "hot", "cold"][i % 5],
+    priority: ["high", "medium", "low"][i % 3],
+    value: `$${(10000 + i * 1000).toLocaleString()}`,
+    owner: ["Sarah Johnson", "Mike Chen", "Alex Lee", "Priya Patel"][i % 4],
+    tags: ["Enterprise", "SMB", "Hot Lead", "Follow-up", "Cold Lead"][i % 5],
+    lastContact: `${i + 1} days ago`,
+  })),
 ];
 
 const initialProducts = [
@@ -150,6 +164,15 @@ const initialProducts = [
     stock: "Unlimited",
     category: "Services",
   },
+  // Dummy products
+  ...Array.from({ length: 18 }, (_, i) => ({
+    id: `P-${(i + 3).toString().padStart(3, "0")}`,
+    name: `Product ${i + 3}`,
+    image: "https://via.placeholder.com/150",
+    price: `$${(100 + i * 10).toLocaleString()}`,
+    stock: 100 - i * 2,
+    category: ["Software", "Hardware", "Services"][i % 3],
+  })),
 ];
 
 
@@ -173,6 +196,16 @@ const initialOrders = [
     created: "2024-06-05",
     shipment: "delivered",
   },
+  // Dummy orders
+  ...Array.from({ length: 18 }, (_, i) => ({
+    id: `O-${(i + 3).toString().padStart(3, "0")}`,
+    customer: `Company ${i + 3}`,
+    total: `$${(3000 + i * 700).toLocaleString()}`,
+    status: ["processing", "completed", "cancelled"][i % 3],
+    payment: ["paid", "unpaid"][i % 2],
+    created: `2024-06-${(6 + i).toString().padStart(2, "0")}`,
+    shipment: ["in transit", "delivered", "pending"][i % 3],
+  })),
 ];
 
 function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus }) {
@@ -1256,7 +1289,7 @@ export default function Sales({ defaultTab = "analytics" }) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => {
-                    setQuotes(prev => prev.filter(q => !selectedQuotes.includes(q.id)));
+                    selectedQuotes.forEach(id => deleteQuote(id));
                     setSelectedQuotes([]);
                     toast({ title: 'Quotes deleted', description: 'Selected quotes deleted successfully!' });
                   }}>Bulk Delete</DropdownMenuItem>

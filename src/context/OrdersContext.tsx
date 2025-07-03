@@ -1,7 +1,36 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 // Order structure: id, quoteId, customer, amount, owner, contactName, company, status, stage, createdDate, quantity, finalizedPrice
-const initialOrders = [];
+const initialOrders = [
+  {
+    id: "O-001",
+    customer: "Acme Corporation",
+    total: "$12,500",
+    status: "processing",
+    payment: "paid",
+    created: "2024-06-04",
+    shipment: "in transit",
+  },
+  {
+    id: "O-002",
+    customer: "TechFlow Inc",
+    total: "$7,800",
+    status: "completed",
+    payment: "paid",
+    created: "2024-06-05",
+    shipment: "delivered",
+  },
+  // Dummy orders
+  ...Array.from({ length: 18 }, (_, i) => ({
+    id: `O-${(i + 3).toString().padStart(3, "0")}`,
+    customer: `Company ${i + 3}`,
+    total: `$${(3000 + i * 700).toLocaleString()}`,
+    status: ["processing", "completed", "cancelled"][i % 3],
+    payment: ["paid", "unpaid"][i % 2],
+    created: `2024-06-${(6 + i).toString().padStart(2, "0")}`,
+    shipment: ["in transit", "delivered", "pending"][i % 3],
+  })),
+];
 
 const OrdersContext = createContext(null);
 

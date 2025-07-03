@@ -17,6 +17,15 @@ const initialAccounts = [
     industry: "e-commerce",
     website: "amazon.com",
   },
+  // Dummy accounts
+  ...Array.from({ length: 18 }, (_, i) => ({
+    id: `A-${(i + 3).toString().padStart(3, "0")}`,
+    name: `Company ${i + 3}`,
+    owner: ["Sarah Johnson", "Mike Chen", "Alex Lee", "Priya Patel"][i % 4],
+    created: `${i + 1} days ago`,
+    industry: ["Technology", "Finance", "Healthcare", "Retail", "Manufacturing"][i % 5],
+    website: `company${i + 3}.com`,
+  })),
 ];
 
 const AccountsContext = createContext(null);
