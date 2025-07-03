@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -255,6 +255,20 @@ export default function Leads() {
     convertedStatus: "Qualified",
   });
 
+  // Auto-sync convertForm fields with selectedLead when modal opens or selectedLead changes
+  useEffect(() => {
+    if (showConvertModal && selectedLead) {
+      setConvertForm((prev) => ({
+        ...prev,
+        // Only update if the user hasn't typed something different
+        accountName: prev.accountType === 'new' && (!prev.accountName || prev.accountName === '' || prev.accountName === selectedLead.company || prev.accountName === selectedLead.name) ? (selectedLead.company || selectedLead.name || "") : prev.accountName,
+        contactName: prev.contactType === 'new' && (!prev.contactName || prev.contactName === '' || prev.contactName === selectedLead.contact || prev.contactName === selectedLead.name) ? (selectedLead.contact || selectedLead.name || "") : prev.contactName,
+        // Always autofetch record owner from selectedLead.owner
+        recordOwner: selectedLead.owner || "",
+      }));
+    }
+  }, [showConvertModal, selectedLead]);
+
   // If a lead is selected, show the detail view
   if (selectedLead) {
     // Use localStatus if set, else selectedLead.status
@@ -278,7 +292,37 @@ export default function Leads() {
                   <DialogTitle className="text-2xl font-normal text-center">Convert Lead</DialogTitle>
                 </DialogHeader>
                 <form className="divide-y divide-gray-200" onSubmit={e => { e.preventDefault(); handleLeadConversion(); }}>
-                  {/* Account Section */}
+                  {/* Contact Section (moved above Account Section) */}
+                  <div className="flex flex-col">
+                    <div className="flex items-center border-l-4 border-blue-500 bg-gray-50 px-8 py-3">
+                      <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                      <span className="font-semibold text-base">Contact</span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-0 px-8 py-4">
+                      {/* Create New Contact */}
+                      <div className="pr-0 md:pr-4 border-b md:border-b-0 md:border-r border-gray-200 flex flex-col">
+                        <label className="flex items-center gap-2 mb-2">
+                          <input type="radio" name="contactType" checked={convertForm.contactType === 'new'} onChange={() => setConvertForm(f => ({ ...f, contactType: 'new' }))} />
+                          <span className="font-semibold">Create New Contact</span>
+                        </label>
+                        <div className="bg-white border rounded-lg p-4 mt-2">
+                          <input className="w-full border rounded px-3 py-2" value={convertForm.contactName} onChange={e => setConvertForm(f => ({ ...f, contactName: e.target.value }))} required />
+                        </div>
+                      </div>
+                      {/* Choose Existing Contact */}
+                      <div className="pl-0 md:pl-4 flex flex-col">
+                        <label className="flex items-center gap-2 mb-2">
+                          <input type="radio" name="contactType" checked={convertForm.contactType === 'existing'} onChange={() => setConvertForm(f => ({ ...f, contactType: 'existing' }))} />
+                          <span className="font-semibold">Choose Existing Contact</span>
+                        </label>
+                        <div className="bg-white border rounded-lg p-4 mt-2">
+                          <label className="block text-xs font-semibold mb-1">0 Contact Matches detected</label>
+                          <input className="w-full border rounded px-3 py-2" disabled />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Account Section (now below Contact Section) */}
                   <div className="flex flex-col">
                     <div className="flex items-center border-l-4 border-blue-500 bg-gray-50 px-8 py-3">
                       <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
@@ -309,36 +353,6 @@ export default function Leads() {
                             <Search className="w-4 h-4 text-gray-400" />
                           </div>
                           <div className="border rounded mt-2 p-2 text-xs text-gray-500 h-16">0 Account Matches</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Contact Section */}
-                  <div className="flex flex-col">
-                    <div className="flex items-center border-l-4 border-blue-500 bg-gray-50 px-8 py-3">
-                      <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-                      <span className="font-semibold text-base">Contact</span>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-0 px-8 py-4">
-                      {/* Create New Contact */}
-                      <div className="pr-0 md:pr-4 border-b md:border-b-0 md:border-r border-gray-200 flex flex-col">
-                        <label className="flex items-center gap-2 mb-2">
-                          <input type="radio" name="contactType" checked={convertForm.contactType === 'new'} onChange={() => setConvertForm(f => ({ ...f, contactType: 'new' }))} />
-                          <span className="font-semibold">Create New Contact</span>
-                        </label>
-                        <div className="bg-white border rounded-lg p-4 mt-2">
-                          <input className="w-full border rounded px-3 py-2" value={convertForm.contactName} onChange={e => setConvertForm(f => ({ ...f, contactName: e.target.value }))} required />
-                        </div>
-                      </div>
-                      {/* Choose Existing Contact */}
-                      <div className="pl-0 md:pl-4 flex flex-col">
-                        <label className="flex items-center gap-2 mb-2">
-                          <input type="radio" name="contactType" checked={convertForm.contactType === 'existing'} onChange={() => setConvertForm(f => ({ ...f, contactType: 'existing' }))} />
-                          <span className="font-semibold">Choose Existing Contact</span>
-                        </label>
-                        <div className="bg-white border rounded-lg p-4 mt-2">
-                          <label className="block text-xs font-semibold mb-1">0 Contact Matches detected</label>
-                          <input className="w-full border rounded px-3 py-2" disabled />
                         </div>
                       </div>
                     </div>
@@ -384,7 +398,7 @@ export default function Leads() {
                         <label className="block text-xs font-semibold mb-1 text-red-600">* Record Owner</label>
                         <div className="flex items-center border rounded px-3 py-2 bg-white">
                           <Search className="w-4 h-4 mr-2 text-gray-400" />
-                          <input className="flex-1 outline-none" placeholder="Search User..." />
+                          <input className="flex-1 outline-none bg-white" placeholder="Search User..." value={convertForm.recordOwner} onChange={e => setConvertForm(f => ({ ...f, recordOwner: e.target.value }))} />
                         </div>
                       </div>
                       <div>
