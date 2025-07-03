@@ -1636,7 +1636,7 @@ export default function Sales({ defaultTab = "analytics" }) {
                         <span className="font-semibold">Create New Account</span>
                       </label>
                       <div className="bg-white border rounded-lg p-4 mt-2">
-                        <label className="block text-xs font-semibold mb-1 text-red-600">* Account Name</label>
+                        <label className="block text-xs font-semibold mb-1 text-red-600"></label>
                         <input className="w-full border rounded px-3 py-2" value={convertForm.accountName} onChange={e => setConvertForm(f => ({ ...f, accountName: e.target.value }))} required />
                       </div>
                     </div>
