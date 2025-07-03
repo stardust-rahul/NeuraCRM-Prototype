@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Mail, Phone, MoreVertical, ArrowLeft } from "lucide-react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useQuotes } from "@/context/QuotesContext";
+import { useOrders } from "@/context/OrdersContext";
 import ProgressTimeline from "@/components/OpportunityStageIndicator";
 import { LineItems } from '@/components/LineItems';
 import { ActivityHistory } from '@/components/ActivityHistory';
@@ -13,6 +14,7 @@ export default function QuoteDetail() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const { quotes, updateQuote } = useQuotes();
+  const { addOrder } = useOrders();
 
   // --- Data Loading Logic ---
   const quoteFromContext = quotes.find(q => q.id === quoteId);
@@ -58,6 +60,32 @@ export default function QuoteDetail() {
         </div>
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="sm">Send Email</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              if (!quote) return;
+              // Prepare order data from quote
+              const orderData = {
+                quoteId: quote.id,
+                customer: quote.customer,
+                amount: quote.amount,
+                owner: quote.owner || quote.dealOwner,
+                contactName: quote.contact?.name,
+                company: quote.contact?.company,
+                status: "Pending",
+                stage: "Draft",
+                createdDate: new Date().toISOString(),
+                // These will be set/edited in OrderDetail
+                quantity: 1,
+                finalizedPrice: quote.amount || 0,
+              };
+              const newOrder = addOrder(orderData);
+              navigate(`/orders/${newOrder.id}`);
+            }}
+          >
+            Convert to Order
+          </Button>
           <Button variant="outline" size="sm">Edit</Button>
           <Button variant="ghost" size="icon"><MoreVertical className="w-5 h-5" /></Button>
         </div>

@@ -1,36 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useOrders } from "@/context/OrdersContext";
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Eye, Edit, Trash, Plus, Search, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
-
-// Dummy initial orders (replace with context or props as needed)
-const initialOrders = [
-  {
-    id: "O-001",
-    customer: "Acme Corporation",
-    total: "$12,500",
-    status: "processing",
-    payment: "paid",
-    created: "2024-06-04",
-    shipment: "in transit",
-  },
-  {
-    id: "O-002",
-    customer: "TechFlow Inc",
-    total: "$7,800",
-    status: "completed",
-    payment: "paid",
-    created: "2024-06-05",
-    shipment: "delivered",
-  },
-];
+import OrdersTableView from "@/modules/OrdersTableView";
 
 export default function Orders() {
-  const [orders] = useState(initialOrders);
+  const { orders } = useOrders();
   const [orderSearch, setOrderSearch] = useState("");
   const [ordersView, setOrdersView] = useState(10);
   const [ordersPage, setOrdersPage] = useState(1);
@@ -39,6 +19,8 @@ export default function Orders() {
 
   const filteredOrders = orders.filter(o => !orderSearch || o.customer.toLowerCase().includes(orderSearch.toLowerCase()));
 
+  const [viewMode, setViewMode] = useState('card');
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between px-2 py-2">
@@ -46,6 +28,25 @@ export default function Orders() {
           <h1 className="text-2xl font-bold">Orders</h1>
         </div>
         <div className="flex items-center space-x-2">
+          {/* View Switch */}
+          <div className="flex items-center bg-gray-100 rounded-lg p-1 mr-2">
+            <button
+              className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors ${viewMode === 'card' ? 'bg-blue-700 text-white' : 'text-blue-700 hover:bg-blue-200'}`}
+              onClick={() => setViewMode('card')}
+              style={{outline: 'none', border: 'none'}}
+              type="button"
+            >
+              Cards
+            </button>
+            <button
+              className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors ${viewMode === 'table' ? 'bg-blue-700 text-white' : 'text-blue-700 hover:bg-blue-200'}`}
+              onClick={() => setViewMode('table')}
+              style={{outline: 'none', border: 'none'}}
+              type="button"
+            >
+              Table
+            </button>
+          </div>
           <label className="text-sm text-muted-foreground">View</label>
           <select className="border rounded px-2 py-1 text-sm" value={ordersView} onChange={e => { setOrdersView(Number(e.target.value)); setOrdersPage(1); }}>
             {[5, 10, 20, 50].map(n => <option key={n} value={n}>{n}</option>)}
@@ -69,81 +70,59 @@ export default function Orders() {
           </Button>
         </div>
       </div>
-      <div className="overflow-x-auto rounded border border-border/50 bg-white shadow-sm">
-        <Table className="min-w-full border-separate border-spacing-0">
-          <TableHeader>
-            <TableRow className="bg-gray-100 hover:bg-gray-100 border-b border-gray-300">
-              <TableHead className="w-[40px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100"><input type="checkbox" checked={selectedOrders.length === filteredOrders.slice((ordersPage-1)*ordersView, ordersPage*ordersView).length && filteredOrders.length > 0} onChange={e => {
-                if (e.target.checked) {
-                  setSelectedOrders(filteredOrders.slice((ordersPage-1)*ordersView, ordersPage*ordersView).map(o => o.id));
-                } else {
-                  setSelectedOrders([]);
-                }
-              }} /></TableHead>
-              <TableHead className="w-[50px] px-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">#</TableHead>
-              <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Customer</TableHead>
-              <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Total</TableHead>
-              <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Status</TableHead>
-              <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Payment</TableHead>
-              <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Shipment</TableHead>
-              <TableHead className="px-2 py-2 border-r border-gray-300 font-bold text-gray-700 bg-gray-100">Created</TableHead>
-              <TableHead className="text-left px-2 py-2 font-bold text-gray-700 bg-gray-100">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+      {/* Orders View Switchable */}
+      {viewMode === 'card' ? (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
             {filteredOrders.slice((ordersPage-1)*ordersView, ordersPage*ordersView).map((order, idx) => (
-              <TableRow key={order.id || idx} className="border-b border-gray-300 text-sm group hover:bg-blue-50 transition-colors">
-                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
-                  <input type="checkbox" checked={selectedOrders.includes(order.id)} onChange={e => {
-                    if (e.target.checked) setSelectedOrders([...selectedOrders, order.id]);
-                    else setSelectedOrders(selectedOrders.filter(id => id !== order.id));
-                  }} />
-                </TableCell>
-                <TableCell className="px-2 py-1 text-muted-foreground border-r border-gray-200 bg-white group-hover:bg-blue-50">{idx + 1}</TableCell>
-                <TableCell className="px-2 py-1 font-medium border-r border-gray-200 bg-white group-hover:bg-blue-50">
-                  <button
-                    className="text-blue-600 hover:underline cursor-pointer bg-transparent border-none p-0 m-0"
-                    style={{ background: 'none' }}
-                    onClick={() => navigate(`/orders/${order.id}`)}
-                  >
-                    {order.customer}
-                  </button>
-                </TableCell>
-                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{order.total}</TableCell>
-                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
-                  <Badge variant={order.status === "completed" ? "default" : order.status === "cancelled" ? "destructive" : "secondary"}>{order.status}</Badge>
-                </TableCell>
-                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">
-                  <Badge variant={order.payment === "paid" ? "default" : order.payment === "refunded" ? "destructive" : "secondary"}>{order.payment}</Badge>
-                </TableCell>
-                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{order.shipment}</TableCell>
-                <TableCell className="px-2 py-1 border-r border-gray-200 bg-white group-hover:bg-blue-50">{order.created}</TableCell>
-                <TableCell className="px-2 py-1 text-left bg-white group-hover:bg-blue-50">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => navigate(`/orders/${order.id}`)}>
-                        <Eye className="w-4 h-4 mr-2" /> View Details
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate(`/orders/${order.id}?edit=true`)}>
-                        <Edit className="w-4 h-4 mr-2" /> Edit Order
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600 focus:text-red-600" disabled>
-                        <Trash className="w-4 h-4 mr-2" /> Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
+              <div key={order.id || idx} className="relative group rounded-xl shadow-lg border border-blue-100 bg-gradient-to-br from-white to-blue-50 hover:shadow-2xl transition-all p-6 flex flex-col justify-between min-h-[220px]">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-blue-700 font-bold">#{order.id || idx+1}</span>
+                  <Badge variant={order.status === "Completed" ? "default" : order.status === "Cancelled" ? "destructive" : "secondary"}>{order.status || 'Pending'}</Badge>
+                </div>
+                <div className="mb-2">
+                  <div className="text-lg font-bold text-blue-900 truncate">{order.customer || '-'}</div>
+                  <div className="text-xs text-muted-foreground">{order.company || ''}</div>
+                </div>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  <span className="text-sm font-semibold">Amount:</span>
+                  <span className="text-blue-800">{typeof order.finalizedPrice === 'number' ? `₹${order.finalizedPrice.toLocaleString()}` : typeof order.amount === 'number' ? `₹${order.amount.toLocaleString()}` : order.amount || '-'}</span>
+                </div>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  <span className="text-sm font-semibold">Payment:</span>
+                  <Badge variant={order.payment === "Paid" ? "default" : order.payment === "Refunded" ? "destructive" : "secondary"}>{order.payment || 'Unpaid'}</Badge>
+                  <span className="text-sm font-semibold ml-4">Shipment:</span>
+                  <Badge variant={order.shipment === "Delivered" ? "default" : order.shipment === "Returned" ? "destructive" : "secondary"}>{order.shipment || 'Pending'}</Badge>
+                </div>
+                <div className="flex items-center justify-between mt-auto">
+                  <span className="text-xs text-muted-foreground">{order.createdDate ? new Date(order.createdDate).toLocaleDateString() : '-'}</span>
+                  <div className="flex space-x-2">
+                    <Button size="icon" variant="ghost" onClick={() => navigate(`/orders/${order.id}`)} title="View Details"><Eye className="w-4 h-4" /></Button>
+                    <Button size="icon" variant="ghost" onClick={() => navigate(`/orders/${order.id}?edit=true`)} title="Edit"><Edit className="w-4 h-4" /></Button>
+                    <Button size="icon" variant="ghost" title="Edit Log" disabled><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z"/></svg></Button>
+                  </div>
+                </div>
+              </div>
             ))}
-          </TableBody>
-        </Table>
-      </div>
+          </div>
+          {/* Floating Action Button */}
+          <button
+            className="fixed bottom-8 right-8 z-50 bg-blue-700 hover:bg-blue-900 text-white rounded-full p-4 shadow-lg transition-all flex items-center space-x-2"
+            onClick={() => navigate("/orders/new")}
+            title="New Order"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+        </>
+      ) : (
+        <OrdersTableView
+          orders={filteredOrders}
+          selectedOrders={selectedOrders}
+          setSelectedOrders={setSelectedOrders}
+          page={ordersPage}
+          pageSize={ordersView}
+        />
+      )}
     </div>
   );
-} 
+}

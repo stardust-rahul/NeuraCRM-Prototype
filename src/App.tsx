@@ -41,6 +41,7 @@ import Pricing from "./pages/Pricing";
 import Opportunities from "./pages/Opportunities";
 import OpportunityDetail from "./pages/OpportunityDetail";
 import { OpportunitiesProvider } from "./context/OpportunitiesContext";
+import { OrdersProvider } from "./context/OrdersContext";
 import Quotes from "./pages/Quotes";
 import QuoteDetail from "./pages/QuoteDetail";
 import Orders from "./pages/Orders";
@@ -57,7 +58,8 @@ const App = () => (
         <ContactsProvider>
       <LeadsProvider>
       <OpportunitiesProvider>
-        <BrowserRouter>
+        <OrdersProvider>
+          <BrowserRouter>
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
@@ -100,6 +102,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        </OrdersProvider>
       </OpportunitiesProvider>
       </LeadsProvider>
         </ContactsProvider>
