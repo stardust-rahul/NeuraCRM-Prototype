@@ -8,6 +8,10 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { MoreHorizontal, Eye, Edit, Trash, Plus, Search, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import OrdersTableView from "@/modules/OrdersTableView";
+import OrdersKanbanView from "@/modules/OrdersKanbanView";
+import OrdersChartView from "@/modules/OrdersChartView";
+import OrdersTimelineView from "@/modules/OrdersTimelineView";
+import OrdersSplitView from "@/modules/OrdersSplitView";
 
 export default function Orders() {
   const { orders } = useOrders();
@@ -20,6 +24,14 @@ export default function Orders() {
   const filteredOrders = orders.filter(o => !orderSearch || o.customer.toLowerCase().includes(orderSearch.toLowerCase()));
 
   const [viewMode, setViewMode] = useState('card');
+  const viewOptions = [
+    { key: 'card', label: 'Cards' },
+    { key: 'table', label: 'Table' },
+    { key: 'kanban', label: 'Kanban' },
+    { key: 'chart', label: 'Chart' },
+    { key: 'timeline', label: 'Timeline' },
+    { key: 'split', label: 'Split' },
+  ];
 
   return (
     <div className="space-y-6">
@@ -30,22 +42,17 @@ export default function Orders() {
         <div className="flex items-center space-x-2">
           {/* View Switch */}
           <div className="flex items-center bg-gray-100 rounded-lg p-1 mr-2">
-            <button
-              className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors ${viewMode === 'card' ? 'bg-blue-700 text-white' : 'text-blue-700 hover:bg-blue-200'}`}
-              onClick={() => setViewMode('card')}
-              style={{outline: 'none', border: 'none'}}
-              type="button"
-            >
-              Cards
-            </button>
-            <button
-              className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors ${viewMode === 'table' ? 'bg-blue-700 text-white' : 'text-blue-700 hover:bg-blue-200'}`}
-              onClick={() => setViewMode('table')}
-              style={{outline: 'none', border: 'none'}}
-              type="button"
-            >
-              Table
-            </button>
+            {viewOptions.map(opt => (
+              <button
+                key={opt.key}
+                className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors ${viewMode === opt.key ? 'bg-blue-700 text-white' : 'text-blue-700 hover:bg-blue-200'}`}
+                onClick={() => setViewMode(opt.key)}
+                style={{outline: 'none', border: 'none'}}
+                type="button"
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
           <label className="text-sm text-muted-foreground">View</label>
           <select className="border rounded px-2 py-1 text-sm" value={ordersView} onChange={e => { setOrdersView(Number(e.target.value)); setOrdersPage(1); }}>
@@ -71,7 +78,7 @@ export default function Orders() {
         </div>
       </div>
       {/* Orders View Switchable */}
-      {viewMode === 'card' ? (
+      {viewMode === 'card' && (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
             {filteredOrders.slice((ordersPage-1)*ordersView, ordersPage*ordersView).map((order, idx) => (
@@ -114,7 +121,8 @@ export default function Orders() {
             <Plus className="w-5 h-5" />
           </button>
         </>
-      ) : (
+      )}
+      {viewMode === 'table' && (
         <OrdersTableView
           orders={filteredOrders}
           selectedOrders={selectedOrders}
@@ -122,6 +130,18 @@ export default function Orders() {
           page={ordersPage}
           pageSize={ordersView}
         />
+      )}
+      {viewMode === 'kanban' && (
+        <OrdersKanbanView orders={filteredOrders} />
+      )}
+      {viewMode === 'chart' && (
+        <OrdersChartView orders={filteredOrders} />
+      )}
+      {viewMode === 'timeline' && (
+        <OrdersTimelineView orders={filteredOrders} />
+      )}
+      {viewMode === 'split' && (
+        <OrdersSplitView orders={filteredOrders} />
       )}
     </div>
   );
