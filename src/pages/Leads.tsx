@@ -25,6 +25,32 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import LeadsList from "@/components/LeadsList";
 
+const CONTACT_SUGGESTIONS = [
+  "Ankit", "Rahul", "Deepak", "Vishal", "John Smith", "Goyal Kumar", "Nidhi Sharma", "Emily Davis",
+  "Priya Patel", "Amit Singh", "Samantha Lee", "Michael Brown", "Olivia Wilson", "Sophia Martinez", "Liam Johnson",
+  "Noah Anderson", "Mia Thomas", "Lucas White", "Emma Harris", "Benjamin Clark", "Ava Lewis", "Elijah Walker",
+  "Charlotte Hall", "James Allen", "Amelia Young", "Logan King", "Harper Wright", "Alexander Scott", "Ella Green",
+  "Daniel Adams", "Grace Baker", "Matthew Nelson", "Chloe Carter", "Henry Mitchell", "Zoe Perez", "Sebastian Roberts",
+  "Layla Turner", "David Phillips", "Lily Campbell", "Jackson Parker", "Scarlett Evans", "Jack Edwards", "Aria Collins",
+  "Owen Stewart", "Penelope Morris", "Gabriel Rogers", "Riley Cook", "Julian Morgan", "Nora Reed", "Levi Bailey"
+];
+
+const COMPANY_SUGGESTIONS = [
+  "Acme Corp", "Amazon", "Ralakde", "RLK", "Google", "Microsoft", "Apple", "Tesla", "Meta", "Netflix",
+  "Walmart", "Target", "IBM", "Oracle", "Salesforce", "Adobe", "Intel", "Cisco", "Uber", "Airbnb",
+  "Spotify", "Shopify", "Zoom", "Dropbox", "Slack", "Twitter", "LinkedIn", "PayPal", "eBay", "Dell",
+  "HP", "Lenovo", "Samsung", "Sony", "Panasonic", "Philips", "Siemens", "Nokia", "Tata", "Infosys",
+  "Reliance", "Flipkart", "Snapdeal", "Ola", "Swiggy", "Zomato", "BYJU'S", "Unacademy", "Freshworks", "Zoho"
+];
+
+const OPPORTUNITY_SUGGESTIONS = [
+  "Iphone", "Macbook", "Ipad", "Apple Watch", "AirPods", "Galaxy S23", "Pixel 8", "Surface Pro", "ThinkPad X1", "Dell XPS",
+  "HP Spectre", "Lenovo Yoga", "Asus Zenbook", "Razer Blade", "Alienware Aurora", "PlayStation 5", "Xbox Series X", "Nintendo Switch", "GoPro Hero", "Canon EOS",
+  "Nikon D850", "Sony A7", "DJI Mavic", "Bose QC45", "Jabra Elite", "Fitbit Versa", "Garmin Fenix", "Oculus Quest", "Valve Index", "Kindle Oasis",
+  "Fire TV", "Echo Dot", "Nest Hub", "Ring Doorbell", "Roku Ultra", "Sonos One", "Tile Pro", "Wyze Cam", "Philips Hue", "Arlo Pro",
+  "Logitech MX", "Corsair K95", "SteelSeries Rival", "WD My Passport", "Seagate Backup Plus", "Sandisk Extreme", "Crucial MX500", "Samsung T7", "Kingston A2000", "HyperX Cloud"
+];
+
 function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus }) {
   const stages = ["New", "Contacted", "Nurturing", "Unqualified", "Converted"];
   const currentIdx = stages.findIndex(
@@ -269,6 +295,22 @@ export default function Leads() {
     }
   }, [showConvertModal, selectedLead]);
 
+  // Add inside the Leads component, near other useState hooks
+  const [contactSearch, setContactSearch] = useState("");
+  const filteredContactSuggestions = CONTACT_SUGGESTIONS.filter(name =>
+    name.toLowerCase().includes(contactSearch.toLowerCase())
+  );
+
+  const [accountSearch, setAccountSearch] = useState("");
+  const filteredAccountSuggestions = COMPANY_SUGGESTIONS.filter(name =>
+    name.toLowerCase().includes(accountSearch.toLowerCase())
+  );
+
+  const [opportunitySearch, setOpportunitySearch] = useState("");
+  const filteredOpportunitySuggestions = OPPORTUNITY_SUGGESTIONS.filter(name =>
+    name.toLowerCase().includes(opportunitySearch.toLowerCase())
+  );
+
   // If a lead is selected, show the detail view
   if (selectedLead) {
     // Use localStatus if set, else selectedLead.status
@@ -315,9 +357,35 @@ export default function Leads() {
                           <input type="radio" name="contactType" checked={convertForm.contactType === 'existing'} onChange={() => setConvertForm(f => ({ ...f, contactType: 'existing' }))} />
                           <span className="font-semibold">Choose Existing Contact</span>
                         </label>
-                        <div className="bg-white border rounded-lg p-4 mt-2">
-                          <label className="block text-xs font-semibold mb-1">0 Contact Matches detected</label>
-                          <input className="w-full border rounded px-3 py-2" disabled />
+                        <div className="bg-white border rounded-lg p-4 mt-2 relative">
+                          <label className="block text-xs font-semibold mb-1">Contact Search</label>
+                          <div className="flex items-center border rounded px-2">
+                            <input
+                              className="flex-1 py-2 outline-none"
+                              placeholder="Search for matching contacts"
+                              value={contactSearch}
+                              onChange={e => setContactSearch(e.target.value)}
+                              onFocus={() => setConvertForm(f => ({ ...f, contactType: 'existing' }))}
+                            />
+                            <Search className="w-4 h-4 text-gray-400" />
+                          </div>
+                          {/* Suggestions dropdown */}
+                          {contactSearch && filteredContactSuggestions.length > 0 && (
+                            <ul className="absolute z-10 left-0 right-0 bg-white border rounded shadow mt-1 max-h-40 overflow-y-auto">
+                              {filteredContactSuggestions.map((name, idx) => (
+                                <li
+                                  key={name}
+                                  className="px-4 py-2 cursor-pointer hover:bg-blue-100 text-sm"
+                                  onClick={() => {
+                                    setConvertForm(f => ({ ...f, contactType: 'existing', contactName: name }));
+                                    setContactSearch(name);
+                                  }}
+                                >
+                                  {name}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -336,7 +404,6 @@ export default function Leads() {
                           <span className="font-semibold">Create New Account</span>
                         </label>
                         <div className="bg-white border rounded-lg p-4 mt-2">
-                          <label className="block text-xs font-semibold mb-1 text-red-600">* Account Name</label>
                           <input className="w-full border rounded px-3 py-2" value={convertForm.accountName} onChange={e => setConvertForm(f => ({ ...f, accountName: e.target.value }))} required />
                         </div>
                       </div>
@@ -346,13 +413,35 @@ export default function Leads() {
                           <input type="radio" name="accountType" checked={convertForm.accountType === 'existing'} onChange={() => setConvertForm(f => ({ ...f, accountType: 'existing' }))} />
                           <span className="font-semibold">Choose Existing Account</span>
                         </label>
-                        <div className="bg-white border rounded-lg p-4 mt-2">
+                        <div className="bg-white border rounded-lg p-4 mt-2 relative">
                           <label className="block text-xs font-semibold mb-1">Account Search</label>
                           <div className="flex items-center border rounded px-2">
-                            <input className="flex-1 py-2 outline-none" placeholder="Search for matching accounts" />
+                            <input
+                              className="flex-1 py-2 outline-none"
+                              placeholder="Search for matching accounts"
+                              value={accountSearch}
+                              onChange={e => setAccountSearch(e.target.value)}
+                              onFocus={() => setConvertForm(f => ({ ...f, accountType: 'existing' }))}
+                            />
                             <Search className="w-4 h-4 text-gray-400" />
                           </div>
-                          <div className="border rounded mt-2 p-2 text-xs text-gray-500 h-16">0 Account Matches</div>
+                          {/* Suggestions dropdown */}
+                          {accountSearch && filteredAccountSuggestions.length > 0 && (
+                            <ul className="absolute z-10 left-0 right-0 bg-white border rounded shadow mt-1 max-h-40 overflow-y-auto">
+                              {filteredAccountSuggestions.map((name, idx) => (
+                                <li
+                                  key={name}
+                                  className="px-4 py-2 cursor-pointer hover:bg-blue-100 text-sm"
+                                  onClick={() => {
+                                    setConvertForm(f => ({ ...f, accountType: 'existing', accountName: name }));
+                                    setAccountSearch(name);
+                                  }}
+                                >
+                                  {name}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -384,9 +473,35 @@ export default function Leads() {
                           <input type="radio" name="opportunityType" checked={convertForm.opportunityType === 'existing'} onChange={() => setConvertForm(f => ({ ...f, opportunityType: 'existing' }))} />
                           <span className="font-semibold">Choose Existing Opportunity</span>
                         </label>
-                        <div className="bg-white border rounded-lg p-4 mt-2">
-                          <label className="block text-xs font-semibold mb-1">To find opportunity, choose an existing account</label>
-                          <input className="w-full border rounded px-3 py-2" disabled />
+                        <div className="bg-white border rounded-lg p-4 mt-2 relative">
+                          <label className="block text-xs font-semibold mb-1">Opportunity Search</label>
+                          <div className="flex items-center border rounded px-2">
+                            <input
+                              className="flex-1 py-2 outline-none"
+                              placeholder="Search for matching opportunities"
+                              value={opportunitySearch}
+                              onChange={e => setOpportunitySearch(e.target.value)}
+                              onFocus={() => setConvertForm(f => ({ ...f, opportunityType: 'existing' }))}
+                            />
+                            <Search className="w-4 h-4 text-gray-400" />
+                          </div>
+                          {/* Suggestions dropdown */}
+                          {opportunitySearch && filteredOpportunitySuggestions.length > 0 && (
+                            <ul className="absolute z-10 left-0 right-0 bg-white border rounded shadow mt-1 max-h-40 overflow-y-auto">
+                              {filteredOpportunitySuggestions.map((name, idx) => (
+                                <li
+                                  key={name}
+                                  className="px-4 py-2 cursor-pointer hover:bg-blue-100 text-sm"
+                                  onClick={() => {
+                                    setConvertForm(f => ({ ...f, opportunityType: 'existing', opportunityName: name }));
+                                    setOpportunitySearch(name);
+                                  }}
+                                >
+                                  {name}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
                         </div>
                       </div>
                     </div>
