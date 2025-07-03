@@ -54,11 +54,11 @@ const OPPORTUNITY_SUGGESTIONS = [
 
 function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus }) {
   const stages = [
-    "Qualification",
-    "Proposal",
-    "Negotiation",
-    "Closed Won",
-    "Closed Lost",
+    "New",
+    "Contacted",
+    "Nurturing",
+    "Unqualified",
+    "Converted",
   ];
   const currentIdx = stages.findIndex(
     (s) => s.toLowerCase() === (currentStage?.toLowerCase() || "qualification")
@@ -427,6 +427,10 @@ export default function Leads() {
     setAttachments((prev) => [...prev, ...files]);
   };
 
+  // Add state for the notification
+  const [markedStage, setMarkedStage] = useState(null);
+  const [showMarkedMsg, setShowMarkedMsg] = useState(false);
+
   // If a lead is selected, show the detail view
   if (selectedLead) {
     // Use localStatus if set, else selectedLead.status
@@ -440,7 +444,12 @@ export default function Leads() {
         {/* Pipeline/Progress Bar */}
         <LeadPipeline
           currentStage={statusToShow}
-          onStageChange={(stage) => setLocalStatus(stage)}
+          onStageChange={(stage) => {
+            setLocalStatus(stage);
+            setMarkedStage(stage);
+            setShowMarkedMsg(true);
+            setTimeout(() => setShowMarkedMsg(false), 2000);
+          }}
           onSelectConvertedStatus={() => { setShowConvertModal(true); setConvertStep("form"); }}
         />
         {/* Convert Lead Modal */}
