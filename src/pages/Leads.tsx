@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
-import { Filter, Plus, Search, Eye, Edit, Phone, Mail, Calendar, MoreHorizontal, ArrowUpRight, Trash, ArrowLeft, MapPin, Globe, Building, User, DollarSign, Tag, Clock, FileText, Check, CheckCircle, Building2, Contact2, Crown, Pencil, X } from "lucide-react";
+import { Filter, Plus, Search, Eye, Edit, Phone, Mail, Calendar, MoreHorizontal, ArrowUpRight, Trash, ArrowLeft, MapPin, Globe, Building, User, DollarSign, Tag, Clock, FileText, Check, CheckCircle, Building2, Contact2, Crown, Pencil, X, ChevronDown, ChevronRight, UploadCloud } from "lucide-react";
 import { useLeads } from "@/context/LeadsContext";
 import { useAccounts } from "@/context/AccountsContext";
 import { useContacts } from "@/context/ContactsContext";
@@ -53,71 +53,52 @@ const OPPORTUNITY_SUGGESTIONS = [
 ];
 
 function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus }) {
-  const stages = ["New", "Contacted", "Nurturing", "Unqualified", "Converted"];
+  const stages = [
+    "Qualification",
+    "Proposal",
+    "Negotiation",
+    "Closed Won",
+    "Closed Lost",
+  ];
   const currentIdx = stages.findIndex(
-    (s) => s.toLowerCase() === (currentStage?.toLowerCase() || "new")
+    (s) => s.toLowerCase() === (currentStage?.toLowerCase() || "qualification")
   );
-  // Add state for success message
-  const [markMessage, setMarkMessage] = useState("");
-  useEffect(() => {
-    if (markMessage) {
-      const timer = setTimeout(() => setMarkMessage(""), 2500);
-      return () => clearTimeout(timer);
-    }
-  }, [markMessage]);
-  // Handler to wrap onStageChange and show message
-  const handleStageClick = (stage) => {
-    onStageChange(stage);
-    setMarkMessage(`Marked as ${stage}`);
-  };
+  // Arrow SVG dimensions
+  const width = 180;
+  const height = 44;
   return (
-    <div className="w-full flex flex-row items-center justify-center px-2 sm:px-8 pt-6 pb-2 relative gap-2">
-      {/* Success message at top right */}
-      {markMessage && (
-        <div className="fixed right-6 top-4 bg-green-100 text-green-700 px-4 py-2 rounded shadow flex items-center gap-2 z-50 text-sm font-semibold">
-          <span className="text-green-600 text-lg">&#10003;</span> {markMessage.replace(/^\u2713\s*/, "")}
-        </div>
-      )}
-      <div className="flex-1 flex items-center w-full flex-nowrap overflow-x-visible">
+    <div className="w-full flex flex-row items-center justify-center px-2 sm:px-8 pt-6 pb-2">
+      <div className="flex-1 flex items-center w-full flex-nowrap overflow-x-auto bg-white border rounded-lg min-h-[54px]">
         {stages.map((stage, idx) => {
           const isCompleted = idx < currentIdx;
           const isCurrent = idx === currentIdx;
-          const isFuture = idx > currentIdx;
-          let base = "flex-1 flex items-center min-w-[240px] max-w-full";
-          // Arrow SVG dimensions
-          const width = 240;
-          const height = 48;
           // Arrow points for SVG
           let points =
             idx === 0
-              ? `0,0 ${width-18},0 ${width},${height/2} ${width-18},${height} 0,${height} 18,${height/2}`
+              ? `8,0 ${width-18},0 ${width},${height/2} ${width-18},${height} 8,${height} 0,${height/2}`
               : `0,0 ${width-18},0 ${width},${height/2} ${width-18},${height} 0,${height} 18,${height/2}`;
           // Fill and text color logic
           let fill = isCompleted
-            ? "#8850f9"
+            ? "#e7f0fd"
             : isCurrent
-            ? "#f3edfd"
-            : "#e5e7eb";
-          let textColor = isCompleted
-            ? "#fff"
-            : isCurrent
-            ? "#8850f9"
-            : "#374151";
-          let border = "#8850f9";
+            ? "#2563eb"
+            : "#f8fafc";
+          let textColor = isCurrent ? "#fff" : isCompleted ? "#2563eb" : "#334155";
+          let fontWeight = isCurrent ? "bold" : "normal";
           return (
-            <div key={stage} className={base} style={{ position: 'relative', marginRight: 0 }}>
+            <div key={stage} style={{ minWidth: width, maxWidth: width, position: 'relative', zIndex: isCurrent ? 2 : 1 }}>
               <svg
                 width={width}
                 height={height}
                 viewBox={`0 0 ${width} ${height}`}
-                style={{ display: 'block', cursor: 'pointer', minWidth: 240 }}
-                onClick={() => handleStageClick(stage)}
+                style={{ display: 'block', cursor: 'pointer', minWidth: width }}
+                onClick={() => onStageChange(stage)}
               >
                 <polygon
                   points={points}
                   fill={fill}
-                  stroke={border}
-                  strokeWidth={2}
+                  stroke="#e5e7eb"
+                  strokeWidth={1}
                   style={{ transition: 'fill 0.2s, stroke 0.2s' }}
                 />
                 <text
@@ -125,8 +106,8 @@ function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus }) 
                   y="50%"
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  fontWeight={isCurrent || isCompleted ? 'bold' : 'normal'}
-                  fontSize="18"
+                  fontWeight={fontWeight}
+                  fontSize="16"
                   fill={textColor}
                   style={{ pointerEvents: 'none', userSelect: 'none' }}
                 >
@@ -139,7 +120,7 @@ function LeadPipeline({ currentStage, onStageChange, onSelectConvertedStatus }) 
       </div>
       {currentIdx === stages.length - 1 && (
         <button
-          className="px-6 py-2 rounded-full bg-[#22c55e] text-white font-semibold flex items-center justify-center gap-2 hover:bg-[#16a34a] transition whitespace-nowrap shadow"
+          className="ml-4 px-6 py-2 rounded-full bg-[#22c55e] text-white font-semibold flex items-center gap-2 hover:bg-[#16a34a] transition whitespace-nowrap shadow"
           style={{ height: 44, fontSize: 16, minWidth: 0, alignSelf: 'center' }}
           onClick={onSelectConvertedStatus}
         >
@@ -395,11 +376,41 @@ export default function Leads() {
   // Add tagInput state at the top of the Leads component
   const [tagInput, setTagInput] = useState("");
 
+  // Add collapsedTiles state
+  const [collapsedTiles, setCollapsedTiles] = useState({});
+  const toggleTile = (key) => setCollapsedTiles(prev => ({ ...prev, [key]: !prev[key] }));
+
+  // Add at the top of the Leads component:
+  const [contactEditMode, setContactEditMode] = useState(false);
+  const [contactEditValues, setContactEditValues] = useState({
+    contact: selectedLead?.contact || selectedLead?.name || '',
+    title: selectedLead?.title || '',
+    email: selectedLead?.email || '',
+    phone: selectedLead?.phone || '',
+  });
+  useEffect(() => {
+    if (selectedLead) {
+      setContactEditValues({
+        contact: selectedLead.contact || selectedLead.name || '',
+        title: selectedLead.title || '',
+        email: selectedLead.email || '',
+        phone: selectedLead.phone || '',
+      });
+    }
+  }, [selectedLead]);
+
+  // Add state for attachments
+  const [attachments, setAttachments] = useState([]);
+  const handleAttachmentUpload = (e) => {
+    const files = Array.from(e.target.files);
+    setAttachments((prev) => [...prev, ...files]);
+  };
+
   // If a lead is selected, show the detail view
   if (selectedLead) {
     // Use localStatus if set, else selectedLead.status
     const statusToShow = localStatus || selectedLead.status;
-    return (
+  return (
       <div className="min-h-screen bg-background ">
         {/* Page Title at the Top Left */}
         <div className="w-full flex items-center px-2 sm:px-8 pt-6 pb-2">
@@ -413,7 +424,7 @@ export default function Leads() {
         />
         {/* Convert Lead Modal */}
         <Dialog open={showConvertModal} onOpenChange={setShowConvertModal}>
-          <DialogContent className="w-full max-w-screen-lg max-h-[calc(100vh-4rem)] overflow-y-auto p-0 mx-2 sm:mx-4 my-8 sm:my-10 rounded-lg">
+        <DialogContent className="w-full max-w-screen-lg max-h-[calc(100vh-4rem)] overflow-y-auto p-0 mx-2 sm:mx-4 my-8 sm:my-10 rounded-lg">
             {convertStep === "form" ? (
               <>
                 <DialogHeader className="px-8 pt-6 pb-2 mt-6">
@@ -718,353 +729,417 @@ export default function Leads() {
             <div className="lg:col-span-2 space-y-6">
               {/* Contact Information */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
+                <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('contact')}>
+                  <div className="flex items-center space-x-2">
                     <User className="w-5 h-5" />
                     <span>Contact Information</span>
-                  </CardTitle>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {!contactEditMode && (
+                      <Button size="sm" variant="outline" onClick={e => { e.stopPropagation(); setContactEditMode(true); }}>
+                        <Edit className="w-4 h-4 mr-1" /> Edit
+                      </Button>
+                    )}
+                    <Button size="icon" variant="ghost" tabIndex={-1} type="button">
+                      {collapsedTiles['contact'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </Button>
+                  </div>
                 </CardHeader>
+                {!collapsedTiles['contact'] && (
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
+                      {/* Full Name */}
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Full Name</Label>
-                      <div className="flex items-center gap-2">
-                        {editField === "contact" ? (
-                          <>
-                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
-                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("contact")}> <Check className="w-4 h-4" /> </Button>
-                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
-                          </>
-                        ) : (
-                          <>
-                            <p className="text-lg font-semibold">{selectedLead.contact || selectedLead.name}</p>
-                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("contact", selectedLead.contact || selectedLead.name)}> <Pencil className="w-4 h-4" /> </Button>
-                          </>
-                        )}
-                      </div>
+                        <div className="flex items-center gap-2">
+                          {contactEditMode ? (
+                            <Input value={contactEditValues.contact} onChange={e => setContactEditValues(v => ({ ...v, contact: e.target.value }))} className="w-auto" />
+                          ) : (
+                      <p className="text-lg font-semibold">{selectedLead.contact || selectedLead.name}</p>
+                          )}
                     </div>
+                      </div>
+                      {/* Title */}
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Title</Label>
-                      <div className="flex items-center gap-2">
-                        {editField === "title" ? (
-                          <>
-                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
-                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("title")}> <Check className="w-4 h-4" /> </Button>
-                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
-                          </>
-                        ) : (
-                          <>
-                            <p className="text-lg">{selectedLead.title}</p>
-                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("title", selectedLead.title)}> <Pencil className="w-4 h-4" /> </Button>
-                          </>
-                        )}
-                      </div>
+                        <div className="flex items-center gap-2">
+                          {contactEditMode ? (
+                            <Input value={contactEditValues.title} onChange={e => setContactEditValues(v => ({ ...v, title: e.target.value }))} className="w-auto" />
+                          ) : (
+                      <p className="text-lg">{selectedLead.title}</p>
+                          )}
                     </div>
+                      </div>
+                      {/* Email */}
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Email</Label>
-                      <div className="flex items-center gap-2">
-                        {editField === "email" ? (
-                          <>
-                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
-                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("email")}> <Check className="w-4 h-4" /> </Button>
-                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
-                          </>
-                        ) : (
-                          <>
-                            <div className="flex items-center space-x-2">
-                              <Mail className="w-4 h-4 text-muted-foreground" />
-                              <a href={`mailto:${selectedLead.email}`} className="text-blue-600 hover:underline">
-                                {selectedLead.email}
-                              </a>
-                            </div>
-                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("email", selectedLead.email)}> <Pencil className="w-4 h-4" /> </Button>
-                          </>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {contactEditMode ? (
+                            <Input value={contactEditValues.email} onChange={e => setContactEditValues(v => ({ ...v, email: e.target.value }))} className="w-auto" />
+                          ) : (
+                      <div className="flex items-center space-x-2">
+                        <Mail className="w-4 h-4 text-muted-foreground" />
+                        <a href={`mailto:${selectedLead.email}`} className="text-blue-600 hover:underline">
+                          {selectedLead.email}
+                        </a>
                       </div>
+                          )}
                     </div>
+                      </div>
+                      {/* Phone */}
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Phone</Label>
-                      <div className="flex items-center gap-2">
-                        {editField === "phone" ? (
-                          <>
-                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
-                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("phone")}> <Check className="w-4 h-4" /> </Button>
-                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
-                          </>
-                        ) : (
-                          <>
-                            <div className="flex items-center space-x-2">
-                              <Phone className="w-4 h-4 text-muted-foreground" />
-                              <a href={`tel:${selectedLead.phone}`} className="text-blue-600 hover:underline">
-                                {selectedLead.phone}
-                              </a>
-                            </div>
-                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("phone", selectedLead.phone)}> <Pencil className="w-4 h-4" /> </Button>
-                          </>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {contactEditMode ? (
+                            <Input value={contactEditValues.phone} onChange={e => setContactEditValues(v => ({ ...v, phone: e.target.value }))} className="w-auto" />
+                          ) : (
+                      <div className="flex items-center space-x-2">
+                        <Phone className="w-4 h-4 text-muted-foreground" />
+                        <a href={`tel:${selectedLead.phone}`} className="text-blue-600 hover:underline">
+                          {selectedLead.phone}
+                        </a>
                       </div>
+                          )}
                     </div>
                   </div>
+                    </div>
+                    {contactEditMode && (
+                      <div className="flex gap-2 justify-end mt-4">
+                        <Button size="sm" variant="outline" onClick={() => { setContactEditMode(false); setContactEditValues({ contact: selectedLead.contact || selectedLead.name || '', title: selectedLead.title || '', email: selectedLead.email || '', phone: selectedLead.phone || '' }); }}>Cancel</Button>
+                        <Button size="sm" onClick={() => {
+                          setSelectedLead(prev => ({ ...prev, contact: contactEditValues.contact, title: contactEditValues.title, email: contactEditValues.email, phone: contactEditValues.phone }));
+                          setContactEditMode(false);
+                        }}>Save</Button>
+                      </div>
+                    )}
                 </CardContent>
+                )}
               </Card>
 
               {/* Company Information */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
+                <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('company')}>
+                  <div className="flex items-center space-x-2">
                     <Building className="w-5 h-5" />
                     <span>Company Information</span>
-                  </CardTitle>
+                  </div>
+                  <Button size="icon" variant="ghost" tabIndex={-1} type="button">
+                    {collapsedTiles['company'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  </Button>
                 </CardHeader>
+                {!collapsedTiles['company'] && (
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Company Name</Label>
-                      <div className="flex items-center gap-2">
-                        {editField === "company" ? (
-                          <>
-                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
-                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("company")}> <Check className="w-4 h-4" /> </Button>
-                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
-                          </>
-                        ) : (
-                          <>
-                            <p className="text-lg font-semibold">{selectedLead.company}</p>
-                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("company", selectedLead.company)}> <Pencil className="w-4 h-4" /> </Button>
-                          </>
-                        )}
-                      </div>
+                        <div className="flex items-center gap-2">
+                          {editField === "company" ? (
+                            <>
+                              <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
+                              <Button size="icon" variant="ghost" onClick={() => handleEditSave("company")}> <Check className="w-4 h-4" /> </Button>
+                              <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                            </>
+                          ) : (
+                            <>
+                      <p className="text-lg font-semibold">{selectedLead.company}</p>
+                              <Button size="icon" variant="ghost" onClick={() => handleEditClick("company", selectedLead.company)}> <Pencil className="w-4 h-4" /> </Button>
+                            </>
+                          )}
+                        </div>
                     </div>
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Source</Label>
-                      <div className="flex items-center gap-2">
-                        {editField === "source" ? (
-                          <>
-                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
-                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("source")}> <Check className="w-4 h-4" /> </Button>
-                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
-                          </>
-                        ) : (
-                          <>
-                            <p className="text-lg capitalize">{selectedLead.source}</p>
-                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("source", selectedLead.source)}> <Pencil className="w-4 h-4" /> </Button>
-                          </>
-                        )}
-                      </div>
+                        <div className="flex items-center gap-2">
+                          {editField === "source" ? (
+                            <>
+                              <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
+                              <Button size="icon" variant="ghost" onClick={() => handleEditSave("source")}> <Check className="w-4 h-4" /> </Button>
+                              <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                            </>
+                          ) : (
+                            <>
+                      <p className="text-lg capitalize">{selectedLead.source}</p>
+                              <Button size="icon" variant="ghost" onClick={() => handleEditClick("source", selectedLead.source)}> <Pencil className="w-4 h-4" /> </Button>
+                            </>
+                          )}
+                        </div>
                     </div>
                   </div>
                 </CardContent>
+                )}
               </Card>
 
               {/* Deal Information */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
+                <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('deal')}>
+                  <div className="flex items-center space-x-2">
                     <DollarSign className="w-5 h-5" />
                     <span>Deal Information</span>
-                  </CardTitle>
+                  </div>
+                  <Button size="icon" variant="ghost" tabIndex={-1} type="button">
+                    {collapsedTiles['deal'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  </Button>
                 </CardHeader>
+                {!collapsedTiles['deal'] && (
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Deal Value</Label>
-                      <div className="flex items-center gap-2">
-                        {editField === "value" ? (
-                          <>
-                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
-                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("value")}> <Check className="w-4 h-4" /> </Button>
-                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
-                          </>
-                        ) : (
-                          <>
-                            <p className="text-lg font-semibold">{selectedLead.value || "$0"}</p>
-                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("value", selectedLead.value)}> <Pencil className="w-4 h-4" /> </Button>
-                          </>
-                        )}
-                      </div>
+                        <div className="flex items-center gap-2">
+                          {editField === "value" ? (
+                            <>
+                              <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
+                              <Button size="icon" variant="ghost" onClick={() => handleEditSave("value")}> <Check className="w-4 h-4" /> </Button>
+                              <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                            </>
+                          ) : (
+                            <>
+                      <p className="text-lg font-semibold">{selectedLead.value || "$0"}</p>
+                              <Button size="icon" variant="ghost" onClick={() => handleEditClick("value", selectedLead.value)}> <Pencil className="w-4 h-4" /> </Button>
+                            </>
+                          )}
+                        </div>
                     </div>
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Owner</Label>
-                      <div className="flex items-center gap-2">
-                        {editField === "owner" ? (
-                          <>
-                            <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
-                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("owner")}> <Check className="w-4 h-4" /> </Button>
-                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
-                          </>
-                        ) : (
-                          <>
-                            <p className="text-lg">{selectedLead.owner || "Unassigned"}</p>
-                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("owner", selectedLead.owner)}> <Pencil className="w-4 h-4" /> </Button>
-                          </>
-                        )}
-                      </div>
+                        <div className="flex items-center gap-2">
+                          {editField === "owner" ? (
+                            <>
+                              <Input value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto" />
+                              <Button size="icon" variant="ghost" onClick={() => handleEditSave("owner")}> <Check className="w-4 h-4" /> </Button>
+                              <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                            </>
+                          ) : (
+                            <>
+                      <p className="text-lg">{selectedLead.owner || "Unassigned"}</p>
+                              <Button size="icon" variant="ghost" onClick={() => handleEditClick("owner", selectedLead.owner)}> <Pencil className="w-4 h-4" /> </Button>
+                            </>
+                          )}
+                        </div>
                     </div>
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Priority</Label>
-                      <div className="flex items-center gap-2">
-                        {editField === "priority" ? (
-                          <>
-                            <select value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto">
-                              <option value="high">High</option>
-                              <option value="medium">Medium</option>
-                              <option value="low">Low</option>
-                            </select>
-                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("priority")}> <Check className="w-4 h-4" /> </Button>
-                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
-                          </>
-                        ) : (
-                          <>
-                            <Badge variant={selectedLead.priority === 'high' ? 'destructive' : selectedLead.priority === 'medium' ? 'secondary' : 'outline'}>
-                              {selectedLead.priority}
-                            </Badge>
-                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("priority", selectedLead.priority)}> <Pencil className="w-4 h-4" /> </Button>
-                          </>
-                        )}
-                      </div>
+                        <div className="flex items-center gap-2">
+                          {editField === "priority" ? (
+                            <>
+                              <select value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto">
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                              </select>
+                              <Button size="icon" variant="ghost" onClick={() => handleEditSave("priority")}> <Check className="w-4 h-4" /> </Button>
+                              <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                            </>
+                          ) : (
+                            <>
+                      <Badge variant={selectedLead.priority === 'high' ? 'destructive' : selectedLead.priority === 'medium' ? 'secondary' : 'outline'}>
+                        {selectedLead.priority}
+                      </Badge>
+                              <Button size="icon" variant="ghost" onClick={() => handleEditClick("priority", selectedLead.priority)}> <Pencil className="w-4 h-4" /> </Button>
+                            </>
+                          )}
+                        </div>
                     </div>
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Status</Label>
-                      <div className="flex items-center gap-2">
-                        {editField === "status" ? (
-                          <>
-                            <select value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto">
-                              <option value="qualified">Qualified</option>
-                              <option value="contacted">Contacted</option>
-                              <option value="new">New Lead</option>
-                            </select>
-                            <Button size="icon" variant="ghost" onClick={() => handleEditSave("status")}> <Check className="w-4 h-4" /> </Button>
-                            <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
-                          </>
-                        ) : (
-                          <>
-                            <Badge variant={selectedLead.status === 'qualified' ? 'default' : selectedLead.status === 'hot' ? 'secondary' : selectedLead.status === 'cold' ? 'destructive' : 'outline'}>
-                              {selectedLead.status}
-                            </Badge>
-                            <Button size="icon" variant="ghost" onClick={() => handleEditClick("status", selectedLead.status)}> <Pencil className="w-4 h-4" /> </Button>
-                          </>
-                        )}
-                      </div>
+                        <div className="flex items-center gap-2">
+                          {editField === "status" ? (
+                            <>
+                              <select value={editValue} onChange={e => setEditValue(e.target.value)} className="w-auto">
+                                <option value="qualified">Qualified</option>
+                                <option value="contacted">Contacted</option>
+                                <option value="new">New Lead</option>
+                              </select>
+                              <Button size="icon" variant="ghost" onClick={() => handleEditSave("status")}> <Check className="w-4 h-4" /> </Button>
+                              <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                            </>
+                          ) : (
+                            <>
+                      <Badge variant={selectedLead.status === 'qualified' ? 'default' : selectedLead.status === 'hot' ? 'secondary' : selectedLead.status === 'cold' ? 'destructive' : 'outline'}>
+                        {selectedLead.status}
+                      </Badge>
+                              <Button size="icon" variant="ghost" onClick={() => handleEditClick("status", selectedLead.status)}> <Pencil className="w-4 h-4" /> </Button>
+                            </>
+                          )}
+                        </div>
                     </div>
                   </div>
                 </CardContent>
+                )}
               </Card>
 
               {/* Notes */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
+                <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('notes')}>
+                  <div className="flex items-center space-x-2">
                     <FileText className="w-5 h-5" />
                     <span>Notes</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2">
-                    {editField === "notes" ? (
-                      <>
-                        <textarea value={editValue} onChange={e => setEditValue(e.target.value)} className="w-full" />
-                        <Button size="icon" variant="ghost" onClick={() => handleEditSave("notes")}> <Check className="w-4 h-4" /> </Button>
-                        <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-gray-700 leading-relaxed">{selectedLead.notes}</p>
-                        <Button size="icon" variant="ghost" onClick={() => handleEditClick("notes", selectedLead.notes)}> <Pencil className="w-4 h-4" /> </Button>
-                      </>
-                    )}
                   </div>
+                  <Button size="icon" variant="ghost" tabIndex={-1} type="button">
+                    {collapsedTiles['notes'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  </Button>
+                </CardHeader>
+                {!collapsedTiles['notes'] && (
+                <CardContent>
+                    <div className="flex items-center gap-2">
+                      {editField === "notes" ? (
+                        <>
+                          <textarea value={editValue} onChange={e => setEditValue(e.target.value)} className="w-full" />
+                          <Button size="icon" variant="ghost" onClick={() => handleEditSave("notes")}> <Check className="w-4 h-4" /> </Button>
+                          <Button size="icon" variant="ghost" onClick={handleEditCancel}> <X className="w-4 h-4" /> </Button>
+                        </>
+                      ) : (
+                        <>
+                  <p className="text-gray-700 leading-relaxed">{selectedLead.notes}</p>
+                          <Button size="icon" variant="ghost" onClick={() => handleEditClick("notes", selectedLead.notes)}> <Pencil className="w-4 h-4" /> </Button>
+                        </>
+                      )}
+                    </div>
                 </CardContent>
+                )}
               </Card>
 
-              {/* Tags (moved below Notes) */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Tag className="w-5 h-5" />
-                    <span>Tags</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {selectedLead.tags && typeof selectedLead.tags === 'string' && selectedLead.tags.trim()
-                      ? selectedLead.tags.split(',').map((tag, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">{tag.trim()}</Badge>
-                        ))
-                      : <p className="text-sm text-muted-foreground">No tags assigned</p>
-                    }
-                  </div>
-                  <form className="flex gap-2" onSubmit={e => {
-                    e.preventDefault();
-                    if (tagInput.trim()) {
-                      const newTags = selectedLead.tags ? selectedLead.tags + ',' + tagInput : tagInput;
-                      setSelectedLead(prev => ({ ...prev, tags: newTags }));
-                      setTagInput("");
-                    }
-                  }}>
-                    <Input
-                      value={tagInput}
-                      onChange={e => setTagInput(e.target.value)}
-                      placeholder="Add tag keyword..."
-                      className="w-auto flex-1"
-                    />
-                    <Button type="submit" size="sm">Add</Button>
-                  </form>
-                </CardContent>
-              </Card>
+              {/* Tags and Attachments */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Tags */}
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('tags')}>
+                    <div className="flex items-center space-x-2">
+                      <Tag className="w-5 h-5" />
+                      <span>Tags</span>
+                    </div>
+                    <Button size="icon" variant="ghost" tabIndex={-1} type="button">
+                      {collapsedTiles['tags'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </Button>
+                  </CardHeader>
+                  {!collapsedTiles['tags'] && (
+                    <CardContent>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {selectedLead.tags && typeof selectedLead.tags === 'string' && selectedLead.tags.trim()
+                          ? selectedLead.tags.split(',').map((tag, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">{tag.trim()}</Badge>
+                            ))
+                          : <p className="text-sm text-muted-foreground">No tags assigned</p>
+                        }
+                      </div>
+                      <form className="flex gap-2" onSubmit={e => {
+                        e.preventDefault();
+                        if (tagInput.trim()) {
+                          const newTags = selectedLead.tags ? selectedLead.tags + ',' + tagInput : tagInput;
+                          setSelectedLead(prev => ({ ...prev, tags: newTags }));
+                          setTagInput("");
+                        }
+                      }}>
+                        <Input
+                          value={tagInput}
+                          onChange={e => setTagInput(e.target.value)}
+                          placeholder="Add tag keyword..."
+                          className="w-auto flex-1"
+                        />
+                        <Button type="submit" size="sm">Add</Button>
+                      </form>
+                    </CardContent>
+                  )}
+                </Card>
+                {/* Attachments */}
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('attachments')}>
+                    <span className="font-semibold">Attachments</span>
+                    <Button size="icon" variant="ghost" tabIndex={-1} type="button">
+                      {collapsedTiles['attachments'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </Button>
+                  </CardHeader>
+                  {!collapsedTiles['attachments'] && (
+                    <CardContent>
+                      <div className="flex flex-col items-center justify-center min-h-[120px]">
+                        <label className="flex flex-col items-center gap-3 cursor-pointer">
+                          <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
+                          <Button variant="outline" className="flex items-center gap-3 px-8 py-4 text-lg" style={{ fontWeight: 500 }}>
+                            <UploadCloud className="w-8 h-8 text-blue-400 mr-2" />
+                            Upload File
+                          </Button>
+                        </label>
+                        {attachments.length > 0 && (
+                          <ul className="mt-4 space-y-1 text-base w-full max-w-xs">
+                            {attachments.map((file, idx) => (
+                              <li key={idx} className="truncate text-gray-700">{file.name}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </CardContent>
+                  )}
+                </Card>
+              </div>
             </div>
 
             {/* Sidebar */}
             <div className="lg:col-span-3 space-y-6">
               {/* Activity Centre */}
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('activity')}>
                   <CardTitle>Activity Centre</CardTitle>
+                  <Button size="icon" variant="ghost" tabIndex={-1} type="button">
+                    {collapsedTiles['activity'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  </Button>
                 </CardHeader>
-                <CardContent className="p-2">
-                  <ActivityCentre lead={selectedLead} />
-                </CardContent>
+                {!collapsedTiles['activity'] && (
+                  <CardContent className="p-2">
+                    <ActivityCentre lead={selectedLead} />
+                  </CardContent>
+                )}
               </Card>
 
               {/* Logs History */}
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('logs')}>
                   <CardTitle>Logs History</CardTitle>
+                  <Button size="icon" variant="ghost" tabIndex={-1} type="button">
+                    {collapsedTiles['logs'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  </Button>
                 </CardHeader>
+                {!collapsedTiles['logs'] && (
                 <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full text-sm border">
-                      <thead>
-                        <tr className="bg-gray-100">
-                          <th className="px-3 py-2 border">Date & Time</th>
-                          <th className="px-3 py-2 border">Owner Name</th>
-                          <th className="px-3 py-2 border">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {logs.map((log, idx) => (
-                          <tr key={idx}>
-                            <td className="px-3 py-2 border whitespace-nowrap">{log.datetime}</td>
-                            <td className="px-3 py-2 border whitespace-nowrap">{log.owner}</td>
-                            <td className="px-3 py-2 border">{log.action}</td>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm border">
+                        <thead>
+                          <tr className="bg-gray-100">
+                            <th className="px-3 py-2 border">Date & Time</th>
+                            <th className="px-3 py-2 border">Owner Name</th>
+                            <th className="px-3 py-2 border">Action</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {logs.map((log, idx) => (
+                            <tr key={idx}>
+                              <td className="px-3 py-2 border whitespace-nowrap">{log.datetime}</td>
+                              <td className="px-3 py-2 border whitespace-nowrap">{log.owner}</td>
+                              <td className="px-3 py-2 border">{log.action}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                 </CardContent>
+                )}
               </Card>
 
               {/* Lead Score */}
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleTile('score')}>
                   <CardTitle>Lead Score</CardTitle>
+                  <Button size="icon" variant="ghost" tabIndex={-1} type="button">
+                    {collapsedTiles['score'] ? <ChevronRight className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  </Button>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-600">{selectedLead.score}</div>
-                    <p className="text-sm text-muted-foreground">out of 100</p>
+                {!collapsedTiles['score'] && (
+                  <CardContent>
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-blue-600">{selectedLead.score}</div>
+                      <p className="text-sm text-muted-foreground">out of 100</p>
                   </div>
                 </CardContent>
+                )}
               </Card>
             </div>
           </div>
