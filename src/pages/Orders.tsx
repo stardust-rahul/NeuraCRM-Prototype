@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Eye, Edit, Trash, Plus, Search, Download } from "lucide-react";
-import { useOrders } from "@/context/OrdersContext";
 import { Input } from "@/components/ui/input";
 import OrdersTableView from "@/modules/OrdersTableView";
 import OrdersKanbanView from "@/modules/OrdersKanbanView";
